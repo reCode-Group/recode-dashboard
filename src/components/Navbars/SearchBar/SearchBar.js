@@ -1,0 +1,54 @@
+import { SearchIcon } from "@chakra-ui/icons";
+import {
+	IconButton,
+	Input,
+	InputGroup,
+	InputLeftElement,
+	useColorModeValue,
+} from "@chakra-ui/react";
+export function SearchBar(props) {
+  // Pass the computed styles into the `__css` prop
+  const { variant, children, ...rest } = props;
+  // Chakra Color Mode
+  const mainRecode = useColorModeValue("recode.300", "recode.300");
+  const searchIconColor = useColorModeValue("gray.700", "gray.200");
+  const inputBg = useColorModeValue("white", "gray.800");
+  return (
+    <InputGroup
+      bg={inputBg}
+      borderRadius="15px"
+      w="200px"
+      _focus={{
+        borderColor: { mainRecode },
+      }}
+      _active={{
+        borderColor: { mainRecode },
+      }}
+    >
+      <InputLeftElement
+        children={
+          <IconButton
+            bg="inherit"
+            borderRadius="inherit"
+            _hover="none"
+            _active={{
+              bg: "inherit",
+              transform: "none",
+              borderColor: "transparent",
+            }}
+            _focus={{
+              boxShadow: "none",
+            }}
+            icon={<SearchIcon color={searchIconColor} w="15px" h="15px" />}
+          ></IconButton>
+        }
+      />
+      <Input
+        fontSize="xs"
+        py="11px"
+        placeholder="Type here..."
+        borderRadius="inherit"
+      />
+    </InputGroup>
+  );
+}
