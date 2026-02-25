@@ -27,7 +27,6 @@ const Header = ({
     <Box
       mb={{ sm: "205px", md: "75px", xl: "70px" }}
       borderRadius='15px'
-      px='0px'
       display='flex'
       flexDirection='column'
       justifyContent='center'
@@ -93,6 +92,7 @@ const Header = ({
           </Flex>
           <Flex
             direction={{ sm: "column", lg: "row" }}
+						gap={{ sm: "8px", md: "10px", lg: "12px" }}
             w={{ sm: "100%", md: "50%", lg: "auto" }}  ml={{ sm: "20px", md: "30px", lg: "40px"  }}> 
             <Button p='0px' bg='transparent' _hover={{ bg: "none" }}>
               <Flex
@@ -101,7 +101,7 @@ const Header = ({
                 bg='hsla(0,0%,100%,.3)'
                 borderRadius='15px'
                 justifyContent='center'
-                py='10px'
+                py='12px'
                 boxShadow='inset 0 0 1px 1px hsl(0deg 0% 100% / 90%), 0 20px 27px 0 rgb(0 0 0 / 5%)'
                 border='1px solid gray.200'
                 cursor='pointer'>

@@ -83,7 +83,6 @@ export default function Dashboard(props) {
 		});
 	};
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	document.documentElement.dir = 'ltr';
 	// Chakra Color Mode
 	return (
 		<ChakraProvider theme={theme} resetCss={false}>

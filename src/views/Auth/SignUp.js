@@ -6,7 +6,6 @@ import {
 	FormControl,
 	FormLabel,
 	HStack,
-	Image,
 	Input,
 	Link,
 	Switch,
@@ -15,15 +14,15 @@ import {
 } from "@chakra-ui/react";
 // Assets
 import BgSignUp from "assets/img/BgSignUp.png";
-import gosuslugi_logo from "assets/svg/gosuslugi-logo.svg";
-import yandex_id_logo from "assets/svg/ya-id-logo.svg";
+import { SberIdIcon, YandexIdIcon } from "components/Icons/Icons";
 
 function SignUp() {
   const titleColor = useColorModeValue("recode.300", "recode.200");
   const textColor = useColorModeValue("gray.700", "white");
   const secondTextColor = useColorModeValue("gray.400", "white");
   const bgColor = useColorModeValue("white", "gray.700");
-  const bgIcons = useColorModeValue("gray.50", "rgba(255, 255, 255, 0.5)");
+  const bgIcons = useColorModeValue("gray.50", "rgba(255, 255, 255, 0.1)");
+  const iconColor = useColorModeValue("black", "lightgray");
   return (
     <Flex
       direction='column'
@@ -93,9 +92,10 @@ function SignUp() {
               border='1px solid lightgray'
               cursor='pointer'
               transition='all .25s ease'
-              _hover={{ bg: bgIcons }}>
-              <Link href='#' style={{ transform: "translateY(2px)" }} >
-								<Image width="100px" src={gosuslugi_logo} />
+              _hover={{ bg: bgIcons }}
+							>
+              <Link href='#' >
+								<SberIdIcon color={iconColor} w="105px" h="105px" />
               </Link>
             </Flex>
             <Flex
@@ -106,9 +106,10 @@ function SignUp() {
               border='1px solid lightgray'
               cursor='pointer'
               transition='all .25s ease'
-              _hover={{ bg: bgIcons }}>
-							<Link href='#' style={{ transform: "translateY(1px)" }}>
-								<Image width="100px" src={yandex_id_logo} />
+              _hover={{ bg: bgIcons }}
+							>
+							<Link href='#'>
+								<YandexIdIcon color={iconColor} w="100px" h="23px" />
 							</Link>
             </Flex>
           </HStack>

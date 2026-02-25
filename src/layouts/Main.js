@@ -11,7 +11,7 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import routes from 'routes.js';
 import theme from 'theme/theme.js';
 
-export default function Pages(props) {
+export default function MainPages(props) {
 	const { ...rest } = props;
 	// ref for the wrapper div
 	const wrapper = React.createRef();
@@ -59,6 +59,7 @@ export default function Pages(props) {
 		}
 		return activeNavbar;
 	};
+
 	const getRoutes = (routes) => {
 		return routes.map((prop, key) => {
 			if (prop.collapse) {
@@ -74,7 +75,9 @@ export default function Pages(props) {
 			}
 		});
 	};
+
 	const navRef = React.useRef();
+	
 	return (
 		<ChakraProvider theme={theme} resetCss={false} w='100%'>
 			<Box ref={navRef} w='100%'>

@@ -4,24 +4,23 @@ import {
 	Box,
 	Button,
 	Flex,
-	Image,
 	Link,
 	Stack,
 	Text,
 	useColorModeValue
 } from "@chakra-ui/react";
 import IconBox from "components/Icons/IconBox";
+import { RecodePlatformLogo } from "components/Icons/Icons";
 import { Separator } from "components/Separator/Separator";
 import { SidebarHelp } from "components/Sidebar/SidebarHelp";
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import logo from '../../assets/svg/recode-platform-logo.svg';
 // this function creates the links and collapses that appear in the sidebar (left menu)
 
 
 const SidebarContent = ({ logoText, routes }) => {
-
-    // to check for active links and opened collapses
+  const logoColor = useColorModeValue("black", "white");
+  // to check for active links and opened collapses
   let location = useLocation();
   // this is for the rest of the collapses
   const [state, setState] = React.useState({});
@@ -185,11 +184,12 @@ const SidebarContent = ({ logoText, routes }) => {
         alignItems="center"
         fontSize="11px"
       >
-				<Image 
+				<RecodePlatformLogo color={logoColor} w="100%" h="32px" />
+				{/* <Image 
 					src={logo}
 					alt="reCode Platform Logo"
 					width={2271}
-				/>
+				/> */}
       </Link>
       <Separator></Separator>
     </Box>
