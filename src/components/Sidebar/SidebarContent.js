@@ -59,9 +59,7 @@ const SidebarContent = ({ logoText, routes }) => {
               }}
               py="12px"
             >
-              {document.documentElement.dir === "rtl"
-                ? prop.rtlName
-                : prop.name}
+              {prop.name}
             </Text>
             {createLinks(prop.views)}
           </div>
@@ -113,9 +111,7 @@ const SidebarContent = ({ logoText, routes }) => {
                   </IconBox>
                 )}
                 <Text color={activeColor} my="auto" fontSize="sm">
-                  {document.documentElement.dir === "rtl"
-                    ? prop.rtlName
-                    : prop.name}
+                  {prop.name}
                 </Text>
               </Flex>
             </Button>
@@ -163,9 +159,7 @@ const SidebarContent = ({ logoText, routes }) => {
                   </IconBox>
                 )}
                 <Text color={inactiveColor} my="auto" fontSize="sm">
-                  {document.documentElement.dir === "rtl"
-                    ? prop.rtlName
-                    : prop.name}
+                  {prop.name}
                 </Text>
               </Flex>
             </Button>
