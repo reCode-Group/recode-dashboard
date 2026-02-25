@@ -109,7 +109,12 @@ export default function AuthNavbar(props) {
           color={navbarIcon}
           variant="transparent-with-icon"
         >
-          <Text>ПЕРЕВОДЧИК</Text>
+				<Text>
+					ПЕРЕВОДЧИК
+					<Text as="span" fontSize="8px" fw="bold" color={(props.secondary === true ? "white" : "recode.300")} verticalAlign="super" ml={0.5}>
+						Бета
+					</Text>
+				</Text>
         </Button>
       </NavLink>
       <NavLink to="/auth/signup">

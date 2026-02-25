@@ -1,13 +1,12 @@
 // Chakra imports
 import {
-  Avatar,
-  Box,
-  Button,
-  Flex,
-  Text,
-  useColorModeValue,
+	Avatar,
+	Box,
+	Button,
+	Flex,
+	Text,
+	useColorModeValue,
 } from "@chakra-ui/react";
-import React from "react";
 
 const Header = ({
   backgroundHeader,
@@ -48,7 +47,7 @@ const Header = ({
           mx='1.5rem'
           maxH='330px'
           w={{ sm: "90%", xl: "95%" }}
-          justifyContent={{ sm: "center", md: "space-between" }}
+          justifyContent={{ sm: "center", md: "flex-start" }}
           align='center'
           backdropFilter='saturate(200%) blur(50px)'
           position='absolute'
@@ -67,7 +66,7 @@ const Header = ({
             align='center'
             mb={{ sm: "10px", md: "0px" }}
             direction={{ sm: "column", md: "row" }}
-            w={{ sm: "100%" }}
+            w={{ xxl: "100%" }}
             textAlign={{ sm: "center", md: "start" }}>
             <Avatar
               me={{ md: "22px" }}
@@ -94,7 +93,7 @@ const Header = ({
           </Flex>
           <Flex
             direction={{ sm: "column", lg: "row" }}
-            w={{ sm: "100%", md: "50%", lg: "auto" }}>
+            w={{ sm: "100%", md: "50%", lg: "auto" }}  ml={{ sm: "20px", md: "30px", lg: "40px"  }}> 
             <Button p='0px' bg='transparent' _hover={{ bg: "none" }}>
               <Flex
                 align='center'

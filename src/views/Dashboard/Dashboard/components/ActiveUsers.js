@@ -4,13 +4,10 @@ import { Flex, SimpleGrid, Text, useColorModeValue } from "@chakra-ui/react";
 import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
 // Custom icons
+import { TokensRemainIcon } from "components/Icons/Icons";
 import {
-  CartIcon,
-  RocketIcon,
-  StatsIcon,
-  WalletIcon,
+	RocketIcon
 } from "components/Icons/Icons.js";
-import React from "react";
 import ChartStatistics from "./ChartStatistics";
 
 const ActiveUsers = ({ title, percentage, chart }) => {
@@ -30,35 +27,23 @@ const ActiveUsers = ({ title, percentage, chart }) => {
                 as='span'
                 color={percentage > 0 ? "green.400" : "red.400"}
                 fontWeight='bold'>
-                {percentage > 0 ? `+${percentage}%` : `-${percentage}%`}
+                {percentage > 0 ? `+${percentage}` : `-${percentage}`}
               </Text>{" "}
-              than last week
+              за эту неделю
             </Text>
           </Flex>
-          <SimpleGrid gap={{ sm: "12px" }} columns={4}>
+          <SimpleGrid gap={{ sm: "12px" }} columns={2}>
             <ChartStatistics
-              title={"Users"}
-              amount={"32,984"}
+              title={"Токенов осталось"}
+              amount={"92 984 / 200 000"}
               percentage={20}
-              icon={<WalletIcon h={"15px"} w={"15px"} color={iconBoxInside} />}
+              icon={<TokensRemainIcon h={"15px"} w={"15px"} color={iconBoxInside} />}
             />
             <ChartStatistics
-              title={"Clicks"}
-              amount={"2.42m"}
+              title={"Макросов переведено"}
+              amount={"8"}
               percentage={80}
               icon={<RocketIcon h={"15px"} w={"15px"} color={iconBoxInside} />}
-            />
-            <ChartStatistics
-              title={"Sales"}
-              amount={"2,400$"}
-              percentage={30}
-              icon={<CartIcon h={"15px"} w={"15px"} color={iconBoxInside} />}
-            />
-            <ChartStatistics
-              title={"Items"}
-              amount={"320"}
-              percentage={40}
-              icon={<StatsIcon h={"15px"} w={"15px"} color={iconBoxInside} />}
             />
           </SimpleGrid>
         </Flex>

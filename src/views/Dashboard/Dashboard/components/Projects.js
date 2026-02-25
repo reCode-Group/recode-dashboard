@@ -29,16 +29,16 @@ const Projects = ({ title, amount, captions, data }) => {
           <Flex align='center'>
             <Icon
               as={IoCheckmarkDoneCircleSharp}
-              color='recode.300'
+              color='green.400'
               w={4}
               h={4}
               pe='3px'
             />
             <Text fontSize='sm' color='gray.400' fontWeight='normal'>
               <Text fontWeight='bold' as='span'>
-                {amount} done
+                {amount} совершено
               </Text>{" "}
-              this month.
+              в этом месяце.
             </Text>
           </Flex>
         </Flex>
@@ -59,12 +59,13 @@ const Projects = ({ title, amount, captions, data }) => {
           {data.map((row) => {
             return (
               <DashboardTableRow
-                key={row.name}
-                name={row.name}
-                logo={row.logo}
-                members={row.members}
-                budget={row.budget}
-                progression={row.progression}
+                key={row.id}
+								id = {row.id}
+                type={row.type}
+                tokens_remain={row.tokens_remain}
+                result_url={row.result_url}
+                status={row.status}
+                date={row.date}
               />
             );
           })}

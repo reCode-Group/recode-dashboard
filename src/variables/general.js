@@ -1,13 +1,13 @@
 // Assets
 import avatar1 from "assets/img/avatars/avatar1.png";
 import avatar10 from "assets/img/avatars/avatar10.png";
-import avatar2 from "assets/img/avatars/avatar2.png";
+import { default as avatar2, default as avatar7 } from "assets/img/avatars/avatar2.png";
 import avatar3 from "assets/img/avatars/avatar3.png";
 import avatar4 from "assets/img/avatars/avatar4.png";
 import avatar5 from "assets/img/avatars/avatar5.png";
-import avatar7 from "assets/img/avatars/avatar7.png";
 import avatar8 from "assets/img/avatars/avatar8.png";
 import avatar9 from "assets/img/avatars/avatar9.png";
+import system_avatar from "assets/img/avatars/system.png";
 // Custom icons
 import {
 	AdobexdLogo,
@@ -31,46 +31,52 @@ import { SiDropbox } from "react-icons/si";
 
 export const dashboardTableData = [
   {
-    logo: AdobexdLogo,
-    name: "Purity UI Version",
-    members: [avatar1, avatar2, avatar3, avatar4, avatar5],
-    budget: "$14,000",
-    progression: 60,
+		id: 42342,
+		type: "VBA -> JS",
+    tokens_remain: 2090,
+		result_url: "https://recode-group.ru",
+    status: "Завершен",
+		date: "02.02.2023"
   },
   {
-    logo: AtlassianLogo,
-    name: "Add Progress Track",
-    members: [avatar3, avatar2],
-    budget: "$3,000",
-    progression: 10,
+		id: 65343,
+		type: "VBA -> JS",
+    tokens_remain: 2810,
+		result_url: "https://recode-group.ru",
+    status: "Завершен",
+		date: "02.02.2023"
   },
   {
-    logo: SlackLogo,
-    name: "Fix Platform Errors",
-    members: [avatar10, avatar4],
-    budget: "Not set",
-    progression: 100,
+		id: 21451,
+		type: "VBA -> JS",
+    tokens_remain: 2710,
+		result_url: "https://recode-group.ru",
+    status: "Завершен",
+		date: "02.02.2023"
   },
   {
-    logo: SpotifyLogo,
-    name: "Launch our Mobile App",
-    members: [avatar2, avatar3, avatar7, avatar8],
-    budget: "$32,000",
-    progression: 100,
+		id: 14342,
+		type: "VBA -> JS",
+    tokens_remain: 1250,
+		result_url: "https://recode-group.ru",
+    status: "Завершен",
+		date: "02.02.2023"
   },
   {
-    logo: JiraLogo,
-    name: "Add the New Pricing Page",
-    members: [avatar10, avatar3, avatar7, avatar2, avatar8],
-    budget: "$400",
-    progression: 25,
+		id: 73242,
+		type: "VBA -> JS",
+    tokens_remain: 8300,
+		result_url: "https://recode-group.ru",
+    status: "Завершен",
+		date: "02.02.2023"
   },
   {
-    logo: InvisionLogo,
-    name: "Redesign New Online Shop",
-    members: [avatar9, avatar3, avatar2],
-    budget: "$7,600",
-    progression: 40,
+		id: 23323,
+		type: "VBA -> JS",
+    tokens_remain: 4300,
+		result_url: "https://recode-group.ru",
+    status: "Завершен",
+		date: "02.02.2023"
   },
 ];
 
@@ -78,37 +84,37 @@ export const timelineData = [
   {
     logo: FaBell,
     title: "$2400, Design changes",
-    date: "22 DEC 7:20 PM",
+    date: "22 DEC 7:20 ",
     color: "recode.300",
   },
   {
     logo: FaHtml5,
     title: "New order #4219423",
-    date: "21 DEC 11:21 PM",
+    date: "21 DEC 11:21 ",
     color: "orange",
   },
   {
     logo: FaShoppingCart,
     title: "Server Payments for April",
-    date: "21 DEC 9:28 PM",
+    date: "21 DEC 9:28 ",
     color: "blue.400",
   },
   {
     logo: FaCreditCard,
     title: "New card added for order #3210145",
-    date: "20 DEC 3:52 PM",
+    date: "20 DEC 3:52 ",
     color: "orange.300",
   },
   {
     logo: SiDropbox,
-    title: "Unlock packages for Development",
-    date: "19 DEC 11:35 PM",
+    title: "Unlock packages for Develoent",
+    date: "19 DEC 11:35 ",
     color: "purple",
   },
   {
     logo: AdobexdLogo,
     title: "New order #9851258",
-    date: "18 DEC 4:41 PM",
+    date: "18 DEC 4:41 ",
   },
 ];
 export const rtlDashboardTableData = [
@@ -160,97 +166,96 @@ export const rtlTimelineData = [
   {
     logo: FaBell,
     title: "$2400, تغييرات في التصميم",
-    date: "22 DEC 7:20 PM",
+    date: "22 DEC 7:20 ",
     color: "recode.300",
   },
   {
     logo: FaHtml5,
     title: "طلب جديد #4219423",
-    date: "21 DEC 11:21 PM",
+    date: "21 DEC 11:21 ",
     color: "orange",
   },
   {
     logo: FaShoppingCart,
     title: "مدفوعات الخادم لشهر أبريل",
-    date: "21 DEC 9:28 PM",
+    date: "21 DEC 9:28 ",
     color: "blue.400",
   },
   {
     logo: FaCreditCard,
     title: "تمت إضافة بطاقة جديدة للطلب #3210145",
-    date: "20 DEC 3:52 PM",
+    date: "20 DEC 3:52 ",
     color: "orange.300",
   },
   {
     logo: SiDropbox,
     title: "فتح الحزم من أجل التنمية",
-    date: "19 DEC 11:35 PM",
+    date: "19 DEC 11:35 ",
     color: "purple",
   },
   {
     logo: AdobexdLogo,
     title: "طلب جديد #9851258",
-    date: "18 DEC 4:41 PM",
+    date: "18 DEC 4:41 ",
   },
 ];
 
 export const tablesTableData = [
   {
-    logo: avatar1,
-    name: "Esthera Jackson",
-    email: "alexa@simmmple.com",
-    subdomain: "Manager",
-    domain: "Organization",
-    status: "Online",
-    date: "14/06/21",
+    logo: system_avatar,
+    name: "Иван Петров",
+    email: "i.petrov@recode-group.ru",
+    subdomain: "Все права",
+    domain: "Администратор",
+    status: "Активен",
+    date: "6 500",
   },
   {
-    logo: avatar2,
-    name: "Alexa Liras",
-    email: "laurent@simmmple.com",
-    subdomain: "Programmer",
-    domain: "Developer",
-    status: "Offline",
-    date: "12/05/21",
+    logo: system_avatar,
+    name: "Анна Смирнова",
+    email: "a.smirnova@recode-group.ru",
+    subdomain: "Права ограничены",
+    domain: "Сотрудник",
+    status: "Активен",
+    date: "4 300",
   },
   {
-    logo: avatar3,
-    name: "Laurent Michael",
-    email: "laurent@simmmple.com",
-    subdomain: "Executive",
-    domain: "Projects",
-    status: "Online",
-    date: "07/06/21",
+    logo: system_avatar,
+    name: "Сергей Иванов",
+    email: "s.ivanov@recode-group.ru",
+    subdomain: "Права ограничены",
+    domain: "Сотрудник",
+    status: "Неактивен",
+    date: "2 100",
   },
   {
-    logo: avatar4,
-    name: "Freduardo Hill",
-    email: "freduardo@simmmple.com",
-    subdomain: "Manager",
-    domain: "Organization",
-    status: "Online",
-    date: "14/11/21",
+    logo: system_avatar,
+    name: "Елена Козлова",
+    email: "e.kozlova@recode-group.ru",
+    subdomain: "Все права",
+    domain: "Сотрудник",
+    status: "Активен",
+    date: "10 000",
   },
   {
-    logo: avatar5,
-    name: "Daniel Thomas",
-    email: "daniel@simmmple.com",
-    subdomain: "Programmer",
-    domain: "Developer",
-    status: "Offline",
-    date: "21/01/21",
+    logo: system_avatar,
+    name: "Дмитрий Новиков",
+    email: "d.novikov@recode-group.ru",
+    subdomain: "Права ограничены",
+    domain: "Сотрудник",
+    status: "Неактивен",
+    date: "10 000",
   },
   {
-    logo: avatar7,
-    name: "Mark Wilson",
-    email: "mark@simmmple.com",
-    subdomain: "Designer",
-    domain: "UI/UX Design",
-    status: "Offline",
-    date: "04/09/20",
+    logo: system_avatar,
+    name: "Ольга Морозова",
+    email: "o.morozova@recode-group.ru",
+    subdomain: "Права ограничены",
+    domain: "Сотрудник",
+    status: "Активен",
+    date: "1 000",
   },
 ];
-
 export const tablesProjectData = [
   {
     logo: AdobexdLogo,
@@ -291,37 +296,37 @@ export const tablesProjectData = [
 
 export const invoicesData = [
   {
-    date: "March, 01, 2020",
+    date: "Март, 01, 2020",
     code: "#MS-415646",
-    price: "$180",
+    price: "18 000",
     logo: FaFilePdf,
     format: "PDF",
   },
   {
-    date: "February, 10, 2020",
+    date: "Февраль, 10, 2020",
     code: "#RV-126749",
-    price: "$250",
+    price: "25 000",
     logo: FaFilePdf,
     format: "PDF",
   },
   {
-    date: "April, 05, 2020",
+    date: "Апрель, 05, 2020",
     code: "#FB-212562",
-    price: "$560",
+    price: "5 600",
     logo: FaFilePdf,
     format: "PDF",
   },
   {
-    date: "June, 25, 2019",
+    date: "Июнь, 25, 2019",
     code: "#QW-103578",
-    price: "$120",
+    price: "12 000",
     logo: FaFilePdf,
     format: "PDF",
   },
   {
-    date: "March, 01, 2019",
+    date: "Март, 01, 2019",
     code: "#AR-803481",
-    price: "$300",
+    price: "3 000",
     logo: FaFilePdf,
     format: "PDF",
   },
@@ -350,42 +355,42 @@ export const billingData = [
 
 export const newestTransactions = [
   {
-    name: "Netflix",
-    date: "27 March 2021, at 12:30 PM",
-    price: "- $2,500",
+    name: "Оплата тарифа",
+    date: "27 Март 2021, в 12:30 (МСК)",
+    price: "- 2 500 руб.",
     logo: FaArrowDown,
   },
   {
-    name: "Apple",
-    date: "27 March 2021, at 12:30 PM",
-    price: "+ $2,500",
+    name: "Зачисление на счет",
+    date: "27 Март 2021, в 12:30 (МСК)",
+    price: "+ 2 500 руб.",
     logo: FaArrowUp,
   },
 ];
 
 export const olderTransactions = [
   {
-    name: "Stripe",
-    date: "26 March 2021, at 13:45 PM",
-    price: "+ $800",
+    name: "Зачисление на счет",
+    date: "26 Март 2021, в 13:45 (МСК)",
+    price: "+ 800 руб.",
     logo: FaArrowUp,
   },
   {
-    name: "HubSpot",
-    date: "26 March 2021, at 12:30 PM",
-    price: "+ $1,700",
+    name: "Зачисление на счет",
+    date: "26 Март 2021, в 12:30 (МСК)",
+    price: "+ 1,700 руб.",
     logo: FaArrowUp,
   },
   {
-    name: "Webflow",
-    date: "26 March 2021, at 05:00 PM",
-    price: "Pending",
+    name: "Зачисление на счет",
+    date: "26 Март 2021, в 05:00 (МСК)",
+    price: "Обработка",
     logo: AiOutlineExclamation,
   },
   {
-    name: "Microsoft",
-    date: "25 March 2021, at 16:30 PM",
-    price: "- $987",
+    name: "Оплата тарифа",
+    date: "25 Март 2021, в 16:30 (МСК)",
+    price: "- 987 руб.",
     logo: FaArrowDown,
   },
 ];

@@ -5,7 +5,6 @@ import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
 import CardHeader from "components/Card/CardHeader.js";
 import TransactionRow from "components/Tables/TransactionRow";
-import React from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
 
 const Transactions = ({
@@ -18,7 +17,7 @@ const Transactions = ({
   const textColor = useColorModeValue("gray.700", "white");
 
   return (
-    <Card my='24px' ms={{ lg: "24px" }}>
+    <Card my='24px'>
       <CardHeader mb='12px'>
         <Flex direction='column' w='100%'>
           <Flex
@@ -53,7 +52,7 @@ const Transactions = ({
             fontSize={{ sm: "sm", md: "md" }}
             fontWeight='semibold'
             my='12px'>
-            NEWEST
+            ПОСЛЕДНИЕ
           </Text>
           {newestTransactions.map((row) => {
             return (
@@ -70,7 +69,7 @@ const Transactions = ({
             fontSize={{ sm: "sm", md: "md" }}
             fontWeight='semibold'
             my='12px'>
-            OLDER
+            РАНЕЕ
           </Text>
           {olderTransactions.map((row) => {
             return (

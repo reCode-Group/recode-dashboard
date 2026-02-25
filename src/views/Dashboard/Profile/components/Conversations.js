@@ -8,10 +8,8 @@ import {
 } from "@chakra-ui/react";
 // Assets
 import avatar2 from "assets/img/avatars/avatar2.png";
-import avatar3 from "assets/img/avatars/avatar3.png";
 import avatar4 from "assets/img/avatars/avatar4.png";
 import avatar5 from "assets/img/avatars/avatar5.png";
-import avatar6 from "assets/img/avatars/avatar6.png";
 // Custom components
 import Card from "components/Card/Card";
 import CardBody from "components/Card/CardBody";
@@ -41,38 +39,10 @@ const Conversations = ({ title }) => {
               />
               <Flex direction='column'>
                 <Text fontSize='sm' color={textColor} fontWeight='bold'>
-                  Sophie B.{" "}
+                  Помощник Андрей{" "}
                 </Text>
-                <Text fontSize='xs' color='gray.500' fontWeight='400'>
-                  Hi! I need more information...
-                </Text>
-              </Flex>
-            </Flex>
-            <Button p='0px' bg='transparent' variant='no-hover'>
-              <Text
-                fontSize='sm'
-                fontWeight='600'
-                color='recode.300'
-                alignSelf='center'>
-                REPLY
-              </Text>
-            </Button>
-          </Flex>
-          <Flex justifyContent='space-between' mb='21px'>
-            <Flex align='center'>
-              <Avatar
-                src={avatar3}
-                w='50px'
-                h='50px'
-                borderRadius='15px'
-                me='10px'
-              />
-              <Flex direction='column'>
-                <Text fontSize='sm' color={textColor} fontWeight='bold'>
-                  Sophie B.{" "}
-                </Text>
-                <Text fontSize='xs' color='gray.500' fontWeight='400'>
-                  Awesome work, can you change...
+                <Text fontSize='sm' color='gray.500' fontWeight='400'>
+                  Добрый день! Сейчас подскажу...
                 </Text>
               </Flex>
             </Flex>
@@ -82,7 +52,7 @@ const Conversations = ({ title }) => {
                 fontWeight='600'
                 color='recode.300'
                 alignSelf='center'>
-                REPLY
+                ОТВЕТИТЬ
               </Text>
             </Button>
           </Flex>
@@ -97,10 +67,10 @@ const Conversations = ({ title }) => {
               />
               <Flex direction='column'>
                 <Text fontSize='sm' color={textColor} fontWeight='bold'>
-                  Sophie B.{" "}
+                  Помощник Елена{" "}
                 </Text>
-                <Text fontSize='xs' color='gray.500' fontWeight='400'>
-                  Have a great afternoon...
+                <Text fontSize='sm' color='gray.500' fontWeight='400'>
+                  Отлично тогда могу закрыть тикет...
                 </Text>
               </Flex>
             </Flex>
@@ -110,7 +80,7 @@ const Conversations = ({ title }) => {
                 fontWeight='600'
                 color='recode.300'
                 alignSelf='center'>
-                REPLY
+                ОТВЕТИТЬ
               </Text>
             </Button>
           </Flex>
@@ -125,27 +95,28 @@ const Conversations = ({ title }) => {
               />
               <Flex direction='column'>
                 <Text fontSize='sm' color={textColor} fontWeight='bold'>
-                  Sophie B.{" "}
+                  Помощник Максим{" "}
                 </Text>
-                <Text fontSize='xs' color='gray.500' fontWeight='400'>
-                  About files I can...
+                <Text fontSize='sm' color='gray.500' fontWeight='400'>
+                  Этот тикет закрыт.
                 </Text>
               </Flex>
             </Flex>
+						
             <Button p='0px' bg='transparent' variant='no-hover'>
               <Text
                 fontSize='sm'
                 fontWeight='600'
-                color='recode.300'
+                color='gray.400'
                 alignSelf='center'>
-                REPLY
+                ЗАКРЫТ
               </Text>
             </Button>
           </Flex>
-          <Flex justifyContent='space-between' mb='21px'>
+					<Flex justifyContent='space-between' mb='6px'>
             <Flex align='center'>
               <Avatar
-                src={avatar6}
+                src={avatar5}
                 w='50px'
                 h='50px'
                 borderRadius='15px'
@@ -153,20 +124,21 @@ const Conversations = ({ title }) => {
               />
               <Flex direction='column'>
                 <Text fontSize='sm' color={textColor} fontWeight='bold'>
-                  Sophie B.{" "}
+                  Помощник Максим{" "}
                 </Text>
-                <Text fontSize='xs' color='gray.500' fontWeight='400'>
-                  About files I can...
+                <Text fontSize='sm' color='gray.500' fontWeight='400'>
+                  Этот тикет закрыт.
                 </Text>
               </Flex>
             </Flex>
+						
             <Button p='0px' bg='transparent' variant='no-hover'>
               <Text
                 fontSize='sm'
                 fontWeight='600'
-                color='recode.300'
+                color='gray.400'
                 alignSelf='center'>
-                REPLY
+                ЗАКРЫТ
               </Text>
             </Button>
           </Flex>

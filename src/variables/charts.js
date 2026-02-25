@@ -1,6 +1,6 @@
 export const barChartData = [
   {
-    name: "Sales",
+    name: "Токенов",
     data: [330, 250, 110, 300, 490, 350, 270, 130, 425],
   },
 ];
@@ -27,7 +27,7 @@ export const barChartOptions = {
     theme: "dark",
   },
   xaxis: {
-    categories: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    categories: ["Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
     show: false,
     labels: {
       show: false,
@@ -112,18 +112,18 @@ export const lineChartOptions = {
   xaxis: {
     type: "datetime",
     categories: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      "Янв",
+      "Фев",
+      "Мар",
+      "Апр",
+      "Май",
+      "Июн",
+      "Июл",
+      "Авг",
+      "Сен",
+      "Окт",
+      "Ноя",
+      "Дек",
     ],
     labels: {
       style: {

@@ -31,7 +31,7 @@ const PaymentMethod = ({ title, mastercard, visa }) => {
             {title}
           </Text>
           <Button bg={bgButton} color='white' fontSize='xs' variant='no-hover'>
-            ADD NEW CARD
+            ДОБАВИТЬ СПОСОБ ОПЛАТЫ
           </Button>
         </Flex>
       </CardHeader>

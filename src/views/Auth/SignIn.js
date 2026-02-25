@@ -47,7 +47,7 @@ function SignIn() {
               mb='36px'
               ms='4px'
               color={textColor}
-              fontWeight='bold'
+              fontWeight='medium'
               fontSize='14px'>
               Введите вашу почту и пароль для авторизации
             </Text>
@@ -107,7 +107,6 @@ function SignIn() {
             <Flex
               flexDirection='column'
               justifyContent='center'
-              alignItems='center'
               maxW='100%'
               mt='0px'>
               <Text color={textColor} fontWeight='medium'>

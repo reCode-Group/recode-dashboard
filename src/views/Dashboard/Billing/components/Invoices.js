@@ -26,7 +26,7 @@ const Invoices = ({ title, data }) => {
             variant='outline'
             fontSize='xs'
             p='8px 32px'>
-            VIEW ALL
+            СМОТРЕТЬ ВСЕ
           </Button>
         </Flex>
       </CardHeader>

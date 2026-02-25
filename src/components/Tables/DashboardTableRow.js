@@ -1,69 +1,67 @@
 import {
-	Avatar,
-	AvatarGroup,
-	Flex,
-	Icon,
-	Progress,
+	Button,
+	Link,
 	Td,
 	Text,
 	Tr,
-	useColorModeValue,
+	useColorModeValue
 } from "@chakra-ui/react";
 
 function DashboardTableRow(props) {
-  const { logo, name, members, budget, progression } = props;
+  const { id, type, tokens_remain, status, result_url, date } = props;
   const textColor = useColorModeValue("gray.700", "white");
+	let bgButton = "recode.300"
+	let colorButton = "white";
+
   return (
     <Tr>
-      <Td minWidth={{ sm: "250px" }} pl="0px">
-        <Flex align="center" py=".8rem" minWidth="100%" flexWrap="nowrap">
-          <Icon as={logo} h={"24px"} w={"24px"} pe="5px" />
-          <Text
-            fontSize="md"
-            color={textColor}
-            fontWeight="bold"
-            minWidth="100%"
-          >
-            {name}
-          </Text>
-        </Flex>
-      </Td>
-
       <Td>
-        <AvatarGroup size="sm">
-          {members.map((member) => {
-            return (
-              <Avatar
-                name="Ryan Florence"
-                key={member}
-                src={member}
-                _hover={{ zIndex: "3", cursor: "pointer" }}
-              />
-            );
-          })}
-        </AvatarGroup>
-      </Td>
-      <Td>
-        <Text fontSize="md" color={textColor} fontWeight="bold" pb=".5rem">
-          {budget}
+        <Text fontSize="md" color={textColor} fontWeight="bold" style={{ transform: "translateX(-22px)" }}>
+          RCD-{id}
         </Text>
       </Td>
-      <Td>
-        <Flex direction="column">
-          <Text
-            fontSize="md"
-            color="recode.300"
-            fontWeight="bold"
-            pb=".2rem"
-          >{`${progression}%`}</Text>
-          <Progress
-            colorScheme={progression === 100 ? "recode" : "cyan"}
-            size="xs"
-            value={progression}
-            borderRadius="15px"
-          />
-        </Flex>
+
+			<Td>
+        <Text fontSize="md" color={textColor} fontWeight="bold">
+          {type}
+        </Text>
       </Td>
+
+			<Td>
+        <Text fontSize="md" color={textColor} fontWeight="bold">
+          {status}
+        </Text>
+      </Td>
+
+			<Td>
+				<Link href={result_url}>
+          <Button
+            bg={bgButton}
+            color={colorButton}
+            fontSize="sm"
+						fontWeight="medium"
+            variant="no-hover"
+            borderRadius="8px"
+						size="sm"
+            px="30px"
+          >
+            Просмотреть код
+          </Button>
+        </Link>
+      </Td>
+
+			<Td>
+        <Text fontSize="md" color={textColor} fontWeight="bold">
+          {tokens_remain}
+        </Text>
+      </Td>
+
+			<Td>
+        <Text fontSize="md" color={textColor} fontWeight="bold">
+          {date}
+        </Text>
+      </Td>
+
     </Tr>
   );
 }

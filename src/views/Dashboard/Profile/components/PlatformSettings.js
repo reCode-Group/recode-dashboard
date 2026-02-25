@@ -21,21 +21,15 @@ const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
             {subtitle1}
           </Text>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='recode' me='10px' />
+            <Switch colorScheme='recode' me='10px' isChecked={true} />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
-              Email me when someone follows me
+              Получать письма о новой конвертации макроса
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='recode' me='10px' />
+            <Switch colorScheme='recode' me='10px' isChecked={true} />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
-              Email me when someone answers on my post
-            </Text>
-          </Flex>
-          <Flex align='center' mb='20px'>
-            <Switch colorScheme='recode' me='10px' />
-            <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
-              Email me when someone mentions me
+              Двух-факторная аутентификация
             </Text>
           </Flex>
           <Text
@@ -48,19 +42,13 @@ const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
           <Flex align='center' mb='20px'>
             <Switch colorScheme='recode' me='10px' />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
-              New launches and projects
+              Темная тема
             </Text>
           </Flex>
           <Flex align='center' mb='20px'>
-            <Switch colorScheme='recode' me='10px' />
+            <Switch colorScheme='recode' me='10px' isChecked={true} />
             <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
-              Monthly product changes
-            </Text>
-          </Flex>
-          <Flex align='center' mb='20px'>
-            <Switch colorScheme='recode' me='10px' />
-            <Text noOfLines={1} fontSize='md' color='gray.500' fontWeight='400'>
-              Subscribe to newsletter
+              Получать рассылку о новостях платформы
             </Text>
           </Flex>
         </Flex>

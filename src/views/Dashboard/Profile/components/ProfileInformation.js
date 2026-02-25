@@ -1,96 +1,79 @@
 // Chakra imports
-import { Flex, Icon, Link, Text, useColorModeValue } from "@chakra-ui/react";
+import { Flex, Text, useColorModeValue } from "@chakra-ui/react";
 // Custom components
 import Card from "components/Card/Card";
 import CardBody from "components/Card/CardBody";
 import CardHeader from "components/Card/CardHeader";
-import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
+import { Separator } from "components/Separator/Separator";
 
 const ProfileInformation = ({
   title,
-  description,
+  company,
+	role,
   name,
   mobile,
   email,
-  location,
+  // location,
 }) => {
   // Chakra color mode
-  const textColor = useColorModeValue("gray.700", "white");
+  const mainColor = useColorModeValue("gray.700", "white");
+  const textColor = useColorModeValue("gray.500", "white");
 
   return (
     <Card p='16px' my={{ sm: "24px", xl: "0px" }}>
       <CardHeader p='12px 5px' mb='12px'>
-        <Text fontSize='lg' color={textColor} fontWeight='bold'>
+        <Text fontSize='lg' color={mainColor} fontWeight='bold'>
           {title}
         </Text>
       </CardHeader>
       <CardBody px='5px'>
         <Flex direction='column'>
-          <Text fontSize='md' color='gray.500' fontWeight='400' mb='30px'>
+          {/* <Text fontSize='md' color='gray.500' fontWeight='400' mb='30px'>
             {description}
-          </Text>
+          </Text> */}
           <Flex align='center' mb='18px'>
-            <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Full Name:{" "}
+            <Text fontSize='sm' color={textColor} fontWeight='medium' me='10px'>
+              КОМПАНИЯ:{" "}
+            </Text>
+            <Text fontSize='md' color='gray.500' fontWeight='400'>
+              {company}
+            </Text>
+          </Flex>
+  				<Flex align='center' mb='18px'>
+            <Text fontSize='sm' color={textColor} fontWeight='medium' me='10px'>
+              РОЛЬ:{" "}
+            </Text>
+            <Text fontSize='md' color='gray.500' fontWeight='400'>
+              {role}
+            </Text>
+          </Flex>
+					
+					<Separator></Separator>
+
+  				<Flex align='center' my='18px'>
+            <Text fontSize='sm' color={textColor} fontWeight='medium' me='10px'>
+              ПОЛНОЕ ИМЯ:{" "}
             </Text>
             <Text fontSize='md' color='gray.500' fontWeight='400'>
               {name}
             </Text>
           </Flex>
+
           <Flex align='center' mb='18px'>
-            <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Mobile:{" "}
+            <Text fontSize='sm' color={textColor} fontWeight='medium' me='10px'>
+              ТЕЛЕФОН:{" "}
             </Text>
             <Text fontSize='md' color='gray.500' fontWeight='400'>
               {mobile}
             </Text>
           </Flex>
           <Flex align='center' mb='18px'>
-            <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Email:{" "}
+            <Text fontSize='sm' color={textColor} fontWeight='medium' me='10px'>
+              ПОЧТА:{" "}
             </Text>
             <Text fontSize='md' color='gray.500' fontWeight='400'>
               {email}
             </Text>
-          </Flex>
-          <Flex align='center' mb='18px'>
-            <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Location:{" "}
-            </Text>
-            <Text fontSize='md' color='gray.500' fontWeight='400'>
-              {location}
-            </Text>
-          </Flex>
-          <Flex align='center' mb='18px'>
-            <Text fontSize='md' color={textColor} fontWeight='bold' me='10px'>
-              Social Media:{" "}
-            </Text>
-            <Flex>
-              <Link
-                href='#'
-                color='recode.300'
-                fontSize='lg'
-                me='10px'
-                _hover={{ color: "recode.300" }}>
-                <Icon as={FaFacebook} />
-              </Link>
-              <Link
-                href='#'
-                color='recode.300'
-                fontSize='lg'
-                me='10px'
-                _hover={{ color: "recode.300" }}>
-                <Icon as={FaInstagram} />
-              </Link>
-              <Link
-                href='#'
-                color='recode.300'
-                fontSize='lg'
-                me='10px'
-                _hover={{ color: "recode.300" }}>
-                <Icon as={FaTwitter} />
-              </Link>
-            </Flex>
           </Flex>
         </Flex>
       </CardBody>

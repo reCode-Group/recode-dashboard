@@ -3,7 +3,6 @@ import { Box, Flex, Spacer, Text } from "@chakra-ui/react";
 // Custom components
 import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
-import React from "react";
 
 const CreditCard = ({
   backgroundImage,
@@ -30,28 +29,40 @@ const CreditCard = ({
           p='0px 10px 20px 10px'
           w='100%'>
           <Flex justify='space-between' align='center'>
-            <Text fontSize='md' fontWeight='bold'>
+            <Text fontSize='md' letterSpacing={0.5} fontWeight='bold'>
               {title}
             </Text>
-            {icon}
+						<Flex align='center'>
+							<Box 
+								style={{
+									borderRadius: '50%',
+									width: '14px',
+									height: '14px'
+								}}
+								m="10px"
+								bgColor="#48BB78"
+							></Box>
+							Активен
+						</Flex>
+            
           </Flex>
           <Spacer />
           <Flex direction='column'>
             <Box>
-              <Text fontSize='xl' letterSpacing='2px' fontWeight='bold'>
+              <Text fontSize='28px' letterSpacing='1px' fontWeight='medium'>
                 {number}
               </Text>
             </Box>
             <Flex mt='14px'>
               <Flex direction='column' me='34px'>
                 <Text fontSize='xs'>{validity.name}</Text>
-                <Text fontSize='xs' fontWeight='bold'>
-                  {validity.date}
+                <Text fontSize='sm' fontWeight='medium'>
+                  {validity.data}
                 </Text>
               </Flex>
               <Flex direction='column'>
                 <Text fontSize='xs'>{cvv.name}</Text>
-                <Text fontSize='xs' fontWeight='bold'>
+                <Text fontSize='sm' fontWeight='medium'>
                   {cvv.code}
                 </Text>
               </Flex>

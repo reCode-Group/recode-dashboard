@@ -3,16 +3,13 @@ import { Box, Flex, Grid, Icon } from "@chakra-ui/react";
 // Assets
 import BackgroundCard1 from "assets/img/BackgroundCard1.png";
 import { MastercardIcon, VisaIcon } from "components/Icons/Icons";
-import React from "react";
 import { FaPaypal, FaWallet } from "react-icons/fa";
 import { RiMastercardFill } from "react-icons/ri";
 import {
-  billingData,
-  invoicesData,
-  newestTransactions,
-  olderTransactions,
+	invoicesData,
+	newestTransactions,
+	olderTransactions
 } from "variables/general";
-import BillingInformation from "./components/BillingInformation";
 import CreditCard from "./components/CreditCard";
 import Invoices from "./components/Invoices";
 import PaymentMethod from "./components/PaymentMethod";
@@ -34,15 +31,15 @@ function Billing() {
             gap='26px'>
             <CreditCard
               backgroundImage={BackgroundCard1}
-              title={"Purity UI"}
-              number={"7812 2139 0823 XXXX"}
+              title={"Ваш тариф"}
+              number={"БАЗОВЫЙ"}
               validity={{
-                name: "VALID THRU",
-                data: "05/24",
+                name: "ДЕЙСТВИТЕЛЕН ДО",
+                data: "05/05/24",
               }}
               cvv={{
-                name: "CVV",
-                code: "09x",
+                name: "ОСТАТОК ТОКЕНОВ",
+                code: "1 100 / 10 000",
               }}
               icon={
                 <Icon
@@ -55,19 +52,19 @@ function Billing() {
             />
             <PaymentStatistics
               icon={<Icon h={"24px"} w={"24px"} color='white' as={FaWallet} />}
-              title={"Salary"}
-              description={"Belong interactive"}
+              title={"Баланс"}
+              description={"Остаток на счете"}
               amount={2000}
             />
             <PaymentStatistics
               icon={<Icon h={"24px"} w={"24px"} color='white' as={FaPaypal} />}
-              title={"Paypal"}
-              description={"Freelance Payment"}
+              title={"Заблокированная сумма на услуги"}
+              description={""}
               amount={4550}
             />
           </Grid>
           <PaymentMethod
-            title={"Payment Method"}
+            title={"Способы оплаты"}
             mastercard={{
               icon: <MastercardIcon w='100%' h='100%' />,
               number: "7812 2139 0823 XXXX",
@@ -78,16 +75,16 @@ function Billing() {
             }}
           />
         </Box>
-        <Invoices title={"Invoices"} data={invoicesData} />
+        <Invoices title={"Отчеты"} data={invoicesData} />
       </Grid>
       <Grid templateColumns={{ sm: "1fr", lg: "1.6fr 1.2fr" }}>
-        <BillingInformation title={"Billing Information"} data={billingData} />
-        <Transactions
-          title={"Your Transactions"}
-          date={"23 - 30 March"}
+				<Transactions
+          title={"Транзакции"}
+          date={"23 - 30 Марта"}
           newestTransactions={newestTransactions}
           olderTransactions={olderTransactions}
         />
+        {/* <BillingInformation title={"Billing Information"} data={billingData} /> */}
       </Grid>
     </Flex>
   );

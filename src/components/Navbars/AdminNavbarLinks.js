@@ -18,7 +18,7 @@ import {
 // Assets
 import avatar1 from "assets/img/avatars/avatar1.png";
 import avatar2 from "assets/img/avatars/avatar2.png";
-import avatar3 from "assets/img/avatars/avatar3.png";
+import system_avatar from "assets/img/avatars/system.png";
 // Custom Icons
 import { ProfileIcon, SettingsIcon } from "components/Icons/Icons";
 // Custom Components
@@ -143,29 +143,29 @@ export default function HeaderLinks(props) {
           <Flex flexDirection="column">
             <MenuItem borderRadius="8px" mb="10px">
               <ItemContent
-                time="13 minutes ago"
-                info="from Alicia"
-                boldInfo="New Message"
-                aName="Alicia"
+                time="13 минут назад"
+                info="от техподдержки"
+                boldInfo="Уведомление"
+                aName=""
                 aSrc={avatar1}
               />
             </MenuItem>
             <MenuItem borderRadius="8px" mb="10px">
               <ItemContent
-                time="2 days ago"
-                info="by Josh Henry"
-                boldInfo="New Album"
+                time="2 дня назад"
+                info="от техподдержки"
+                boldInfo="Уведомление"
                 aName="Josh Henry"
                 aSrc={avatar2}
               />
             </MenuItem>
             <MenuItem borderRadius="8px">
               <ItemContent
-                time="3 days ago"
-                info="Payment succesfully completed!"
+                time="3 дня назад"
+                info="Тариф успешно оплачен!"
                 boldInfo=""
                 aName="Kara"
-                aSrc={avatar3}
+                aSrc={system_avatar}
               />
             </MenuItem>
           </Flex>

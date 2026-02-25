@@ -6,23 +6,24 @@ import {
 	FormControl,
 	FormLabel,
 	HStack,
-	Icon,
+	Image,
 	Input,
 	Link,
 	Switch,
 	Text,
-	useColorModeValue,
+	useColorModeValue
 } from "@chakra-ui/react";
 // Assets
 import BgSignUp from "assets/img/BgSignUp.png";
-import { FaApple, FaFacebook, FaGoogle } from "react-icons/fa";
+import gosuslugi_logo from "assets/svg/gosuslugi-logo.svg";
+import yandex_id_logo from "assets/svg/ya-id-logo.svg";
 
 function SignUp() {
   const titleColor = useColorModeValue("recode.300", "recode.200");
   const textColor = useColorModeValue("gray.700", "white");
   const secondTextColor = useColorModeValue("gray.400", "white");
   const bgColor = useColorModeValue("white", "gray.700");
-  const bgIcons = useColorModeValue("recode.200", "rgba(255, 255, 255, 0.5)");
+  const bgIcons = useColorModeValue("gray.50", "rgba(255, 255, 255, 0.5)");
   return (
     <Flex
       direction='column'
@@ -82,63 +83,33 @@ function SignUp() {
             mb='22px'>
             Регистрация
           </Text>
-          <HStack spacing='15px' justify='center' mb='40px'>
+          <HStack spacing='15px' justify='center' mb='25px'>
             <Flex
               justify='center'
               align='center'
-              w='75px'
-              h='75px'
+              h='70px'
+							p='20px'
               borderRadius='15px'
               border='1px solid lightgray'
               cursor='pointer'
               transition='all .25s ease'
-              _hover={{ filter: "brightness(120%)", bg: bgIcons }}>
-              <Link href='#'>
-                <Icon
-                  as={FaFacebook}
-                  w='30px'
-                  h='30px'
-                  _hover={{ filter: "brightness(120%)" }}
-                />
+              _hover={{ bg: bgIcons }}>
+              <Link href='#' style={{ transform: "translateY(2px)" }} >
+								<Image width="100px" src={gosuslugi_logo} />
               </Link>
             </Flex>
             <Flex
               justify='center'
-              align='center'
-              w='75px'
-              h='75px'
+							p='20px'
+              h='70px'
               borderRadius='15px'
               border='1px solid lightgray'
               cursor='pointer'
               transition='all .25s ease'
-              _hover={{ filter: "brightness(120%)", bg: bgIcons }}>
-              <Link href='#'>
-                <Icon
-                  as={FaApple}
-                  w='30px'
-                  h='30px'
-                  _hover={{ filter: "brightness(120%)" }}
-                />
-              </Link>
-            </Flex>
-            <Flex
-              justify='center'
-              align='center'
-              w='75px'
-              h='75px'
-              borderRadius='15px'
-              border='1px solid lightgray'
-              cursor='pointer'
-              transition='all .25s ease'
-              _hover={{ filter: "brightness(120%)", bg: bgIcons }}>
-              <Link href='#'>
-                <Icon
-                  as={FaGoogle}
-                  w='30px'
-                  h='30px'
-                  _hover={{ filter: "brightness(120%)" }}
-                />
-              </Link>
+              _hover={{ bg: bgIcons }}>
+							<Link href='#' style={{ transform: "translateY(1px)" }}>
+								<Image width="100px" src={yandex_id_logo} />
+							</Link>
             </Flex>
           </HStack>
           <FormControl>
