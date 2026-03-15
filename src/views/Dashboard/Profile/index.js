@@ -2,10 +2,10 @@
 import { Flex, Grid, useColorModeValue } from "@chakra-ui/react";
 import avatar4 from "assets/img/avatars/avatar4.png";
 import ProfileBgImage from "assets/img/ProfileBackground.png";
+import ConversionHistory from "components/Tables/ConversionHistory";
 import { FaCube, FaPenFancy } from "react-icons/fa";
 import { IoDocumentsSharp } from "react-icons/io5";
 import { dashboardTableData } from "variables/general";
-import Projects from "../Dashboard/components/Projects";
 import Conversations from "./components/Conversations";
 import Header from "./components/Header";
 import PlatformSettings from "./components/PlatformSettings";
@@ -68,11 +68,13 @@ function Profile() {
         templateRows={{ sm: "1fr auto", md: "1fr", lg: "1fr" }}
         gap='24px'
 				mt="24px">
-        <Projects
+        <ConversionHistory
           title={"Последние конвертации"}
           amount={9}
           captions={["ID", "Тип", "Статус", "Результат перевода", "Затраченные токены", "Дата", ]}
           data={dashboardTableData}
+					enablePagination={true}
+					showFullHistoryButton={true}
         />
         {/* <OrdersOverview
           title={"Orders Overview"}
@@ -80,7 +82,7 @@ function Profile() {
           data={timelineData}
         /> */}
       </Grid>
-      {/* <Projects title={"Projects"} description={"Architects design houses"} /> */}
+      {/* <ConversionHistory title={"Projects"} description={"Architects design houses"} /> */}
     </Flex>
   );
 }

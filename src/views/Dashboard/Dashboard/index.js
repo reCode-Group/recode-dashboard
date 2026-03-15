@@ -1,12 +1,12 @@
 // Chakra imports
 import {
-  Box,
+	Box,
 	Flex,
 	Grid,
 	Image,
 	SimpleGrid,
 	useColorModeValue,
-  useDisclosure,
+	useDisclosure,
 } from "@chakra-ui/react";
 // assets
 import peopleImage from "assets/img/people-image.png";
@@ -18,13 +18,13 @@ import {
 	PlusIcon,
 	WalletIcon
 } from "components/Icons/Icons.js";
+import ConversionHistory from "components/Tables/ConversionHistory";
 import { useHistory } from "react-router-dom";
 import { dashboardTableData } from "variables/general";
 import CreateSupportTicketModal from "views/Dashboard/Support/components/CreateSupportTicketModal";
 import ActiveUsers from "./components/ActiveUsers";
 import BuiltByDevelopers from "./components/BuiltByDevelopers";
 import MiniStatistics from "./components/MiniStatistics";
-import Projects from "./components/Projects";
 import SalesOverview from "./components/SalesOverview";
 import WorkWithTheRockets from "./components/WorkWithTheRockets";
 
@@ -116,11 +116,14 @@ export default function Dashboard() {
         templateColumns={{ sm: "1fr" }}
         templateRows={{ sm: "1fr auto", md: "1fr", lg: "1fr" }}
         gap='24px'>
-        <Projects
+        <ConversionHistory
           title={"Конвертации"}
           amount={30}
           captions={["ID", "Тип", "Статус", "Результат перевода", "Затраченные токены", "Дата", ]}
           data={dashboardTableData}
+          enablePagination={false}
+          initialRowsPerPage={5}
+          showFullHistoryButton={true}
         />
       </Grid>
 
@@ -133,3 +136,4 @@ export default function Dashboard() {
     </Flex>
   );
 }
+

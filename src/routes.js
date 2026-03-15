@@ -6,6 +6,7 @@ import Dashboard from "views/Dashboard/Dashboard";
 import Profile from "views/Dashboard/Profile";
 import Support from "views/Dashboard/Support";
 import Tables from "views/Dashboard/Tables";
+import ConversionHistoryPage from "views/Dashboard/ConversionHistory";
 
 import {
 	CreditIcon,
@@ -82,11 +83,11 @@ var dashRoutes = [
 				component: SignIn,
 				layout: "/auth",
 			},
-			{
-				path: "/tables",
+						{
+				path: "/conversion-history",
 				name: "История конвертаций",
 				icon: <HistoryIcon color="inherit" />,
-				component: Tables,
+				component: ConversionHistoryPage,
 				layout: "/admin",
 			},
 
@@ -94,3 +95,5 @@ var dashRoutes = [
   },
 ];
 export default dashRoutes;
+
+
