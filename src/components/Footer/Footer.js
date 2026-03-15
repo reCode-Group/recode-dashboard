@@ -1,6 +1,5 @@
 /*eslint-disable*/
 import { Flex, Link, List, ListItem, Text } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
 
 export default function Footer(props) {
   // const linkRecode = useColorModeValue("recode.400", "red.200");=
@@ -17,7 +16,7 @@ export default function Footer(props) {
       justifyContent="space-between"
       px="30px"
       pb="20px"
-      fontSize="sm"
+			fontSize="sm"
     >
       <Text
         color="gray.400"
@@ -36,8 +35,8 @@ export default function Footer(props) {
             md: "25px",
           }}
         >
-          <Link as={RouterLink} color="gray.400" to="/auth/privacy-policy" textDecoration="underline">
-            Политика конфиденциальности
+          <Link color="gray.400" href="https://recode-group/policy" textDecoration="underline">
+						Политика конфиденциальности
           </Link>
         </ListItem>
         <ListItem
@@ -46,8 +45,8 @@ export default function Footer(props) {
             md: "25px",
           }}
         >
-          <Link as={RouterLink} color="gray.400" to="/auth/public-offer" textDecoration="underline">
-            Публичная оферта
+          <Link color="gray.400" href="https://recode-group/policy" textDecoration="underline">
+						Публичная оферта
           </Link>
         </ListItem>
         <ListItem
@@ -57,12 +56,12 @@ export default function Footer(props) {
           }}
         >
           <Link color="gray.400" href="https://recode-group/blog" textDecoration="underline">
-            Блог
+						Блог
           </Link>
         </ListItem>
         <ListItem>
-          <Link color="gray.400" href="https://recode-group/contact" textDecoration="underline">
-            Контакты
+           <Link color="gray.400" href="https://recode-group/contact" textDecoration="underline">
+						Контакты
           </Link>
         </ListItem>
       </List>
