@@ -32,7 +32,7 @@ export default function AuthNavbar(props) {
   let mainText = useColorModeValue("gray.700", "gray.200");
   let navbarBg = useColorModeValue(
     "linear-gradient(112.83deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.8) 110.84%)",
-    "linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)"
+    "linear-gradient(112.83deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 110.84%)"
   );
   let navbarBorder = useColorModeValue(
     "1.5px solid #FFFFFF",

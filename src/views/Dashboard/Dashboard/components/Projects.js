@@ -38,7 +38,7 @@ const Projects = ({ title, amount, captions, data }) => {
               <Text fontWeight='bold' as='span'>
                 {amount} совершено
               </Text>{" "}
-              в этом месяце.
+              в этом месяце
             </Text>
           </Flex>
         </Flex>

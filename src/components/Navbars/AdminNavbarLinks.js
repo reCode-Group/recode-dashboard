@@ -56,7 +56,7 @@ export default function HeaderLinks(props) {
         bg={inputBg}
         borderRadius="15px"
         w={{
-          sm: "128px",
+          sm: "50%",
           md: "200px",
         }}
         me={{ sm: "auto", md: "20px" }}
@@ -139,7 +139,7 @@ export default function HeaderLinks(props) {
         <MenuButton>
           <BellIcon color={navbarIcon} w="18px" h="18px" />
         </MenuButton>
-        <MenuList p="16px 8px">
+        <MenuList p="16px" borderRadius="18px">
           <Flex flexDirection="column">
             <MenuItem borderRadius="8px" mb="10px">
               <ItemContent
