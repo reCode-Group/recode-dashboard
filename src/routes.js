@@ -4,13 +4,15 @@ import SignUp from "views/Auth/SignUp.js";
 import Billing from "views/Dashboard/Billing";
 import Dashboard from "views/Dashboard/Dashboard";
 import Profile from "views/Dashboard/Profile";
+import Support from "views/Dashboard/Support";
 import Tables from "views/Dashboard/Tables";
 
 import {
 	CreditIcon,
 	HomeIcon,
 	PersonIcon,
-	RocketIcon
+	RocketIcon,
+	SupportIcon
 } from "components/Icons/Icons";
 
 import { CompanyIcon, ConverterIcon, EmployersIcon, HistoryIcon } from "components/Icons/Icons";
@@ -37,6 +39,14 @@ var dashRoutes = [
     icon: <CreditIcon color="inherit" />,
     component: Billing,
     layout: "/admin",
+  },
+  {
+    path: "/support",
+    name: "Техподдержка",
+    icon: <SupportIcon color="inherit" />,
+    component: Support,
+    layout: "/admin",
+    hiddenInSidebar: true,
   },
 	{
     path: "/signup",

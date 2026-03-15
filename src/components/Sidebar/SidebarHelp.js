@@ -1,4 +1,4 @@
-import { QuestionIcon } from "@chakra-ui/icons";
+﻿import { QuestionIcon } from "@chakra-ui/icons";
 import { Button, Flex, Link, Text } from "@chakra-ui/react";
 import SidebarHelpImage from "assets/img/SidebarHelpImage.png";
 import IconBox from "components/Icons/IconBox";
@@ -29,7 +29,7 @@ export function SidebarHelp(props) {
       </Text>
       <Link
         w="100%"
-        href="https://demos.creative-tim.com/docs-purity-ui-dashboard/"
+        href="admin/support"
       >
         <Button
           fontSize="xs"
