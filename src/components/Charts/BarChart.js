@@ -1,4 +1,4 @@
-import Card from "components/Card/Card";
+﻿import Card from "components/Card/Card";
 import { Component } from "react";
 import Chart from "react-apexcharts";
 import { barChartData, barChartOptions } from "variables/charts";
@@ -7,16 +7,9 @@ class BarChart extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      chartData: [],
-      chartOptions: {},
-    };
-  }
-
-  componentDidMount() {
-    this.setState({
       chartData: barChartData,
       chartOptions: barChartOptions,
-    });
+    };
   }
 
   render() {
