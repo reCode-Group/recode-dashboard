@@ -5,7 +5,7 @@ import Billing from "views/Dashboard/Billing";
 import Dashboard from "views/Dashboard/Dashboard";
 import Profile from "views/Dashboard/Profile";
 import Support from "views/Dashboard/Support";
-import Tables from "views/Dashboard/Tables";
+import EmployeeTable from "views/Dashboard/Tables/components/EmployeeTable";
 import ConversionHistoryPage from "views/Dashboard/ConversionHistory";
 
 import {
@@ -66,14 +66,14 @@ var dashRoutes = [
 				path: "/tables",
 				name: "Компания",
 				icon: <CompanyIcon color="inherit" />,
-				component: Tables,
+				component: EmployeeTable,
 				layout: "/admin",
 			},
 			{
 				path: "/tables",
 				name: "Сотрудники",
 				icon: <EmployersIcon color="inherit" />,
-				component: Tables,
+				component: EmployeeTable,
 				layout: "/admin",
 			},
 			{
@@ -95,5 +95,3 @@ var dashRoutes = [
   },
 ];
 export default dashRoutes;
-
-

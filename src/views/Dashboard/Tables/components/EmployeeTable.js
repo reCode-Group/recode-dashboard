@@ -1,5 +1,6 @@
-// Chakra imports
+﻿// Chakra imports
 import {
+  Flex,
   Table,
   Tbody,
   Text,
@@ -13,11 +14,20 @@ import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
 import CardHeader from "components/Card/CardHeader.js";
 import TablesTableRow from "components/Tables/TablesTableRow";
+import { tablesTableData } from "variables/general";
 import React from "react";
 
-const Authors = ({ title, captions, data }) => {
+const defaultCaptions = ["Пользователь", "Роль", "Статус", "Остаток токенов", ""];
+
+const EmployeeTable = ({
+  title = "Таблица сотрудников",
+  captions = defaultCaptions,
+  data = tablesTableData,
+  withPageContainer = true,
+}) => {
   const textColor = useColorModeValue("gray.700", "white");
-  return (
+
+  const tableContent = (
     <Card overflowX={{ sm: "scroll", xl: "hidden" }}>
       <CardHeader p='6px 0px 22px 0px'>
         <Text fontSize='xl' color={textColor} fontWeight='bold'>
@@ -57,6 +67,13 @@ const Authors = ({ title, captions, data }) => {
       </CardBody>
     </Card>
   );
+
+  if (!withPageContainer) {
+    return tableContent;
+  }
+
+  return <Flex direction='column' pt={{ base: "120px", md: "75px" }}>{tableContent}</Flex>;
 };
 
-export default Authors;
+export default EmployeeTable;
+
