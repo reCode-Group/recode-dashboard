@@ -1,20 +1,29 @@
 // Chakra imports
 import {
-	Flex,
-	Stat,
-	StatHelpText,
-	StatLabel,
-	StatNumber,
-	useColorModeValue,
+  Flex,
+  Stat,
+  StatHelpText,
+  StatLabel,
+  StatNumber,
+  useColorModeValue,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
 import IconBox from "components/Icons/IconBox";
 
-const MiniStatistics = ({ title, amount, percentage, icon }) => {
+const MiniStatistics = ({
+  title,
+  amount,
+  percentage,
+  icon,
+  enableIconAction = false,
+  onIconAction,
+  iconActionLabel = "statistics action",
+}) => {
   const iconRecode = useColorModeValue("recode.300", "recode.300");
   const textColor = useColorModeValue("gray.700", "white");
+  const isIconActionEnabled = enableIconAction && typeof onIconAction === "function";
 
   return (
     <Card minH='83px'>
@@ -40,13 +49,21 @@ const MiniStatistics = ({ title, amount, percentage, icon }) => {
                 fontWeight='bold'
                 ps='3px'
                 fontSize='md'>
-								{percentage != null ?
-									(percentage > 0 ? `+${percentage}%` : `${percentage}%`) : ""
-								}
+                {percentage != null ? (percentage > 0 ? `+${percentage}%` : `${percentage}%`) : ""}
               </StatHelpText>
             </Flex>
           </Stat>
-          <IconBox as='box' h={"45px"} w={"45px"} bg={iconRecode}>
+          <IconBox
+            as={isIconActionEnabled ? "button" : "box"}
+            type={isIconActionEnabled ? "button" : undefined}
+            aria-label={isIconActionEnabled ? iconActionLabel : undefined}
+            onClick={isIconActionEnabled ? onIconAction : undefined}
+            cursor={isIconActionEnabled ? "pointer" : "default"}
+            border='none'
+            appearance='none'
+            h={'45px'}
+            w={'45px'}
+            bg={iconRecode}>
             {icon}
           </IconBox>
         </Flex>

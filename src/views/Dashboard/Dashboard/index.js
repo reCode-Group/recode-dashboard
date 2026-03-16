@@ -1,139 +1,127 @@
 // Chakra imports
 import {
-	Box,
 	Flex,
 	Grid,
 	Image,
 	SimpleGrid,
 	useColorModeValue,
 	useDisclosure,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 // assets
-import peopleImage from "assets/img/people-image.png";
-import logoRecode from "assets/svg/recode-logo-white.svg";
-import BarChart from "components/Charts/BarChart";
+import peopleImage from 'assets/img/people-image.png';
+import logoRecode from 'assets/svg/recode-logo-white.svg';
+import BarChart from 'components/Charts/BarChart';
 // Custom icons
-import { EmployersIcon, TokensRemainIcon } from "components/Icons/Icons";
-import {
-	PlusIcon,
-	WalletIcon
-} from "components/Icons/Icons.js";
-import ConversionHistory from "components/Tables/ConversionHistory";
-import { useHistory } from "react-router-dom";
-import { dashboardTableData } from "variables/general";
-import CreateSupportTicketModal from "views/Dashboard/Support/components/CreateSupportTicketModal";
-import ActiveUsers from "./components/ActiveUsers";
-import BuiltByDevelopers from "./components/BuiltByDevelopers";
-import MiniStatistics from "./components/MiniStatistics";
-import SalesOverview from "./components/SalesOverview";
-import WorkWithTheRockets from "./components/WorkWithTheRockets";
+import { EmployersIcon, TokensRemainIcon } from 'components/Icons/Icons';
+import { PlusIcon, WalletIcon } from 'components/Icons/Icons.js';
+import ConversionHistory from 'components/Tables/ConversionHistory';
+import { useHistory } from 'react-router-dom';
+import { dashboardTableData } from 'variables/general';
+import CreateSupportTicketModal from 'views/Dashboard/Support/components/CreateSupportTicketModal';
+import ActiveUsers from './components/ActiveUsers';
+import BuiltByDevelopers from './components/BuiltByDevelopers';
+import MiniStatistics from './components/MiniStatistics';
+import SalesOverview from './components/SalesOverview';
+import WorkWithTheRockets from './components/WorkWithTheRockets';
 
 export default function Dashboard() {
-  const iconBoxInside = useColorModeValue("white", "white");
-  const history = useHistory();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+	const iconBoxInside = useColorModeValue('white', 'white');
+	const history = useHistory();
+	const { isOpen, onOpen, onClose } = useDisclosure();
 
-  return (
-    <Flex flexDirection='column' pt={{ base: "120px", md: "75px" }}>
-      <SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
-        <MiniStatistics
-          title={"Тариф"}
-          amount={"Стандарт"}
-          icon={<WalletIcon h={"24px"} w={"24px"} color={iconBoxInside} />}
-        />
-        <MiniStatistics
-          title={"Остаток токенов"}
-          amount={"180 000"}
-          percentage={-5}
-          icon={<TokensRemainIcon h={"24px"} w={"24px"} color={iconBoxInside} />}
-        />
-        <MiniStatistics
-          title={"Количество сотрудников"}
-          amount={"6"}
-          icon={<EmployersIcon h={"24px"} w={"24px"} color={iconBoxInside} />}
-        />
-        <Box
-          role="button"
-          onClick={onOpen}
-          cursor="pointer"
-          borderRadius="20px"
-          _hover={{ transform: "translateY(-2px)", transition: "all 0.2s ease" }}
-        >
-          <MiniStatistics
-            title={"Техподдержка"}
-            amount={"Создать тикет"}
-            icon={<PlusIcon h={"24px"} w={"24px"} color={iconBoxInside} />}
-          />
-        </Box>
-      </SimpleGrid>
-      <Grid
-        templateColumns={{ md: "1fr", lg: "1.8fr 1.2fr" }}
-        templateRows={{ md: "1fr auto", lg: "1fr" }}
-        my='26px'
-        gap='24px'>
+	return (
+		<Flex flexDirection="column" pt={{ base: '120px', md: '75px' }}>
+			<SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing="24px">
+				<MiniStatistics
+					title={'Тариф'}
+					amount={'Стандарт'}
+					icon={<WalletIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
+				/>
+				<MiniStatistics
+					title={'Остаток токенов'}
+					amount={'180 000'}
+					percentage={-5}
+					icon={<TokensRemainIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
+				/>
+				<MiniStatistics
+					title={'Количество сотрудников'}
+					amount={'6'}
+					icon={<EmployersIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
+				/>
+				<MiniStatistics
+					title={'Техподдержка'}
+					amount={'Обращений нет'}
+					icon={<PlusIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
+					enableIconAction={true}
+					onIconAction={onOpen}
+					iconActionLabel='Open support ticket modal'
+				/>
+			</SimpleGrid>
+			<Grid
+				templateColumns={{ md: '1fr', lg: '1.8fr 1.2fr' }}
+				templateRows={{ md: '1fr auto', lg: '1fr' }}
+				my="26px"
+				gap="24px"
+			>
 				<BuiltByDevelopers
-					title={"Создан для Вас"}
-					name={"Платформа Рекод"}
+					title={'Создан для Вас'}
+					name={'Платформа Рекод'}
 					description={
 						<>
 							Управляйте компанией, добавляйте сотрудников и распределяйте токены.
 							<br />
-							Покупайте тарифы, переводите макросы и отслеживайте статистику: история переводов, расход токенов.
+							Покупайте тарифы, переводите макросы и отслеживайте статистику: история переводов,
+							расход токенов.
 						</>
 					}
-          image={
-            <Image
-              src={logoRecode}
-              alt='recode logo'
+					image={
+						<Image
+							src={logoRecode}
+							alt="recode logo"
 							width={180}
-              minWidth={{ md: "300px", lg: "auto" }}
-            />
-          }
-        />
-        <WorkWithTheRockets
-          backgroundImage={peopleImage}
-          title={"Сайт для бизнеса за 1 день"}
-          description={
-            "Современный адаптивный сайт с готовым набором инструментов под ваш бизнес и поддержка 24/7 от 750 руб./мес."
-          }
-        />
-      </Grid>
-      <Grid
-        templateColumns={{ sm: "1fr", lg: "1.3fr 1.7fr" }}
-        templateRows={{ sm: "repeat(2, 1fr)", lg: "1fr" }}
-        gap='24px'
-        mb={{ lg: "26px" }}>
-        <ActiveUsers
-          title={"Расход токенов"}
-          percentage={2300}
-          chart={<BarChart />}
-        />
-        <SalesOverview
-          title={"Операции над токенами"}
-        />
-      </Grid>
-      <Grid
-        templateColumns={{ sm: "1fr" }}
-        templateRows={{ sm: "1fr auto", md: "1fr", lg: "1fr" }}
-        gap='24px'>
-        <ConversionHistory
-          title={"Конвертации"}
-          amount={30}
-          captions={["ID", "Тип", "Статус", "Результат перевода", "Затраченные токены", "Дата", ]}
-          data={dashboardTableData}
-          enablePagination={false}
-          initialRowsPerPage={5}
-          showFullHistoryButton={true}
-        />
-      </Grid>
+							minWidth={{ md: '300px', lg: 'auto' }}
+						/>
+					}
+				/>
+				<WorkWithTheRockets
+					backgroundImage={peopleImage}
+					title={'Сайт для бизнеса за 1 день'}
+					description={
+						'Современный адаптивный сайт с готовым набором инструментов под ваш бизнес и поддержка 24/7 от 750 руб./мес.'
+					}
+				/>
+			</Grid>
+			<Grid
+				templateColumns={{ sm: '1fr', lg: '1.3fr 1.7fr' }}
+				templateRows={{ sm: 'repeat(2, 1fr)', lg: '1fr' }}
+				gap="24px"
+				mb={{ lg: '26px' }}
+			>
+				<ActiveUsers title={'Расход токенов'} percentage={2300} chart={<BarChart />} />
+				<SalesOverview title={'Операции над токенами'} />
+			</Grid>
+			<Grid
+				templateColumns={{ sm: '1fr' }}
+				templateRows={{ sm: '1fr auto', md: '1fr', lg: '1fr' }}
+				gap="24px"
+			>
+				<ConversionHistory
+					title={'Конвертации'}
+					amount={30}
+					captions={['ID', 'Тип', 'Статус', 'Результат перевода', 'Затраченные токены', 'Дата']}
+					data={dashboardTableData}
+					enablePagination={false}
+					initialRowsPerPage={5}
+					showFullHistoryButton={true}
+				/>
+			</Grid>
 
-      <CreateSupportTicketModal
-        isOpen={isOpen}
-        onClose={onClose}
-        onNavigateToTickets={() => history.push("/admin/support")}
-        onTicketCreated={() => {}}
-      />
-    </Flex>
-  );
+			<CreateSupportTicketModal
+				isOpen={isOpen}
+				onClose={onClose}
+				onNavigateToTickets={() => history.push('/admin/support')}
+				onTicketCreated={() => {}}
+			/>
+		</Flex>
+	);
 }
-
