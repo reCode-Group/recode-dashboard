@@ -1,101 +1,95 @@
 // Chakra imports
-import {
-	Button,
-	Flex,
-	Icon,
-	Spacer,
-	Text,
-	useColorModeValue,
-} from "@chakra-ui/react";
+import { Box, Flex, Image, Text, useColorModeValue } from '@chakra-ui/react';
 // Custom components
-import Card from "components/Card/Card.js";
-import CardBody from "components/Card/CardBody.js";
-import CardHeader from "components/Card/CardHeader.js";
-import IconBox from "components/Icons/IconBox";
-import { FaPencilAlt } from "react-icons/fa";
+import Card from 'components/Card/Card.js';
+import CardBody from 'components/Card/CardBody.js';
+import CardHeader from 'components/Card/CardHeader.js';
+// Assets
+import mirLogo from 'assets/img/payment-methods/mir.png';
+import sbpLogo from 'assets/img/payment-methods/sbp.png';
+import statementLogo from 'assets/img/payment-methods/statement.png';
+import tbankLogo from 'assets/img/payment-methods/tbank.png';
 
-const PaymentMethod = ({ title, mastercard, visa }) => {
-  const iconRecode = useColorModeValue("recode.300", "recode.300");
-  const textColor = useColorModeValue("gray.700", "white");
-  const borderColor = useColorModeValue("#dee2e6", "gray.500");
-  const bgButton = useColorModeValue(
-    "linear-gradient(81.62deg, #313860 2.25%, #151928 79.87%)",
-    "gray.800"
-  );
+const methods = [
+	{
+		key: 'sbp',
+		title: 'Система быстрых платежей (СБП)',
+		icon: sbpLogo,
+		iconW: '56px',
+		iconH: '33px',
+	},
+	{
+		key: 'card',
+		title: 'Банковская карта',
+		icon: mirLogo,
+		iconW: '47px',
+		iconH: '14px',
+	},
+	{
+		key: 'tbank',
+		title: 'Через Т-Банк',
+		icon: tbankLogo,
+		iconW: '69px',
+		iconH: '25px',
+	},
+	{
+		key: 'statement',
+		title: 'Выписка счета',
+		icon: statementLogo,
+		iconW: '24px',
+		iconH: '22px',
+	},
+];
 
-  return (
-    <Card p='16px' mt='24px'>
-      <CardHeader>
-        <Flex justify='space-between' align='center' minHeight='60px' w='100%'>
-          <Text fontSize='lg' color={textColor} fontWeight='bold'>
-            {title}
-          </Text>
-          <Button bg={bgButton} color='white' fontSize='xs' variant='no-hover'>
-            ДОБАВИТЬ СПОСОБ ОПЛАТЫ
-          </Button>
-        </Flex>
-      </CardHeader>
-      <CardBody>
-        <Flex
-          direction={{ sm: "column", md: "row" }}
-          align='center'
-          w='100%'
-          justify='center'
-          py='1rem'>
-          <Flex
-            p='1rem'
-            bg='transparent'
-            borderRadius='15px'
-            width='100%'
-            border='1px solid'
-            borderColor={borderColor}
-            align='center'
-            mb={{ sm: "24px", md: "0px" }}
-            me={{ sm: "0px", md: "24px" }}>
-            <IconBox me='10px' w='25px' h='22px'>
-              {mastercard.icon}
-            </IconBox>
-            <Text color='gray.400' fontSize='md' fontWeight='semibold'>
-              {mastercard.number}
-            </Text>
-            <Spacer />
-            <Button
-              p='0px'
-              bg='transparent'
-              w='16px'
-              h='16px'
-              variant='no-hover'>
-              <Icon as={FaPencilAlt} />
-            </Button>
-          </Flex>
-          <Flex
-            p='16px'
-            bg='transparent'
-            borderRadius='15px'
-            width='100%'
-            border='1px solid'
-            borderColor={borderColor}
-            align='center'>
-            <IconBox me='10px' w='25px' h='25px'>
-              {visa.icon}
-            </IconBox>
-            <Text color='gray.400' fontSize='md' fontWeight='semibold'>
-              {visa.number}
-            </Text>
-            <Spacer />
-            <Button
-              p='0px'
-              bg='transparent'
-              w='16px'
-              h='16px'
-              variant='no-hover'>
-              <Icon as={FaPencilAlt} />
-            </Button>
-          </Flex>
-        </Flex>
-      </CardBody>
-    </Card>
-  );
+const PaymentMethod = ({ title = 'Способ оплаты' }) => {
+	const textColor = useColorModeValue('gray.700', 'white');
+	const mutedColor = useColorModeValue('gray.400', 'gray.400');
+	const borderColor = useColorModeValue('gray.200', 'whiteAlpha.200');
+	const cardBg = useColorModeValue('white', 'gray.800');
+	const tileBg = useColorModeValue('white', 'gray.800');
+
+	return (
+		<Card p="1.5rem" mt="24px" bg={cardBg}>
+			<CardHeader pb="8px">
+				<Text fontSize="lg" color={textColor} fontWeight="bold">
+					{title}
+				</Text>
+			</CardHeader>
+			<CardBody pt="8px">
+				<Flex wrap="wrap" gap="14px">
+					{methods.map((method) => (
+						<Flex
+							key={method.key}
+							align="center"
+							gap="10px"
+							minH="64px"
+							px="20px"
+							py="12px"
+							border="1px solid"
+							borderColor={borderColor}
+							borderRadius="15px"
+							bg={tileBg}
+							flex="0 0 auto"
+						>
+							<Box w={method.iconW} h={method.iconH} flexShrink={0}>
+								<Image src={method.icon} alt={method.title} w="100%" h="100%" objectFit="contain" />
+							</Box>
+							<Text
+								color={mutedColor}
+								fontSize="md"
+								fontWeight="medium"
+								lineHeight="1.4"
+								whiteSpace="nowrap"
+							>
+								{method.title}
+							</Text>
+						</Flex>
+					))}
+				</Flex>
+				<Box h="2px" />
+			</CardBody>
+		</Card>
+	);
 };
 
 export default PaymentMethod;

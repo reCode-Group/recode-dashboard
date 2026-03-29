@@ -18,7 +18,7 @@ import InvoicesRow from 'components/Tables/InvoicesRow';
 
 const Invoices = ({ title, data }) => {
 	const textColor = useColorModeValue('gray.700', 'white');
-	const captions = ['Дата', 'Сумма, ₽', 'Акты', 'Счета-фактуры'];
+	const captions = ['Дата', 'Сумма, ₽', 'Акты', 'Счета-фактуры'];
 
 	return (
 		<Card p="22px" my={{ sm: '24px', lg: '0px' }} ms={{ sm: '0px', lg: '24px' }}>
@@ -44,7 +44,12 @@ const Invoices = ({ title, data }) => {
 					<Thead>
 						<Tr my=".8rem" pl="0px" color="gray.400">
 							{captions.map((caption, idx) => (
-								<Th color="gray.400" key={caption} ps={idx === 0 ? '0px' : null}>
+								<Th
+									color="gray.400"
+									key={caption}
+									ps={idx === 0 ? '0px' : null}
+									verticalAlign="top"
+								>
 									{caption}
 								</Th>
 							))}
