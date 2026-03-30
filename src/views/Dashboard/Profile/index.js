@@ -8,7 +8,7 @@ import { IoDocumentsSharp } from 'react-icons/io5';
 import { useState } from 'react';
 import { dashboardTableData } from 'variables/general';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
-import Conversations from './components/Conversations';
+import SupportTicketList from 'views/Dashboard/Support/components/SupportTicketList';
 import Header from './components/Header';
 import PlatformSettings from './components/PlatformSettings';
 import ProfileInformation from './components/ProfileInformation';
@@ -69,7 +69,7 @@ function Profile() {
 							mobile={'+7 (903) 123 1234 123'}
 							email={'one@recode-group.ru'}
 						/>
-						<Conversations title={'Открытые тикеты'} />
+						<SupportTicketList title={'Открытые тикеты'} />
 					</Grid>
 					<Grid
 						templateColumns={{ sm: '1fr' }}

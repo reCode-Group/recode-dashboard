@@ -9,7 +9,7 @@ import Card from 'components/Card/Card';
 import CardBody from 'components/Card/CardBody';
 import CardHeader from 'components/Card/CardHeader';
 
-const Conversations = ({ title }) => {
+const SupportTicketList = ({ title }) => {
 	// Chakra color mode
 	const textColor = useColorModeValue('gray.700', 'white');
 
@@ -102,4 +102,4 @@ const Conversations = ({ title }) => {
 	);
 };
 
-export default Conversations;
+export default SupportTicketList;
