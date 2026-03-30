@@ -16,7 +16,7 @@ import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import InvoicesRow from 'components/Tables/InvoicesRow';
 
-const Invoices = ({ title, data }) => {
+const Documents = ({ title, data }) => {
 	const textColor = useColorModeValue('gray.700', 'white');
 	const captions = ['Дата', 'Сумма, ₽', 'Акты', 'Счета-фактуры'];
 
@@ -81,4 +81,4 @@ const Invoices = ({ title, data }) => {
 	);
 };
 
-export default Invoices;
+export default Documents;

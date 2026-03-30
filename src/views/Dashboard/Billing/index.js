@@ -3,7 +3,7 @@ import { Flex, Grid, GridItem } from '@chakra-ui/react';
 // Assets
 import BackgroundCard1 from 'assets/img/BackgroundCard1.png';
 import { invoicesData, newestTransactions, olderTransactions } from 'variables/general';
-import Invoices from './components/Invoices';
+import Documents from './components/Documents';
 import OtherTariffs from './components/OtherTariffs';
 import PaymentMethod from './components/PaymentMethod';
 import TariffCard from './components/TariffCard';
@@ -71,7 +71,7 @@ function Billing() {
 				</GridItem>
 
 				<GridItem minH="0" display="flex">
-					<Invoices title={'Отчеты'} data={invoicesData} />
+					<Documents title={'Отчеты'} data={invoicesData} />
 				</GridItem>
 			</Grid>
 		</Flex>
