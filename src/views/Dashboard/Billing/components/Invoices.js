@@ -21,7 +21,13 @@ const Invoices = ({ title, data }) => {
 	const captions = ['Дата', 'Сумма, ₽', 'Акты', 'Счета-фактуры'];
 
 	return (
-		<Card p="22px" my={{ sm: '24px', lg: '0px' }} ms={{ sm: '0px', lg: '24px' }}>
+		<Card
+			p="22px"
+			flex="1"
+			h="100%"
+			display="flex"
+			flexDirection="column"
+		>
 			<CardHeader>
 				<Flex justify="space-between" align="center" mb="1rem" w="100%">
 					<Text fontSize="lg" color={textColor} fontWeight="bold">
@@ -39,7 +45,7 @@ const Invoices = ({ title, data }) => {
 					</Button>
 				</Flex>
 			</CardHeader>
-			<CardBody>
+			<CardBody flex="1" display="flex" flexDirection="column">
 				<Table variant="simple" color={textColor}>
 					<Thead>
 						<Tr my=".8rem" pl="0px" color="gray.400">

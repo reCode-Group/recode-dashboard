@@ -49,7 +49,7 @@ const PaymentMethod = ({ title = 'Способ оплаты' }) => {
 	const iconBg = useColorModeValue('white', 'gray.500');
 
 	return (
-		<Card p="1.5rem" mt="24px" bg={cardBg}>
+		<Card p="1.5rem" bg={cardBg}>
 			<CardHeader pb="8px">
 				<Text fontSize="lg" color={textColor} fontWeight="bold">
 					{title}

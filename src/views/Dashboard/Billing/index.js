@@ -1,5 +1,5 @@
 // Chakra imports
-import { Box, Flex, Grid } from '@chakra-ui/react';
+import { Flex, Grid, GridItem } from '@chakra-ui/react';
 // Assets
 import BackgroundCard1 from 'assets/img/BackgroundCard1.png';
 import { invoicesData, newestTransactions, olderTransactions } from 'variables/general';
@@ -11,19 +11,32 @@ import Transactions from './components/Transactions';
 
 function Billing() {
 	return (
-		<Flex direction="column" pt={{ base: '120px', md: '75px' }}>
-			<Grid templateColumns={{ sm: '1fr', lg: '2fr 1fr' }} templateRows="1fr">
-				<Box>
+		<Flex direction="column" pt={{ base: '120px', md: '75px' }} mb="100px">
+			<Grid
+				templateColumns={{ base: '1fr', lg: '2fr 1fr' }}
+				templateRows="auto"
+				alignItems="stretch"
+				gap="24px"
+				minH={{ base: 'auto', lg: 'calc(100vh - 95px)' }}
+			>
+				<GridItem minH="0" display="flex" flexDirection="column" gap="24px">
 					<Grid
-						templateColumns={{
-							base: '1fr',
-							lg: '1fr 1fr',
+						templateColumns={{ base: '1fr', md: '1fr 1fr' }}
+						templateRows={{
+							base: 'auto auto auto',
+							md: 'auto auto',
+							lg: 'minmax(0, 4fr) minmax(0, 5fr)',
 						}}
-						templateRows={{ base: 'auto', lg: 'auto auto' }}
+						templateAreas={{
+							base: `"tariff" "others" "transactions"`,
+							md: `"tariff others" "transactions transactions"`,
+							lg: `"tariff transactions" "others transactions"`,
+						}}
 						alignItems="stretch"
 						gap="26px"
+						h={{ base: 'auto', lg: '600px' }}
 					>
-						<Box gridColumn={{ base: '1', lg: '1' }} gridRow={{ base: 'auto', lg: '1' }}>
+						<GridItem area="tariff" minH="0">
 							<TariffCard
 								backgroundImage={BackgroundCard1}
 								title={'Ваш тариф'}
@@ -41,22 +54,25 @@ function Billing() {
 									code: '20 000 ₽/мес.',
 								}}
 							/>
-						</Box>
-						<Box gridColumn={{ base: '1', lg: '1' }} gridRow={{ base: 'auto', lg: '2' }}>
+						</GridItem>
+						<GridItem area="others" minH="0">
 							<OtherTariffs />
-						</Box>
-						<Box gridColumn={{ base: '1', lg: '2' }} gridRow={{ base: 'auto', lg: '1 / span 2' }}>
+						</GridItem>
+						<GridItem area="transactions" minH="0" h={{ base: 'auto', lg: '100%' }}>
 							<Transactions
 								title={'Транзакции'}
 								date={'23 - 30 Марта'}
 								newestTransactions={newestTransactions}
 								olderTransactions={olderTransactions}
 							/>
-						</Box>
+						</GridItem>
 					</Grid>
 					<PaymentMethod title={'Способ оплаты'} />
-				</Box>
-				<Invoices title={'Отчеты'} data={invoicesData} />
+				</GridItem>
+
+				<GridItem minH="0" display="flex">
+					<Invoices title={'Отчеты'} data={invoicesData} />
+				</GridItem>
 			</Grid>
 		</Flex>
 	);
