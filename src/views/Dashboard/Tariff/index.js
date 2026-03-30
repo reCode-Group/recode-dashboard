@@ -6,7 +6,7 @@ import TariffCard from 'views/Dashboard/Billing/components/TariffCard';
 
 function Tariff() {
 	return (
-		<Flex direction="column" pt={{ base: '120px', md: '75px' }}>
+		<Flex direction="column" pt={{ base: '120px', md: '75px' }} minH="100vh">
 			<Box w={{ base: '100%', lg: '70%' }}>
 				<Grid
 					templateColumns={{ base: '1fr', lg: '1fr 1fr' }}

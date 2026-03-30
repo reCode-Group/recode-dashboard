@@ -22,8 +22,10 @@ const TariffCard = ({
 			backgroundRepeat="no-repeat"
 			background="cover"
 			bgPosition="10%"
+			borderRadius="15px"
 			h="100%"
 			p="16px"
+			style={{ backgroundColor: '#151928' }}
 		>
 			<CardBody h="100%" w="100%">
 				<Flex direction="column" color="white" h="100%" p="0px 10px 10px 10px" w="100%">
