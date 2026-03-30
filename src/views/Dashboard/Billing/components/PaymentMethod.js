@@ -45,8 +45,8 @@ const PaymentMethod = ({ title = 'Способ оплаты' }) => {
 	const textColor = useColorModeValue('gray.700', 'white');
 	const mutedColor = useColorModeValue('gray.400', 'gray.400');
 	const borderColor = useColorModeValue('gray.200', 'whiteAlpha.200');
-	const cardBg = useColorModeValue('white', 'gray.800');
-	const tileBg = useColorModeValue('white', 'gray.800');
+	const cardBg = useColorModeValue('white', 'gray.700');
+	const iconBg = useColorModeValue('white', 'gray.500');
 
 	return (
 		<Card p="1.5rem" mt="24px" bg={cardBg}>
@@ -68,12 +68,26 @@ const PaymentMethod = ({ title = 'Способ оплаты' }) => {
 							border="1px solid"
 							borderColor={borderColor}
 							borderRadius="15px"
-							bg={tileBg}
 							flex="0 0 auto"
+							cursor="pointer"
 						>
-							<Box w={method.iconW} h={method.iconH} flexShrink={0}>
-								<Image src={method.icon} alt={method.title} w="100%" h="100%" objectFit="contain" />
-							</Box>
+							<Flex
+								w={method.iconW + '4px'}
+								h="90%"
+								flexShrink={0}
+								align="center"
+								bg={iconBg}
+								borderRadius="8px"
+								px="6px"
+							>
+								<Image
+									src={method.icon}
+									alt={method.title}
+									w={method.iconW}
+									h={method.iconH}
+									objectFit="contain"
+								/>
+							</Flex>
 							<Text
 								color={mutedColor}
 								fontSize="md"
