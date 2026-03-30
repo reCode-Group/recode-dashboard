@@ -3,22 +3,31 @@ import { Flex, Grid, useColorModeValue } from '@chakra-ui/react';
 import avatar4 from 'assets/img/avatars/avatar4.png';
 import ProfileBgImage from 'assets/img/ProfileBackground.png';
 import ConversionHistory from 'components/Tables/ConversionHistory';
-import { FaCube, FaPenFancy } from 'react-icons/fa';
+import { useEffect, useMemo, useState } from 'react';
+import { FaCube } from 'react-icons/fa';
 import { IoDocumentsSharp } from 'react-icons/io5';
-import { useState } from 'react';
-import { dashboardTableData } from 'variables/general';
-import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
+import { useLocation } from 'react-router-dom';
+import { dashboardTableData, invoicesData } from 'variables/general';
+import DocumentsFull from 'views/Dashboard/Billing/components/DocumentsFull';
 import SupportTicketList from 'views/Dashboard/Support/components/SupportTicketList';
 import Header from './components/Header';
 import PlatformSettings from './components/PlatformSettings';
 import ProfileInformation from './components/ProfileInformation';
 
 function Profile() {
+	const location = useLocation();
 	const bgProfile = useColorModeValue(
 		'hsla(0,0%,100%,.8)',
 		'linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)'
 	);
-	const [activeTab, setActiveTab] = useState('overview');
+	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [location.search]);
+	const [activeTab, setActiveTab] = useState(queryTab === 'documents' ? 'documents' : 'overview');
+
+	useEffect(() => {
+		if (queryTab === 'documents' || queryTab === 'overview') {
+			setActiveTab(queryTab);
+		}
+	}, [queryTab]);
 
 	const tabs = [
 		{
@@ -27,14 +36,9 @@ function Profile() {
 			icon: <FaCube w="100%" h="100%" />,
 		},
 		{
-			id: 'company',
-			name: 'КОМПАНИЯ',
+			id: 'documents',
+			name: 'ДОКУМЕНТЫ',
 			icon: <IoDocumentsSharp w="100%" h="100%" />,
-		},
-		{
-			id: 'employees',
-			name: 'СОТРУДНИКИ',
-			icon: <FaPenFancy w="100%" h="100%" />,
 		},
 	];
 
@@ -51,16 +55,11 @@ function Profile() {
 				onTabChange={setActiveTab}
 			/>
 
-			{activeTab === 'employees' ? (
-				<EmployeeTable withPageContainer={false} />
+			{activeTab === 'documents' ? (
+				<DocumentsFull title={'Отчеты'} data={invoicesData} />
 			) : (
 				<>
 					<Grid templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }} gap="22px">
-						<PlatformSettings
-							title={'Настройки платформы'}
-							subtitle1={'АККАУНТ'}
-							subtitle2={'ПЕРСОНАЛИЗАЦИЯ'}
-						/>
 						<ProfileInformation
 							title={'Данные'}
 							company={'ООО «Рога и Копыта»'}
@@ -68,6 +67,11 @@ function Profile() {
 							name={'Виктория Генадиевна Кузнецова'}
 							mobile={'+7 (903) 123 1234 123'}
 							email={'one@recode-group.ru'}
+						/>
+						<PlatformSettings
+							title={'Настройки платформы'}
+							subtitle1={'АККАУНТ'}
+							subtitle2={'ПЕРСОНАЛИЗАЦИЯ'}
 						/>
 						<SupportTicketList title={'Открытые тикеты'} />
 					</Grid>

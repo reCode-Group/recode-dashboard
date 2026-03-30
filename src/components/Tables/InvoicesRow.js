@@ -60,15 +60,15 @@ function InvoicesRow(props) {
 				</Flex>
 			</Td>
 			<Td>
-				<Text fontSize="md" color="gray.400" fontWeight="semibold">
+				<Text fontSize="md" color={textColor} fontWeight="semibold">
 					{price}
 				</Text>
 			</Td>
 			<Td>
 				<Button p="0px" bg="transparent" variant="no-hover">
 					<Flex alignItems="center">
-						<Icon as={actLogo} w="20px" h="auto" me="5px" />
-						<Text fontSize="md" color={textColor} fontWeight="bold">
+						<Icon as={actLogo} w="18px" h="auto" me="5px" />
+						<Text fontSize="sm" color={textColor} fontWeight="bold">
 							{actFormat}
 						</Text>
 					</Flex>
@@ -77,8 +77,8 @@ function InvoicesRow(props) {
 			<Td>
 				<Button p="0px" bg="transparent" variant="no-hover">
 					<Flex alignItems="center">
-						<Icon as={invoiceLogo} w="20px" h="auto" me="5px" />
-						<Text fontSize="md" color={textColor} fontWeight="bold">
+						<Icon as={invoiceLogo} w="18px" h="auto" me="5px" />
+						<Text fontSize="sm" color={textColor} fontWeight="bold">
 							{invoiceFormat}
 						</Text>
 					</Flex>
