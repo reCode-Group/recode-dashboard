@@ -3,6 +3,7 @@ import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 const tariffs = [
 	{
@@ -67,6 +68,7 @@ function PeriodSwitcher({ value, onChange }) {
 
 function OtherTariffs() {
 	const [period, setPeriod] = useState('month');
+	const history = useHistory();
 	const titleColor = useColorModeValue('#2D3748', 'white');
 	const mutedColor = useColorModeValue('#A0AEC0', 'gray.400');
 	const borderColor = useColorModeValue('#E2E8F0', 'whiteAlpha.300');
@@ -151,6 +153,7 @@ function OtherTariffs() {
 								bg="white"
 								_hover={{ bg: 'white', opacity: 0.9 }}
 								_active={{ bg: 'white' }}
+								onClick={() => history.push('/admin/billing/pay')}
 							>
 								ВЫБРАТЬ
 							</Button>

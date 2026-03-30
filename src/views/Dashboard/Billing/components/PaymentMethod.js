@@ -46,7 +46,7 @@ const PaymentMethod = ({ title = 'Способ оплаты' }) => {
 	const mutedColor = useColorModeValue('gray.400', 'gray.400');
 	const borderColor = useColorModeValue('gray.200', 'whiteAlpha.200');
 	const cardBg = useColorModeValue('white', 'gray.700');
-	const iconBg = useColorModeValue('white', 'gray.500');
+	const iconBg = useColorModeValue('transparent', 'gray.500');
 
 	return (
 		<Card p="1.5rem" bg={cardBg}>

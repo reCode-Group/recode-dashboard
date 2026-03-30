@@ -10,6 +10,7 @@ import { CreditIcon, HomeIcon, PersonIcon, RocketIcon, SupportIcon } from 'compo
 
 import { CompanyIcon, ConverterIcon, EmployersIcon, HistoryIcon } from 'components/Icons/Icons';
 import Billing from 'views/Dashboard/Billing';
+import BillingPay from 'views/Dashboard/BillingPay';
 import Tariff from 'views/Dashboard/Tariff';
 
 var dashRoutes = [
@@ -27,6 +28,13 @@ var dashRoutes = [
 		secondaryNavbar: true,
 		component: Profile,
 		layout: '/admin',
+	},
+	{
+		path: '/billing/pay',
+		name: 'Billing Pay',
+		component: BillingPay,
+		layout: '/admin',
+		hiddenInSidebar: true,
 	},
 	{
 		path: '/billing',
