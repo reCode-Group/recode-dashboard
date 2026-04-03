@@ -146,25 +146,23 @@ const PaymentMethod = ({
 								cursor="pointer"
 								onClick={() => handleSelect(method.id)}
 							>
-								{method.icon ? (
-									<Flex
-										px="4px"
-										h="24px"
-										borderRadius="6px"
-										align="center"
-										justify="center"
-										bg={iconSurface}
-										flexShrink={0}
-									>
-										<Image
-											src={method.icon}
-											alt={method.title}
-											w={method.iconW || '24px'}
-											h={method.iconH || '24px'}
-											objectFit="contain"
-										/>
-									</Flex>
-								) : null}
+								<Flex
+									px="4px"
+									h="24px"
+									borderRadius="6px"
+									align="center"
+									justify="center"
+									bg={iconSurface}
+									flexShrink={0}
+								>
+									<Image
+										src={method.icon}
+										alt={method.title}
+										w={method.iconW || '24px'}
+										h={method.iconH || '24px'}
+										objectFit="contain"
+									/>
+								</Flex>
 								<Text color={mutedColor} whiteSpace="nowrap">
 									{method.title}
 								</Text>

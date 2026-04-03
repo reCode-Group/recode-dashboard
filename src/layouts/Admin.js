@@ -27,6 +27,18 @@ export default function Dashboard(props) {
 	const getRoute = () => {
 		return window.location.pathname !== '/admin/full-screen-maps';
 	};
+	const getCurrentHashPath = () => {
+		const rawHash = window.location.hash || '';
+		const hashPath = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash;
+		const noQuery = hashPath.split('?')[0];
+		const normalized = noQuery.replace(/\/+$/, '');
+		return normalized || '/';
+	};
+	const isRouteActive = (route) => {
+		const routePath = `${route.layout}${route.path}`;
+		const normalizedRoute = routePath.replace(/\/+$/, '');
+		return getCurrentHashPath() === (normalizedRoute || '/');
+	};
 	const getActiveRoute = (routes) => {
 		let activeRoute = 'Default Brand Text';
 		for (let i = 0; i < routes.length; i++) {
@@ -41,7 +53,7 @@ export default function Dashboard(props) {
 					return categoryActiveRoute;
 				}
 			} else {
-				if (window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1) {
+				if (isRouteActive(routes[i])) {
 					return routes[i].name;
 				}
 			}
@@ -58,7 +70,7 @@ export default function Dashboard(props) {
 					return categoryActiveNavbar;
 				}
 			} else {
-				if (window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1) {
+				if (isRouteActive(routes[i])) {
 					if (routes[i].secondaryNavbar) {
 						return routes[i].secondaryNavbar;
 					}

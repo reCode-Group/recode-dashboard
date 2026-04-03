@@ -1,25 +1,40 @@
-// import
 import SignIn from 'views/Auth/SignIn.js';
+import Billing from 'views/Dashboard/Billing';
+import BillingPay from 'views/Dashboard/BillingPay';
 import ConversionHistoryPage from 'views/Dashboard/ConversionHistory';
 import Dashboard from 'views/Dashboard/Dashboard';
 import Profile from 'views/Dashboard/Profile';
+import ProfileComplete from 'views/Dashboard/ProfileComplete';
 import Support from 'views/Dashboard/Support';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
-
-import { CreditIcon, HomeIcon, PersonIcon, RocketIcon, SupportIcon } from 'components/Icons/Icons';
-
-import { CompanyIcon, ConverterIcon, EmployersIcon, HistoryIcon } from 'components/Icons/Icons';
-import Billing from 'views/Dashboard/Billing';
-import BillingPay from 'views/Dashboard/BillingPay';
 import Tariff from 'views/Dashboard/Tariff';
 
-var dashRoutes = [
+import {
+	CompanyIcon,
+	ConverterIcon,
+	CreditIcon,
+	EmployersIcon,
+	HistoryIcon,
+	HomeIcon,
+	PersonIcon,
+	RocketIcon,
+	SupportIcon,
+} from 'components/Icons/Icons';
+
+const dashRoutes = [
 	{
 		path: '/dashboard',
 		name: 'Главная',
 		icon: <HomeIcon color="inherit" />,
 		component: Dashboard,
 		layout: '/admin',
+	},
+	{
+		path: '/profile/complete',
+		name: 'Профиль',
+		component: ProfileComplete,
+		layout: '/admin',
+		hiddenInSidebar: true,
 	},
 	{
 		path: '/profile',
@@ -94,4 +109,5 @@ var dashRoutes = [
 		],
 	},
 ];
+
 export default dashRoutes;

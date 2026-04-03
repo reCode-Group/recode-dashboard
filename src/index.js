@@ -6,6 +6,7 @@ import AuthLayout from "layouts/Auth.js";
 ReactDOM.render(
   <HashRouter>
     <Switch>
+      <Redirect exact from={`/profile/complete`} to="/admin/profile/complete" />
       <Route path={`/auth`} component={AuthLayout} />
       <Route path={`/admin`} component={AdminLayout} />
       <Redirect from={`/`} to="/admin/dashboard" />
