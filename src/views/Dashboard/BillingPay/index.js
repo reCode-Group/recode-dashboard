@@ -46,7 +46,7 @@ function BillingPay() {
 	const labelColor = useColorModeValue('gray.700', 'gray.100');
 	const inputTextColor = useColorModeValue('gray.500', 'gray.200');
 	const inputBg = useColorModeValue('white', 'whiteAlpha.50');
-	const readonlyBg = useColorModeValue('gray.200', 'whiteAlpha.200');
+	const readonlyBg = useColorModeValue('gray.200', 'whiteAlpha.400');
 	const borderColor = useColorModeValue('gray.200', 'whiteAlpha.300');
 
 	const selectedTariff = useMemo(() => TARIFFS.find((item) => item.id === tariffId) || TARIFFS[0], [
@@ -55,6 +55,7 @@ function BillingPay() {
 	const selectedPeriod = useMemo(() => PERIODS.find((item) => item.id === periodId) || PERIODS[0], [
 		periodId,
 	]);
+	const isStatementMethod = paymentMethodId === 'statement';
 	const paymentAmount = useMemo(
 		() => formatAmount(selectedTariff.monthlyPrice * selectedPeriod.value),
 		[selectedPeriod.value, selectedTariff.monthlyPrice]
@@ -124,18 +125,20 @@ function BillingPay() {
 								</Select>
 							</FormControl>
 
-							<FormControl>
-								<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
-									ИНН
-								</FormLabel>
-								<Input
-									value={inn}
-									onChange={(event) => setInn(event.target.value)}
-									placeholder="0239951661"
-									bg={inputBg}
-									{...inputStyles}
-								/>
-							</FormControl>
+							{isStatementMethod ? (
+								<FormControl>
+									<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
+										ИНН
+									</FormLabel>
+									<Input
+										value={inn}
+										onChange={(event) => setInn(event.target.value)}
+										placeholder="0239951661"
+										bg={inputBg}
+										{...inputStyles}
+									/>
+								</FormControl>
+							) : null}
 
 							<Button
 								mt="8px"

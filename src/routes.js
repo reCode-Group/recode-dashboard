@@ -31,7 +31,7 @@ var dashRoutes = [
 	},
 	{
 		path: '/billing/pay',
-		name: 'Billing Pay',
+		name: 'Оплата услуг',
 		component: BillingPay,
 		layout: '/admin',
 		hiddenInSidebar: true,

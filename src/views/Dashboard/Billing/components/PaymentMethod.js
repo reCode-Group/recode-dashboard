@@ -107,7 +107,7 @@ const PaymentMethod = ({
 	const activeBorderColor = '#005DE0';
 	const summaryColor = useColorModeValue('#38A169', 'green.300');
 	const bulletColor = useColorModeValue('#4A5568', 'gray.200');
-	const iconSurface = useColorModeValue('transparent', 'whiteAlpha.100');
+	const iconSurface = useColorModeValue('transparent', 'whiteAlpha.700');
 
 	const explanation = useMemo(() => EXPLANATIONS[selectedMethod] ?? EXPLANATIONS.statement, [
 		selectedMethod,

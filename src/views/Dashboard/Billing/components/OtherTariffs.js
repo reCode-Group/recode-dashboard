@@ -9,7 +9,7 @@ const tariffs = [
 	{
 		id: 'standard',
 		name: 'СТАНДАРТ',
-		badge: 'Хит!',
+		badge: 'Хит',
 		tokens: '50 000',
 		price: {
 			month: '20 000 руб./мес.',
