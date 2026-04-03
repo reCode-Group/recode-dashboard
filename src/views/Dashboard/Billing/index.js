@@ -13,28 +13,28 @@ function Billing() {
 	return (
 		<Flex direction="column" pt={{ base: '120px', md: '75px' }} mb="100px">
 			<Grid
-				templateColumns={{ base: '1fr', lg: '2fr 1fr' }}
+				templateColumns={{ base: '1fr', xl: '2fr 1fr' }}
 				templateRows="auto"
 				alignItems="stretch"
 				gap="24px"
-				minH={{ base: 'auto', lg: 'calc(100vh - 95px)' }}
+				minH={{ base: 'auto', xl: 'calc(100vh - 95px)' }}
 			>
 				<GridItem minH="0" display="flex" flexDirection="column" gap="24px">
 					<Grid
-						templateColumns={{ base: '1fr', md: '1fr 1fr' }}
+						templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
 						templateRows={{
 							base: 'auto auto auto',
-							md: 'auto auto',
-							lg: 'minmax(0, 4fr) minmax(0, 5fr)',
+							lg: 'auto auto',
+							xl: 'minmax(0, 4fr) minmax(0, 5fr)',
 						}}
 						templateAreas={{
 							base: `"tariff" "others" "transactions"`,
-							md: `"tariff others" "transactions transactions"`,
-							lg: `"tariff transactions" "others transactions"`,
+							lg: `"tariff others" "transactions transactions"`,
+							xl: `"tariff transactions" "others transactions"`,
 						}}
 						alignItems="stretch"
 						gap="26px"
-						h={{ base: 'auto', lg: '600px' }}
+						h={{ base: 'auto', xl: '600px' }}
 					>
 						<GridItem area="tariff" minH="0">
 							<TariffCard
@@ -58,7 +58,7 @@ function Billing() {
 						<GridItem area="others" minH="0">
 							<OtherTariffs />
 						</GridItem>
-						<GridItem area="transactions" minH="0" h={{ base: 'auto', lg: '100%' }}>
+						<GridItem area="transactions" minH="0" h={{ base: 'auto', xl: '100%' }}>
 							<Transactions
 								title={'Транзакции'}
 								date={'23 - 30 Марта'}

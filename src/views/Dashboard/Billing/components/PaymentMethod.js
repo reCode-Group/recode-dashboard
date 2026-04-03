@@ -1,39 +1,38 @@
-// Chakra imports
 import { Box, Flex, Image, Text, useColorModeValue } from '@chakra-ui/react';
-// Custom components
 import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
-// Assets
+import { useMemo, useState } from 'react';
+
 import mirLogo from 'assets/img/payment-methods/mir.png';
 import sbpLogo from 'assets/img/payment-methods/sbp.png';
 import statementLogo from 'assets/img/payment-methods/statement.png';
 import tbankLogo from 'assets/img/payment-methods/tbank.png';
 
-const methods = [
+const DEFAULT_METHODS = [
 	{
-		key: 'sbp',
+		id: 'sbp',
 		title: 'Система быстрых платежей (СБП)',
 		icon: sbpLogo,
 		iconW: '56px',
 		iconH: '33px',
 	},
 	{
-		key: 'card',
+		id: 'card',
 		title: 'Банковская карта',
 		icon: mirLogo,
 		iconW: '47px',
 		iconH: '14px',
 	},
 	{
-		key: 'tbank',
+		id: 'tbank',
 		title: 'Через Т-Банк',
 		icon: tbankLogo,
 		iconW: '69px',
 		iconH: '25px',
 	},
 	{
-		key: 'statement',
+		id: 'statement',
 		title: 'Выписка счета',
 		icon: statementLogo,
 		iconW: '24px',
@@ -41,66 +40,167 @@ const methods = [
 	},
 ];
 
-const PaymentMethod = ({ title = 'Способ оплаты' }) => {
-	const textColor = useColorModeValue('gray.700', 'white');
-	const mutedColor = useColorModeValue('gray.400', 'gray.400');
-	const borderColor = useColorModeValue('gray.200', 'whiteAlpha.200');
+const EXPLANATIONS = {
+	statement: {
+		commissionText: '0%',
+		commissionLabel: 'определяется банком',
+		processingText: '3-4',
+		processingLabel: 'рабочих дня',
+		bullets: [
+			'При оплате от юридического лица, не являющегося владельцем аккаунта, укажите в назначении платежа номер счета и логин аккаунта, за который производится оплата.',
+			'Данные в счете должны полностью совпадать с данными владельца пополняемого аккаунта, указанными в личной карточке плательщика.',
+			'При формировании платежного поручения и назначении платежа обязательно укажите номер счета и логин аккаунта.',
+			'При совершении оплаты из-за границы может потребоваться код валютной операции: [20100].',
+			'Зачисление средств на баланс аккаунта производится в будние дни после поступления средств на расчетный счет.',
+		],
+	},
+	card: {
+		commissionText: 'Комиссия',
+		commissionLabel: 'по тарифу банка-эмитента',
+		processingText: 'до 10 минут',
+		processingLabel: 'в рабочее время',
+		bullets: [
+			'Поддерживаются карты Mastercard, Visa и МИР, выпущенные банками РФ.',
+			'Для успешной оплаты может потребоваться подтверждение 3-D Secure.',
+			'Квитанция формируется автоматически и доступна в разделе документов.',
+		],
+	},
+	sbp: {
+		commissionText: '0%',
+		commissionLabel: 'для большинства банков',
+		processingText: 'мгновенно',
+		processingLabel: 'после подтверждения',
+		bullets: [
+			'Оплата выполняется через приложение банка по QR или deep-link.',
+			'Лимиты и доступность метода зависят от банка отправителя.',
+			'После оплаты баланс обновляется автоматически.',
+		],
+	},
+	tbank: {
+		commissionText: '0%',
+		commissionLabel: 'по внутреннему тарифу Т-Банка',
+		processingText: 'до 5 минут',
+		processingLabel: 'в рабочее время',
+		bullets: [
+			'Оплата выполняется через приложение Т-Банка с подтверждением операции.',
+			'Комиссия и лимиты зависят от условий обслуживающего банка.',
+			'После успешной оплаты баланс обновляется автоматически.',
+		],
+	},
+};
+
+const PaymentMethod = ({
+	title = 'Способ оплаты',
+	titleFontSize = 'lg',
+	showExplanations = false,
+	value,
+	defaultValue = 'statement',
+	onChange,
+	methods = DEFAULT_METHODS,
+}) => {
+	const [internalValue, setInternalValue] = useState(defaultValue);
+	const selectedMethod = value ?? internalValue;
+	const textColor = useColorModeValue('#2D3748', 'white');
+	const mutedColor = useColorModeValue('gray.500', 'gray.300');
+	const borderColor = useColorModeValue('gray.200', 'whiteAlpha.300');
 	const cardBg = useColorModeValue('white', 'gray.700');
-	const iconBg = useColorModeValue('transparent', 'gray.500');
+	const activeBorderColor = '#005DE0';
+	const summaryColor = useColorModeValue('#38A169', 'green.300');
+	const bulletColor = useColorModeValue('#4A5568', 'gray.200');
+	const iconSurface = useColorModeValue('transparent', 'whiteAlpha.100');
+
+	const explanation = useMemo(() => EXPLANATIONS[selectedMethod] ?? EXPLANATIONS.statement, [
+		selectedMethod,
+	]);
+
+	const handleSelect = (id) => {
+		if (value === undefined) {
+			setInternalValue(id);
+		}
+		if (onChange) {
+			onChange(id);
+		}
+	};
 
 	return (
-		<Card p="1.5rem" bg={cardBg}>
-			<CardHeader pb="8px">
-				<Text fontSize="lg" color={textColor} fontWeight="bold">
+		<Card p="24px" bg={cardBg}>
+			<CardHeader p="0" pb="12px">
+				<Text fontSize={titleFontSize} lineHeight="1.2" color={textColor} fontWeight="bold">
 					{title}
 				</Text>
 			</CardHeader>
-			<CardBody pt="8px">
-				<Flex wrap="wrap" gap="14px">
-					{methods.map((method) => (
-						<Flex
-							key={method.key}
-							align="center"
-							gap="10px"
-							minH="64px"
-							px="20px"
-							py="12px"
-							border="1px solid"
-							borderColor={borderColor}
-							borderRadius="15px"
-							flex="0 0 auto"
-							cursor="pointer"
-						>
+			<CardBody p="0" style={{ flexDirection: 'column' }}>
+				<Flex wrap="wrap" gap="8px">
+					{methods.map((method) => {
+						const isActive = selectedMethod === method.id;
+						return (
 							<Flex
-								w={method.iconW + '4px'}
-								h="90%"
-								flexShrink={0}
+								key={method.id}
 								align="center"
-								bg={iconBg}
-								borderRadius="8px"
-								px="6px"
+								gap="8px"
+								h="50px"
+								px="12px"
+								border="2px solid"
+								borderColor={isActive ? activeBorderColor : borderColor}
+								borderRadius="15px"
+								cursor="pointer"
+								onClick={() => handleSelect(method.id)}
 							>
-								<Image
-									src={method.icon}
-									alt={method.title}
-									w={method.iconW}
-									h={method.iconH}
-									objectFit="contain"
-								/>
+								{method.icon ? (
+									<Flex
+										px="4px"
+										h="24px"
+										borderRadius="6px"
+										align="center"
+										justify="center"
+										bg={iconSurface}
+										flexShrink={0}
+									>
+										<Image
+											src={method.icon}
+											alt={method.title}
+											w={method.iconW || '24px'}
+											h={method.iconH || '24px'}
+											objectFit="contain"
+										/>
+									</Flex>
+								) : null}
+								<Text color={mutedColor} whiteSpace="nowrap">
+									{method.title}
+								</Text>
 							</Flex>
-							<Text
-								color={mutedColor}
-								fontSize="md"
-								fontWeight="medium"
-								lineHeight="1.4"
-								whiteSpace="nowrap"
-							>
-								{method.title}
+						);
+					})}
+				</Flex>
+
+				{showExplanations ? (
+					<Box mt="16px">
+						<Flex align="center" gap="8px" wrap="wrap">
+							<Text color={summaryColor} fontSize="20px" lineHeight="1.4" fontWeight="bold">
+								{explanation.commissionText}
+							</Text>
+							<Text color={mutedColor} fontSize="20px" lineHeight="1.4">
+								{explanation.commissionLabel}
+							</Text>
+							<Text color={summaryColor} fontSize="20px" lineHeight="1.4" fontWeight="bold">
+								{explanation.processingText}
+							</Text>
+							<Text color={mutedColor} fontSize="20px" lineHeight="1.4">
+								{explanation.processingLabel}
 							</Text>
 						</Flex>
-					))}
-				</Flex>
-				<Box h="2px" />
+						<Flex direction="column" mt="10px" gap="8px">
+							{explanation.bullets.map((bullet) => (
+								<Flex key={bullet} align="flex-start" gap="8px">
+									<Box w="6px" h="6px" mt="8px" borderRadius="full" bg="#3182CE" flexShrink={0} />
+									<Text fontSize="13px" lineHeight="1.5" color={bulletColor}>
+										{bullet}
+									</Text>
+								</Flex>
+							))}
+						</Flex>
+					</Box>
+				) : null}
 			</CardBody>
 		</Card>
 	);
