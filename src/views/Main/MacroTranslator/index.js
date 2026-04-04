@@ -184,7 +184,6 @@ export default function MacroTranslatorPage() {
 							borderWidth="1px"
 							borderColor={tableBorder}
 							borderRadius="15px"
-							bg={inputBg}
 							mt="8px"
 							px="16px"
 							py="12px"
