@@ -320,7 +320,12 @@ export default function MacroTranslatorPage() {
 				</Box>
 			</Flex>
 
-			<Modal isOpen={isDisclaimerOpen} onClose={() => setIsDisclaimerOpen(false)} isCentered size="3xl">
+			<Modal
+				isOpen={isDisclaimerOpen}
+				onClose={() => setIsDisclaimerOpen(false)}
+				isCentered
+				size="3xl"
+			>
 				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
 				<ModalContent
 					bg={modalGlassBg}
@@ -344,13 +349,21 @@ export default function MacroTranslatorPage() {
 					<ModalCloseButton top="20px" right="20px" />
 					<ModalBody px="28px" py="22px" bg={modalSectionBg}>
 						<Text fontSize="14px" lineHeight="1.6" color={modalTextColor}>
-							Наш онлайн-сервис предоставляет возможность автоматизированного перевода кода между языками программирования исключительно "как есть" без каких-либо гарантий точности, полноты или пригодности результата для конкретных целей использования. Пользователь несет полную ответственность за проверку и исправление полученного кода перед его применением в своих проектах.
+							Наш онлайн-сервис предоставляет возможность автоматизированного перевода кода между
+							языками программирования исключительно "как есть" без каких-либо гарантий точности,
+							полноты или пригодности результата для конкретных целей использования. Пользователь
+							несет полную ответственность за проверку и исправление полученного кода перед его
+							применением в своих проектах.
 						</Text>
 						<Text fontSize="14px" lineHeight="1.6" color={modalTextColor} mt="12px">
-							Мы не несем ответственности за любые возможные убытки, ущерб или другие последствия, возникшие вследствие использования нашего сервиса, включая, но не ограничиваясь, ошибками в результате конвертации, потерей данных или нарушением работы программного обеспечения пользователя.
+							Мы не несем ответственности за любые возможные убытки, ущерб или другие последствия,
+							возникшие вследствие использования нашего сервиса, включая, но не ограничиваясь,
+							ошибками в результате конвертации, потерей данных или нарушением работы программного
+							обеспечения пользователя.
 						</Text>
 						<Text fontSize="14px" lineHeight="1.6" color={modalTextColor} mt="12px">
-							Продолжая использовать наш сервис, вы соглашаетесь с данным отказом от ответственности и принимаете все риски, связанные с его использованием.
+							Продолжая использовать наш сервис, вы соглашаетесь с данным отказом от ответственности
+							и принимаете все риски, связанные с его использованием.
 						</Text>
 					</ModalBody>
 					<ModalFooter
@@ -360,7 +373,11 @@ export default function MacroTranslatorPage() {
 						borderColor="blackAlpha.200"
 						bg={modalSectionBg}
 					>
-						<Button colorScheme="blue" borderRadius="12px" onClick={() => setIsDisclaimerOpen(false)}>
+						<Button
+							colorScheme="recode"
+							borderRadius="12px"
+							onClick={() => setIsDisclaimerOpen(false)}
+						>
 							Понятно
 						</Button>
 					</ModalFooter>

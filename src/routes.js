@@ -8,6 +8,7 @@ import ProfileComplete from 'views/Dashboard/ProfileComplete';
 import Support from 'views/Dashboard/Support';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
 import Tariff from 'views/Dashboard/Tariff';
+import DocumentationPage from 'views/Main/Documentation';
 import MacroTranslatorPage from 'views/Main/MacroTranslator';
 
 import {
@@ -99,6 +100,13 @@ const dashRoutes = [
 				icon: <EmployersIcon color="inherit" />,
 				component: EmployeeTable,
 				layout: '/main',
+			},
+			{
+				path: '/documentation',
+				name: 'Документация',
+				component: DocumentationPage,
+				layout: '/main',
+				hiddenInSidebar: true,
 			},
 			{
 				path: '/macro-translator',

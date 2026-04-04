@@ -7,12 +7,14 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import AuthNavbar from 'components/Navbars/AuthNavbar.js';
 import React from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
 import routes from 'routes.js';
 import theme from 'theme/theme.js';
 
 export default function MainLayout(props) {
 	const { ...rest } = props;
+	const location = useLocation();
+	const isDocumentationRoute = location.pathname === '/main/documentation';
 	// ref for the wrapper div
 	const wrapper = React.createRef();
 	React.useEffect(() => {
@@ -81,9 +83,11 @@ export default function MainLayout(props) {
 	return (
 		<ChakraProvider theme={theme} resetCss={false} w="100%">
 			<Box ref={navRef} w="100%">
-				<Portal containerRef={navRef}>
-					<AuthNavbar secondary={getActiveNavbar(routes)} logoText="RECODE DASHBOARD" />
-				</Portal>
+				{!isDocumentationRoute && (
+					<Portal containerRef={navRef}>
+						<AuthNavbar secondary={getActiveNavbar(routes)} logoText="RECODE DASHBOARD" />
+					</Portal>
+				)}
 				<Box w="100%">
 					<Box ref={wrapper} w="1044px" mx="auto">
 						<Switch>
@@ -93,9 +97,11 @@ export default function MainLayout(props) {
 						</Switch>
 					</Box>
 				</Box>
-				<Box px="24px" mx="auto" width="1044px" maxW="100%">
-					<Footer />
-				</Box>
+				{!isDocumentationRoute && (
+					<Box px="24px" mx="auto" width="1044px" maxW="100%">
+						<Footer />
+					</Box>
+				)}
 			</Box>
 		</ChakraProvider>
 	);
