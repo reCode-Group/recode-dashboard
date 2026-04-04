@@ -3,14 +3,14 @@ import { ChakraProvider, Portal, useDisclosure } from '@chakra-ui/react';
 import Configurator from 'components/Configurator/Configurator';
 import Footer from 'components/Footer/Footer.js';
 // Layout components
-import AdminNavbar from 'components/Navbars/AdminNavbar.js';
-import Sidebar from 'components/Sidebar';
-import React, { useState } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
-import routes from 'routes.js';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import AdminNavbar from 'components/Navbars/AdminNavbar.js';
+import Sidebar from 'components/Sidebar';
+import { useState } from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import routes from 'routes.js';
 // Custom Chakra theme
 import theme from 'theme/theme.js';
 import FixedPlugin from '../components/FixedPlugin/FixedPlugin';
@@ -21,8 +21,8 @@ import PanelContent from '../components/Layout/PanelContent';
 export default function Dashboard(props) {
 	const { ...rest } = props;
 	// states and functions
-	const [ sidebarVariant, setSidebarVariant ] = useState('transparent');
-	const [ fixed, setFixed ] = useState(false);
+	const [sidebarVariant, setSidebarVariant] = useState('transparent');
+	const [fixed, setFixed] = useState(false);
 	// functions for changing the states from components
 	const getRoute = () => {
 		return window.location.pathname !== '/admin/full-screen-maps';
@@ -40,7 +40,7 @@ export default function Dashboard(props) {
 		return getCurrentHashPath() === (normalizedRoute || '/');
 	};
 	const getActiveRoute = (routes) => {
-		let activeRoute = 'Default Brand Text';
+		let activeRoute = 'reCode Dashboard';
 		for (let i = 0; i < routes.length; i++) {
 			if (routes[i].collapse) {
 				let collapseActiveRoute = getActiveRoute(routes[i].views);
@@ -88,9 +88,7 @@ export default function Dashboard(props) {
 				return getRoutes(prop.views);
 			}
 			if (prop.layout === '/admin') {
-				return (
-					<Route exact path={prop.layout + prop.path} component={prop.component} key={key} />
-				);
+				return <Route exact path={prop.layout + prop.path} component={prop.component} key={key} />;
 			} else {
 				return null;
 			}
@@ -102,20 +100,21 @@ export default function Dashboard(props) {
 		<ChakraProvider theme={theme} resetCss={false}>
 			<Sidebar
 				routes={routes}
-				logoText={'PURITY UI DASHBOARD'}
-				display='none'
+				logoText={'RECODE DASHBOARD'}
+				display="none"
 				sidebarVariant={sidebarVariant}
 				{...rest}
 			/>
 			<MainPanel
 				w={{
 					base: '100%',
-					xl: 'calc(100% - 275px)'
-				}}>
+					xl: 'calc(100% - 275px)',
+				}}
+			>
 				<Portal>
 					<AdminNavbar
 						onOpen={onOpen}
-						logoText={'PURITY UI DASHBOARD'}
+						logoText={'RECODE DASHBOARD'}
 						brandText={getActiveRoute(routes)}
 						secondary={getActiveNavbar(routes)}
 						fixed={fixed}
@@ -127,7 +126,7 @@ export default function Dashboard(props) {
 						<PanelContainer>
 							<Switch>
 								{getRoutes(routes)}
-								<Redirect from='/admin' to='/admin/dashboard' />
+								<Redirect from="/admin" to="/admin/dashboard" />
 							</Switch>
 						</PanelContainer>
 					</PanelContent>

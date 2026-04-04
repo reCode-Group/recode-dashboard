@@ -98,7 +98,7 @@ const dashRoutes = [
 				name: 'Сотрудники',
 				icon: <EmployersIcon color="inherit" />,
 				component: EmployeeTable,
-				layout: '/admin',
+				layout: '/main',
 			},
 			{
 				path: '/login-page',

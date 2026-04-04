@@ -21,7 +21,7 @@ export default function Pages(props) {
 		return function cleanup() {};
 	});
 	const getActiveRoute = (routes) => {
-		let activeRoute = 'Default Brand Text';
+		let activeRoute = 'reCode Dashboard';
 		for (let i = 0; i < routes.length; i++) {
 			if (routes[i].collapse) {
 				let collapseActiveRoute = getActiveRoute(routes[i].views);
@@ -76,20 +76,20 @@ export default function Pages(props) {
 	};
 	const navRef = React.useRef();
 	return (
-		<ChakraProvider theme={theme} resetCss={false} w='100%'>
-			<Box ref={navRef} w='100%'>
+		<ChakraProvider theme={theme} resetCss={false} w="100%">
+			<Box ref={navRef} w="100%">
 				<Portal containerRef={navRef}>
-					<AuthNavbar secondary={getActiveNavbar(routes)} logoText='PURITY UI DASHBOARD' />
+					<AuthNavbar secondary={getActiveNavbar(routes)} logoText="RECODE DASHBOARD" />
 				</Portal>
-				<Box w='100%'>
-					<Box ref={wrapper} w='100%'>
+				<Box w="100%">
+					<Box ref={wrapper} w="100%">
 						<Switch>
 							{getRoutes(routes)}
-							<Redirect from='/auth' to='/auth/login-page' />
+							<Redirect from="/auth" to="/auth/login-page" />
 						</Switch>
 					</Box>
 				</Box>
-				<Box px='24px' mx='auto' width='1044px' maxW='100%'>
+				<Box px="24px" mx="auto" width="1044px" maxW="100%">
 					<Footer />
 				</Box>
 			</Box>
