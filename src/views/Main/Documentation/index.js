@@ -160,7 +160,18 @@ export default function DocumentationPage() {
 			<Box as="aside" display={{ base: 'none', md: 'block' }} w="30vw" minW="280px" bg={panelBg}>
 				<Box position="sticky" top="0" p="2vw">
 					<Flex align="center" mb="2vw" fontWeight="500" fontSize={{ md: 'md', xl: '2xl' }}>
-						<Image src={recodeLogoColored} alt="reCode" w="8vw" minW="96px" mr="0.5rem" />
+						<Box
+							as="button"
+							type="button"
+							bg="transparent"
+							border="0"
+							p="0"
+							m="0"
+							cursor="pointer"
+							onClick={() => history.push('/')}
+						>
+							<Image src={recodeLogoColored} alt="reCode" w="8vw" minW="96px" mr="0.5rem" />
+						</Box>
 						<Text color={mutedColor}>/ Документация</Text>
 					</Flex>
 					<Box as="ul" listStyleType="none" m="0" p="0">
