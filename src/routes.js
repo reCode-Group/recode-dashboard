@@ -1,5 +1,4 @@
-﻿import SignIn from 'views/Auth/SignIn.js';
-import Billing from 'views/Dashboard/Billing';
+﻿import Billing from 'views/Dashboard/Billing';
 import BillingPay from 'views/Dashboard/BillingPay';
 import CompanyRegistration from 'views/Dashboard/CompanyRegistration';
 import ConversionHistoryPage from 'views/Dashboard/ConversionHistory';
@@ -9,6 +8,7 @@ import ProfileComplete from 'views/Dashboard/ProfileComplete';
 import Support from 'views/Dashboard/Support';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
 import Tariff from 'views/Dashboard/Tariff';
+import MacroTranslatorPage from 'views/Main/MacroTranslator';
 
 import {
 	CompanyIcon,
@@ -101,11 +101,11 @@ const dashRoutes = [
 				layout: '/main',
 			},
 			{
-				path: '/login-page',
+				path: '/macro-translator',
 				name: 'Перейти в переводчик',
 				icon: <ConverterIcon color="inherit" />,
-				component: SignIn,
-				layout: '/auth',
+				component: MacroTranslatorPage,
+				layout: '/main',
 			},
 			{
 				path: '/conversion-history',
@@ -119,3 +119,4 @@ const dashRoutes = [
 ];
 
 export default dashRoutes;
+

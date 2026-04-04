@@ -68,8 +68,8 @@ export default function MainLayout(props) {
 			if (prop.category === 'account') {
 				return getRoutes(prop.views);
 			}
-			if (prop.layout === '/auth') {
-				return <Route path={prop.layout + prop.path} component={prop.component} key={key} />;
+			if (prop.layout === '/auth' || prop.layout === '/main') {
+				return <Route exact path={prop.layout + prop.path} component={prop.component} key={key} />;
 			} else {
 				return null;
 			}
@@ -85,9 +85,10 @@ export default function MainLayout(props) {
 					<AuthNavbar secondary={getActiveNavbar(routes)} logoText="RECODE DASHBOARD" />
 				</Portal>
 				<Box w="100%">
-					<Box ref={wrapper} w="100%">
+					<Box ref={wrapper} w="1044px" mx="auto">
 						<Switch>
 							{getRoutes(routes)}
+							<Redirect from="/main" to="/main/macro-translator" />
 							<Redirect from="/auth" to="/auth/login-page" />
 						</Switch>
 					</Box>
