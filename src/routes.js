@@ -9,6 +9,8 @@ import Support from 'views/Dashboard/Support';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
 import Tariff from 'views/Dashboard/Tariff';
 import DocumentationPage from 'views/Main/Documentation';
+import BlogArticlePage from 'views/Main/Blog/Article';
+import BlogPage from 'views/Main/Blog';
 import MacroTranslatorPage from 'views/Main/MacroTranslator';
 
 import {
@@ -105,6 +107,20 @@ const dashRoutes = [
 				path: '/documentation',
 				name: 'Документация',
 				component: DocumentationPage,
+				layout: '/main',
+				hiddenInSidebar: true,
+			},
+			{
+				path: '/blog',
+				name: 'Блог',
+				component: BlogPage,
+				layout: '/main',
+				hiddenInSidebar: true,
+			},
+			{
+				path: '/blog/:slug',
+				name: 'Статья',
+				component: BlogArticlePage,
 				layout: '/main',
 				hiddenInSidebar: true,
 			},
