@@ -136,7 +136,7 @@ export default function AuthNavbar(props) {
 					<Text>БЛОГ</Text>
 				</Button>
 			</NavLink>
-			<NavLink to="/auth/signin">
+			<NavLink to="/main/contacts#support">
 				<Button
 					fontSize="sm"
 					fontWeight="medium"

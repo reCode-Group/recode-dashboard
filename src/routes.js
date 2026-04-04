@@ -11,6 +11,7 @@ import Tariff from 'views/Dashboard/Tariff';
 import DocumentationPage from 'views/Main/Documentation';
 import BlogArticlePage from 'views/Main/Blog/Article';
 import BlogPage from 'views/Main/Blog';
+import ContactsPage from 'views/Main/Contacts';
 import MacroTranslatorPage from 'views/Main/MacroTranslator';
 
 import {
@@ -121,6 +122,13 @@ const dashRoutes = [
 				path: '/blog/:slug',
 				name: 'Статья',
 				component: BlogArticlePage,
+				layout: '/main',
+				hiddenInSidebar: true,
+			},
+			{
+				path: '/contacts',
+				name: 'Контакты',
+				component: ContactsPage,
 				layout: '/main',
 				hiddenInSidebar: true,
 			},

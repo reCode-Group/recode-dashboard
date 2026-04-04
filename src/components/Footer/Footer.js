@@ -1,5 +1,6 @@
 /*eslint-disable*/
 import { Flex, Link, List, ListItem, Text } from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom";
 
 export default function Footer(props) {
   // const linkRecode = useColorModeValue("recode.400", "red.200");=
@@ -60,7 +61,12 @@ export default function Footer(props) {
           </Link>
         </ListItem>
         <ListItem>
-           <Link color="gray.400" href="https://recode-group/contact" textDecoration="underline">
+           <Link
+            as={RouterLink}
+            to="/main/contacts"
+            color="gray.400"
+            textDecoration="underline"
+          >
 						Контакты
           </Link>
         </ListItem>
