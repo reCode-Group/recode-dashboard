@@ -2,6 +2,7 @@
 import { Box, Button, Flex, HStack, Image, Link, Text, useColorModeValue } from '@chakra-ui/react';
 import recode_logo_colored from 'assets/svg/recode-logo-colored.svg';
 import recode_logo_white from 'assets/svg/recode-logo-white.svg';
+import { MAIN_CONTAINER_MAX_WIDTH, MAIN_NAVBAR_WIDTH } from 'constants/layout';
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -63,7 +64,7 @@ export default function AuthNavbar(props) {
 			<Image
 				src={props.secondary === true ? recode_logo_white : recode_logo_colored}
 				alt="reCode Platform Logo"
-				width={125}
+				width={{ base: 108, sm: 118, md: 125 }}
 			/>
 		</Link>
 	);
@@ -154,7 +155,7 @@ export default function AuthNavbar(props) {
 	return (
 		<Flex
 			position={navbarPosition}
-			top="16px"
+			top={{ base: '8px', md: '12px', xl: '16px' }}
 			left="50%"
 			transform="translate(-50%, 0px)"
 			background={navbarBg}
@@ -163,11 +164,11 @@ export default function AuthNavbar(props) {
 			filter={navbarFilter}
 			backdropFilter={navbarBackdrop}
 			borderRadius="15px"
-			px="24px"
-			py="22px"
+			px={{ base: '14px', sm: '16px', md: '20px', xl: '24px' }}
+			py={{ base: '10px', sm: '12px', md: '16px', xl: '22px' }}
 			mx="auto"
-			width="1044px"
-			maxW="90%"
+			w={MAIN_NAVBAR_WIDTH}
+			maxW={MAIN_CONTAINER_MAX_WIDTH}
 			alignItems="center"
 			zIndex={1000}
 		>

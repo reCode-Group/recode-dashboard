@@ -1,6 +1,7 @@
 // chakra imports
 import { Box, ChakraProvider, Portal } from '@chakra-ui/react';
 import Footer from 'components/Footer/Footer.js';
+import { MAIN_CONTAINER_MAX_WIDTH, MAIN_CONTAINER_PADDING_X } from 'constants/layout';
 // core components
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -15,6 +16,8 @@ export default function MainLayout(props) {
 	const { ...rest } = props;
 	const location = useLocation();
 	const isDocumentationRoute = location.pathname === '/main/documentation';
+	const contentMaxWidth = isDocumentationRoute ? '100%' : MAIN_CONTAINER_MAX_WIDTH;
+	const contentPaddingX = isDocumentationRoute ? '0px' : MAIN_CONTAINER_PADDING_X;
 	// ref for the wrapper div
 	const wrapper = React.createRef();
 	React.useEffect(() => {
@@ -89,7 +92,7 @@ export default function MainLayout(props) {
 					</Portal>
 				)}
 				<Box w="100%">
-					<Box ref={wrapper} w="1044px" mx="auto">
+					<Box ref={wrapper} w="100%" maxW={contentMaxWidth} px={contentPaddingX} mx="auto">
 						<Switch>
 							{getRoutes(routes)}
 							<Redirect from="/main" to="/main/macro-translator" />
@@ -98,7 +101,7 @@ export default function MainLayout(props) {
 					</Box>
 				</Box>
 				{!isDocumentationRoute && (
-					<Box px="24px" mx="auto" width="1044px" maxW="100%">
+					<Box px={MAIN_CONTAINER_PADDING_X} mx="auto" width="100%" maxW={MAIN_CONTAINER_MAX_WIDTH}>
 						<Footer />
 					</Box>
 				)}

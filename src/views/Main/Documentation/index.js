@@ -156,8 +156,14 @@ export default function DocumentationPage() {
 	};
 
 	return (
-		<Flex w="100vw" ml="calc(50% - 50vw)" color={textColor}>
-			<Box as="aside" display={{ base: 'none', md: 'block' }} w="30vw" minW="280px" bg={panelBg}>
+		<Flex w="100%" minW="0" color={textColor}>
+			<Box
+				as="aside"
+				display={{ base: 'none', md: 'block' }}
+				w={{ md: '280px', xl: '320px' }}
+				flexShrink={0}
+				bg={panelBg}
+			>
 				<Box position="sticky" top="0" p="2vw">
 					<Flex align="center" mb="2vw" fontWeight="500" fontSize={{ md: 'md', xl: '2xl' }}>
 						<Box
@@ -204,13 +210,15 @@ export default function DocumentationPage() {
 				</Box>
 			</Box>
 
-			<Box as="main" flex="1" minW="0" h="180vh">
+			<Box as="main" flex="1" minW="0">
 				<Flex
 					position="sticky"
 					top="0"
 					zIndex="5"
-					align="center"
+					flexDir={{ base: 'column', md: 'row' }}
+					align={{ base: 'stretch', md: 'center' }}
 					justify="space-between"
+					gap={{ base: '10px', md: '0' }}
 					px="4vw"
 					py={{ base: '4.5vw', md: '0.8rem' }}
 					bg={mainBg}
@@ -221,12 +229,13 @@ export default function DocumentationPage() {
 						md: 'none',
 					}}
 				>
-					<Flex display={{ base: 'flex', md: 'none' }} w="50vw">
+					<Flex display={{ base: 'flex', md: 'none' }} w="100%">
 						<Image src={recodeLogoColored} alt="reCode" w="8rem" />
 					</Flex>
 					<Box
 						position="relative"
 						w={{ base: '100%', md: '25vw' }}
+						maxW={{ base: '100%', md: '360px' }}
 						minW={{ base: '0', md: '220px' }}
 					>
 						<Flex

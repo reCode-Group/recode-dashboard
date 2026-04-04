@@ -15,7 +15,7 @@ export default function Footer(props) {
         xl: "start",
       }}
       justifyContent="space-between"
-      px="30px"
+      px={{ base: "0px", md: "8px" }}
       pb="20px"
 			fontSize="sm"
     >
@@ -29,13 +29,14 @@ export default function Footer(props) {
       >
         &copy; ООО «Рекод Решения», {1900 + new Date().getYear()}
       </Text>
-      <List display="flex">
-        <ListItem
-          me={{
-            base: "20px",
-            md: "25px",
-          }}
-        >
+      <List
+        display="flex"
+        flexWrap={{ base: "wrap", md: "nowrap" }}
+        justifyContent="center"
+        rowGap="8px"
+        columnGap="20px"
+      >
+        <ListItem>
           <Link
             as={RouterLink}
             to="/main/privacy-policy"
@@ -45,12 +46,7 @@ export default function Footer(props) {
 						Политика конфиденциальности
           </Link>
         </ListItem>
-        <ListItem
-          me={{
-            base: "20px",
-            md: "25px",
-          }}
-        >
+        <ListItem>
           <Link
             as={RouterLink}
             to="/main/public-offer"
@@ -60,12 +56,7 @@ export default function Footer(props) {
 						Публичная оферта
           </Link>
         </ListItem>
-        <ListItem
-          me={{
-            base: "20px",
-            md: "25px",
-          }}
-        >
+        <ListItem>
           <Link color="gray.400" href="https://recode-group/blog" textDecoration="underline">
 						Блог
           </Link>
