@@ -1,6 +1,7 @@
-import SignIn from 'views/Auth/SignIn.js';
+﻿import SignIn from 'views/Auth/SignIn.js';
 import Billing from 'views/Dashboard/Billing';
 import BillingPay from 'views/Dashboard/BillingPay';
+import CompanyRegistration from 'views/Dashboard/CompanyRegistration';
 import ConversionHistoryPage from 'views/Dashboard/ConversionHistory';
 import Dashboard from 'views/Dashboard/Dashboard';
 import Profile from 'views/Dashboard/Profile';
@@ -33,6 +34,13 @@ const dashRoutes = [
 		path: '/profile/complete',
 		name: 'Профиль',
 		component: ProfileComplete,
+		layout: '/admin',
+		hiddenInSidebar: true,
+	},
+	{
+		path: '/company/reg',
+		name: 'Компания',
+		component: CompanyRegistration,
 		layout: '/admin',
 		hiddenInSidebar: true,
 	},
