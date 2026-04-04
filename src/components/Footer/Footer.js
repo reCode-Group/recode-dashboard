@@ -36,7 +36,12 @@ export default function Footer(props) {
             md: "25px",
           }}
         >
-          <Link color="gray.400" href="https://recode-group/policy" textDecoration="underline">
+          <Link
+            as={RouterLink}
+            to="/main/privacy-policy"
+            color="gray.400"
+            textDecoration="underline"
+          >
 						Политика конфиденциальности
           </Link>
         </ListItem>
@@ -46,7 +51,12 @@ export default function Footer(props) {
             md: "25px",
           }}
         >
-          <Link color="gray.400" href="https://recode-group/policy" textDecoration="underline">
+          <Link
+            as={RouterLink}
+            to="/main/public-offer"
+            color="gray.400"
+            textDecoration="underline"
+          >
 						Публичная оферта
           </Link>
         </ListItem>

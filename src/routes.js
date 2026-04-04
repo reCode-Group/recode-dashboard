@@ -13,6 +13,8 @@ import BlogArticlePage from 'views/Main/Blog/Article';
 import BlogPage from 'views/Main/Blog';
 import ContactsPage from 'views/Main/Contacts';
 import MacroTranslatorPage from 'views/Main/MacroTranslator';
+import PrivacyPolicyPage from 'views/Main/Legal/PrivacyPolicy';
+import PublicOfferPage from 'views/Main/Legal/PublicOffer';
 
 import {
 	CompanyIcon,
@@ -129,6 +131,20 @@ const dashRoutes = [
 				path: '/contacts',
 				name: 'Контакты',
 				component: ContactsPage,
+				layout: '/main',
+				hiddenInSidebar: true,
+			},
+			{
+				path: '/privacy-policy',
+				name: 'Политика конфиденциальности',
+				component: PrivacyPolicyPage,
+				layout: '/main',
+				hiddenInSidebar: true,
+			},
+			{
+				path: '/public-offer',
+				name: 'Публичная оферта',
+				component: PublicOfferPage,
 				layout: '/main',
 				hiddenInSidebar: true,
 			},
