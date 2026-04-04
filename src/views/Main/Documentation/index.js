@@ -1,7 +1,17 @@
-import 'views/Main/Documentation/styles.css';
-
+import {
+	Box,
+	Button,
+	Flex,
+	Heading,
+	Icon,
+	Image,
+	SimpleGrid,
+	Text,
+	useColorModeValue,
+} from '@chakra-ui/react';
 import recodeLogoColored from 'assets/svg/recode-logo-colored.svg';
 import { useEffect, useMemo, useState } from 'react';
+import { FiChevronRight, FiFileText, FiSearch } from 'react-icons/fi';
 import { useHistory } from 'react-router-dom';
 
 const sections = [
@@ -56,27 +66,11 @@ const sections = [
 ];
 
 function DocumentIcon() {
-	return (
-		<svg className="docs-card-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-			<path
-				fillRule="evenodd"
-				clipRule="evenodd"
-				d="M9.29289 1.29289C9.48043 1.10536 9.73478 1 10 1H18C19.6569 1 21 2.34315 21 4V20C21 21.6569 19.6569 23 18 23H6C4.34315 23 3 21.6569 3 20V8C3 7.73478 3.10536 7.48043 3.29289 7.29289L9.29289 1.29289ZM18 3H11V8C11 8.55228 10.5523 9 10 9H5V20C5 20.5523 5.44772 21 6 21H18C18.5523 21 19 20.5523 19 20V4C19 3.44772 18.5523 3 18 3ZM6.41421 7H9V4.41421L6.41421 7ZM7 13C7 12.4477 7.44772 12 8 12H16C16.5523 12 17 12.4477 17 13C17 13.5523 16.5523 14 16 14H8C7.44772 14 7 13.5523 7 13ZM7 17C7 16.4477 7.44772 16 8 16H16C16.5523 16 17 16.4477 17 17C17 17.5523 16.5523 18 16 18H8C7.44772 18 7 17.5523 7 17Z"
-			/>
-		</svg>
-	);
+	return <Icon as={FiFileText} boxSize={{ base: 8, md: 10 }} color="blue.500" />;
 }
 
 function SearchIcon() {
-	return (
-		<svg className="docs-search-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-			<path
-				fillRule="evenodd"
-				clipRule="evenodd"
-				d="M17.0392 15.6244C18.2714 14.084 19.0082 12.1301 19.0082 10.0041C19.0082 5.03127 14.9769 1 10.0041 1C5.03127 1 1 5.03127 1 10.0041C1 14.9769 5.03127 19.0082 10.0041 19.0082C12.1301 19.0082 14.084 18.2714 15.6244 17.0392L21.2921 22.707C21.6828 23.0977 22.3163 23.0977 22.707 22.707C23.0977 22.3163 23.0977 21.6828 22.707 21.2921L17.0392 15.6244ZM10.0041 17.0173C6.1308 17.0173 2.99087 13.8774 2.99087 10.0041C2.99087 6.1308 6.1308 2.99087 10.0041 2.99087C13.8774 2.99087 17.0173 6.1308 17.0173 10.0041C17.0173 13.8774 13.8774 17.0173 10.0041 17.0173Z"
-			/>
-		</svg>
-	);
+	return <Icon as={FiSearch} color="gray.500" boxSize={4} mr={2} />;
 }
 
 export default function DocumentationPage() {
@@ -84,6 +78,16 @@ export default function DocumentationPage() {
 	const [activeSectionId, setActiveSectionId] = useState(sections[0].id);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
+	const panelBg = useColorModeValue('gray.100', 'gray.700');
+	const softBg = useColorModeValue('gray.100', 'gray.700');
+	const textColor = useColorModeValue('gray.800', 'white');
+	const mutedColor = useColorModeValue('gray.500', 'gray.300');
+	const dividerColor = useColorModeValue('gray.100', 'whiteAlpha.200');
+	const dropdownBorder = useColorModeValue('gray.200', 'whiteAlpha.300');
+	const searchBg = useColorModeValue('white', 'whiteAlpha.200');
+	const mainBg = useColorModeValue('white', 'gray.800');
+	const dropdownBg = useColorModeValue('white', 'gray.800');
+	const searchResultHoverBg = useColorModeValue('gray.100', 'whiteAlpha.200');
 
 	const searchableItems = useMemo(
 		() =>
@@ -92,8 +96,9 @@ export default function DocumentationPage() {
 					...item,
 					sectionId: section.id,
 					sectionTitle: section.title,
-					searchText:
-						`${section.title} ${item.title} ${item.description}`.toLocaleLowerCase('ru-RU'),
+					searchText: `${section.title} ${item.title} ${item.description}`.toLocaleLowerCase(
+						'ru-RU'
+					),
 				}))
 			),
 		[]
@@ -138,7 +143,7 @@ export default function DocumentationPage() {
 		if (!sectionElement) return;
 		const sectionTop = sectionElement.getBoundingClientRect().top + window.pageYOffset;
 		window.scrollTo({
-			top: sectionTop - 110,
+			top: sectionTop - 90,
 			behavior: 'smooth',
 		});
 	};
@@ -151,103 +156,231 @@ export default function DocumentationPage() {
 	};
 
 	return (
-		<div className="docs-page">
-			<aside className="docs-side-menu">
-				<div className="docs-side-sticky">
-					<div className="docs-side-logo">
-						<img src={recodeLogoColored} alt="reCode" />
-						<span>/ Документация</span>
-					</div>
-					<ul className="docs-side-nav">
+		<Flex w="100vw" ml="calc(50% - 50vw)" color={textColor}>
+			<Box as="aside" display={{ base: 'none', md: 'block' }} w="30vw" minW="280px" bg={panelBg}>
+				<Box position="sticky" top="0" p="2vw">
+					<Flex align="center" mb="2vw" fontWeight="500" fontSize={{ md: 'md', xl: '2xl' }}>
+						<Image src={recodeLogoColored} alt="reCode" w="8vw" minW="96px" mr="0.5rem" />
+						<Text color={mutedColor}>/ Документация</Text>
+					</Flex>
+					<Box as="ul" listStyleType="none" m="0" p="0">
 						{sections.map((section) => (
-							<li key={section.id}>
-								<button
-									type="button"
-									className={activeSectionId === section.id ? 'is-active' : ''}
+							<Box as="li" key={section.id}>
+								<Button
+									variant="unstyled"
+									w="100%"
+									textAlign="left"
+									fontWeight="medium"
+									p="1rem"
+									mb="8px"
+									h="auto"
+									minH="unset"
+									whiteSpace="normal"
+									wordBreak="break-word"
+									overflowWrap="anywhere"
+									borderRadius="1rem"
+									color={activeSectionId === section.id ? 'white' : mutedColor}
+									bg={activeSectionId === section.id ? 'gray.400' : 'transparent'}
+									transition="all 0.15s ease-in-out"
+									_hover={{ bg: 'gray.300', color: 'gray.500' }}
 									onClick={() => scrollToSection(section.id)}
 								>
 									{section.title}
-								</button>
-							</li>
+								</Button>
+							</Box>
 						))}
-					</ul>
-				</div>
-			</aside>
+					</Box>
+				</Box>
+			</Box>
 
-			<main className="docs-main">
-				<div className="docs-search-bar">
-					<div className="docs-mobile-logo">
-						<img src={recodeLogoColored} alt="reCode" />
-					</div>
-					<div className="docs-search-placeholder">
-						<SearchIcon />
-						<input
-							type="text"
-							value={searchQuery}
-							onChange={(event) => setSearchQuery(event.target.value)}
-							onFocus={() => setIsSearchFocused(true)}
-							onBlur={() => setTimeout(() => setIsSearchFocused(false), 120)}
-							placeholder="Поиск по документации"
-							aria-label="Поиск по документации"
-						/>
+			<Box as="main" flex="1" minW="0" h="180vh">
+				<Flex
+					position="sticky"
+					top="0"
+					zIndex="5"
+					align="center"
+					justify="space-between"
+					px="4vw"
+					py={{ base: '4.5vw', md: '0.8rem' }}
+					bg={mainBg}
+					borderBottom="1px solid"
+					borderColor={dividerColor}
+					boxShadow={{
+						base: '0 0 8px rgba(45, 60, 100, 0.03), 0 4px 32px rgba(45, 60, 100, 0.05)',
+						md: 'none',
+					}}
+				>
+					<Flex display={{ base: 'flex', md: 'none' }} w="50vw">
+						<Image src={recodeLogoColored} alt="reCode" w="8rem" />
+					</Flex>
+					<Box
+						position="relative"
+						w={{ base: '100%', md: '25vw' }}
+						minW={{ base: '0', md: '220px' }}
+					>
+						<Flex
+							align="center"
+							bg={searchBg}
+							borderRadius="2rem"
+							border="2px solid"
+							borderColor={dividerColor}
+							px="0.6rem"
+							py={{ base: '2vw', md: '0.4rem' }}
+						>
+							<SearchIcon />
+							<input
+								type="text"
+								value={searchQuery}
+								onChange={(event) => setSearchQuery(event.target.value)}
+								onFocus={() => setIsSearchFocused(true)}
+								onBlur={() => setTimeout(() => setIsSearchFocused(false), 120)}
+								placeholder="Поиск по документации"
+								aria-label="Поиск по документации"
+								style={{
+									width: '100%',
+									border: 'none',
+									outline: 'none',
+									background: 'transparent',
+									color: 'inherit',
+									fontSize: 'inherit',
+								}}
+							/>
+						</Flex>
 						{trimmedSearchQuery && isSearchFocused && (
-							<div className="docs-search-dropdown">
+							<Box
+								position="absolute"
+								top="calc(100% + 8px)"
+								left="0"
+								right="0"
+								display="flex"
+								flexDir="column"
+								gap="2px"
+								p="6px"
+								border="1px solid"
+								borderColor={dropdownBorder}
+								borderRadius="14px"
+								bg={dropdownBg}
+								boxShadow="0 10px 30px rgba(26, 32, 44, 0.12)"
+								zIndex="20"
+							>
 								{searchResults.length > 0 ? (
 									searchResults.map((result) => (
-										<button
+										<Box
+											as="button"
 											key={`${result.sectionId}-${result.title}-${result.href}`}
 											type="button"
-											className="docs-search-result"
+											display="flex"
+											flexDir="column"
+											gap="2px"
+											w="100%"
+											px="10px"
+											py="8px"
+											borderRadius="10px"
+											textAlign="left"
+											transition="0.15s ease-in-out"
+											_hover={{ bg: searchResultHoverBg }}
 											onMouseDown={(event) => {
 												event.preventDefault();
 												openSearchResult(result);
 											}}
 										>
-											<span className="docs-search-result-title">{result.title}</span>
-											<span className="docs-search-result-section">
+											<Text fontSize="0.92rem" fontWeight="600" color={textColor}>
+												{result.title}
+											</Text>
+											<Text fontSize="0.78rem" color={mutedColor}>
 												{result.sectionTitle}
-											</span>
-										</button>
+											</Text>
+										</Box>
 									))
 								) : (
-									<div className="docs-search-empty">Ничего не найдено</div>
+									<Text px="10px" py="10px" color={mutedColor} fontSize="0.85rem">
+										Ничего не найдено
+									</Text>
 								)}
-							</div>
+							</Box>
 						)}
-					</div>
-					<button
-						type="button"
-						className="docs-start-button"
+					</Box>
+					<Button
+						display={{ base: 'none', md: 'inline-flex' }}
+						bg="recode.500"
+						color="white"
+						borderRadius="999px"
+						px="1.6rem"
+						py="0.5rem"
+						fontSize="sm"
+						fontWeight="medium"
+						_hover={{ bg: 'recode.400' }}
 						onClick={() => history.push('/main/macro-translator')}
 					>
-						Начать работу
-					</button>
-				</div>
+						НАЧАТЬ РАБОТУ
+					</Button>
+				</Flex>
 
-				<div className="docs-content">
+				<Box mx="4vw">
 					{sections.map((section) => (
-						<section id={section.id} key={section.id} className="docs-section">
-							<h2>{section.title}</h2>
-							<div className="docs-cards">
+						<Box as="section" id={section.id} key={section.id} my={{ base: '10vw', md: '4vw' }}>
+							<Heading
+								fontWeight="semibold"
+								fontSize={{ base: '2xl', md: '2rem' }}
+								mb={{ base: '4vw', md: '2vw' }}
+							>
+								{section.title}
+							</Heading>
+							<SimpleGrid
+								columns={{ base: 1, xl: 2 }}
+								spacing={{ base: '4vw', md: '2vw' }}
+								w={{ base: '100%', md: '80%' }}
+							>
 								{section.items.map((item) => (
-									<a
+									<Box
+										as="a"
 										key={`${section.id}-${item.title}`}
-										className="docs-card"
 										href={item.href}
 										target="_blank"
 										rel="noreferrer"
+										role="group"
+										position="relative"
+										display="flex"
+										flexWrap="wrap"
+										alignItems="center"
+										gap={{ base: '2vw', md: '1vw' }}
+										p={{ base: '4vw', md: '1.5vw' }}
+										borderRadius="1rem"
+										bg={softBg}
+										textDecoration="none"
+										transition="all 0.2s ease-in-out"
+										_hover={{ transform: 'translateY(-3px)' }}
 									>
 										<DocumentIcon />
-										<span className="docs-card-title">{item.title}</span>
-										<p>{item.description}</p>
-										<span className="docs-card-arrow" />
-									</a>
+										<Text
+											display="inline-block"
+											fontSize={{ base: '1.2rem', md: '1.4rem' }}
+											fontWeight="500"
+										>
+											{item.title}
+										</Text>
+										<Text m="0" color={mutedColor}>
+											{item.description}
+										</Text>
+										<Icon
+											as={FiChevronRight}
+											position="absolute"
+											right={{ base: '4vw', md: '1vw' }}
+											bottom={{ base: '4vw', md: '1vw' }}
+											color="blue.500"
+											boxSize={5}
+											opacity="0"
+											transform="translateX(-4px)"
+											transition="all 0.2s ease-in-out"
+											_groupHover={{ opacity: 1, transform: 'translateX(0)' }}
+										/>
+									</Box>
 								))}
-							</div>
-						</section>
+							</SimpleGrid>
+						</Box>
 					))}
-				</div>
-			</main>
-		</div>
+				</Box>
+			</Box>
+		</Flex>
 	);
 }
