@@ -26,7 +26,17 @@ import { FiUploadCloud, FiX } from 'react-icons/fi';
 const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
 const ALLOWED_AVATAR_TYPES = ['image/png', 'image/jpeg'];
 
-const CompanyInformation = ({ title, company, email, description, fullName, inn, ogrn, phone }) => {
+const CompanyInformation = ({
+	title,
+	company,
+	email,
+	description,
+	fullName,
+	legalAddress,
+	inn,
+	ogrn,
+	phone,
+}) => {
 	const mainColor = useColorModeValue('gray.700', 'white');
 	const textColor = useColorModeValue('gray.500', 'white');
 	const borderProfileColor = useColorModeValue('gray.100', 'rgba(255, 255, 255, 0.31)');
@@ -145,6 +155,12 @@ const CompanyInformation = ({ title, company, email, description, fullName, inn,
 								ПОЛНОЕ НАИМЕНОВАНИЕ:{' '}
 								<Text as="span" fontSize="sm" color="gray.400" fontWeight="400">
 									{fullName}
+								</Text>
+							</Text>
+							<Text fontSize="sm" color={textColor} fontWeight="medium">
+								ЮРИДИЧЕСКИЙ АДРЕС:{' '}
+								<Text as="span" fontSize="sm" color="gray.400" fontWeight="400">
+									{legalAddress}
 								</Text>
 							</Text>
 							<Text fontSize="sm" color={textColor} fontWeight="medium">
