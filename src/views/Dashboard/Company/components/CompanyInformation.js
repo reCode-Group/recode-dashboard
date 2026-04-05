@@ -51,6 +51,8 @@ const CompanyInformation = ({
 		'linear-gradient(113.34deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.8) 110.84%)',
 		'linear-gradient(113.34deg, rgba(26, 32, 44, 0.82) 0%, rgba(26, 32, 44, 0.8) 110.84%)'
 	);
+	const modalInputBg = useColorModeValue('white', 'whiteAlpha.100');
+	const modalInputBorderColor = useColorModeValue('gray.200', 'whiteAlpha.300');
 
 	const {
 		isOpen: isAvatarModalOpen,
@@ -387,7 +389,8 @@ const CompanyInformation = ({
 									value={editableResponsibleFullName}
 									onChange={(event) => setEditableResponsibleFullName(event.target.value)}
 									placeholder="Иванов Иван Иванович"
-									bg="white"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
 									borderRadius="12px"
 								/>
 							</FormControl>
@@ -399,7 +402,8 @@ const CompanyInformation = ({
 									value={editableEmail}
 									onChange={(event) => setEditableEmail(event.target.value)}
 									placeholder="company@example.ru"
-									bg="white"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
 									borderRadius="12px"
 								/>
 							</FormControl>
@@ -410,7 +414,8 @@ const CompanyInformation = ({
 									value={editablePhone}
 									onChange={(event) => setEditablePhone(event.target.value)}
 									placeholder="+7 (___) ___-__-__"
-									bg="white"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
 									borderRadius="12px"
 								/>
 							</FormControl>
@@ -421,7 +426,8 @@ const CompanyInformation = ({
 									value={editableLegalAddress}
 									onChange={(event) => setEditableLegalAddress(event.target.value)}
 									placeholder="г. Москва, ул. Примерная, д. 1"
-									bg="white"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
 									borderRadius="12px"
 								/>
 							</FormControl>

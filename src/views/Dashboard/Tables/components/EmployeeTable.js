@@ -72,6 +72,8 @@ const EmployeeTable = ({
 	const glassBg = useColorModeValue('rgba(255, 255, 255, 0.92)', 'rgba(26, 32, 44, 0.9)');
 	const sectionBg = useColorModeValue('rgba(255, 255, 255, 0.72)', 'rgba(26, 32, 44, 0.65)');
 	const modalSubtitleColor = useColorModeValue('gray.500', 'gray.300');
+	const modalInputBg = useColorModeValue('white', 'whiteAlpha.100');
+	const modalInputBorderColor = useColorModeValue('gray.200', 'whiteAlpha.300');
 	const hiddenColumnsSet = new Set(hiddenColumns);
 	const scrollRef = useRef(null);
 
@@ -95,9 +97,20 @@ const EmployeeTable = ({
 	useEffect(() => {
 		const element = scrollRef.current;
 		if (!element) return;
+		let frameId = null;
+		let lastHasScrollbar = null;
 
 		const updateScrollbarState = () => {
-			setHasScrollbar(element.scrollHeight > element.clientHeight);
+			if (frameId !== null) {
+				cancelAnimationFrame(frameId);
+			}
+			frameId = requestAnimationFrame(() => {
+				const nextHasScrollbar = element.scrollHeight > element.clientHeight;
+				if (nextHasScrollbar !== lastHasScrollbar) {
+					lastHasScrollbar = nextHasScrollbar;
+					setHasScrollbar((prev) => (prev === nextHasScrollbar ? prev : nextHasScrollbar));
+				}
+			});
 		};
 
 		updateScrollbarState();
@@ -107,6 +120,9 @@ const EmployeeTable = ({
 		window.addEventListener('resize', updateScrollbarState);
 
 		return () => {
+			if (frameId !== null) {
+				cancelAnimationFrame(frameId);
+			}
 			resizeObserver.disconnect();
 			window.removeEventListener('resize', updateScrollbarState);
 		};
@@ -369,7 +385,8 @@ const EmployeeTable = ({
 									value={fullName}
 									onChange={(event) => setFullName(event.target.value)}
 									placeholder="Иванов Иван Иванович"
-									bg="white"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
 									borderRadius="12px"
 									h="46px"
 								/>
@@ -382,7 +399,14 @@ const EmployeeTable = ({
 								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
 									Роль
 								</FormLabel>
-								<Select value={role} isDisabled bg="white" borderRadius="12px" h="46px">
+								<Select
+									value={role}
+									isDisabled
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
+									borderRadius="12px"
+									h="46px"
+								>
 									<option value={ROLE_EMPLOYEE}>{ROLE_EMPLOYEE}</option>
 								</Select>
 							</FormControl>
@@ -396,7 +420,8 @@ const EmployeeTable = ({
 									value={email}
 									onChange={(event) => setEmail(event.target.value)}
 									placeholder="name@company.ru"
-									bg="white"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
 									borderRadius="12px"
 									h="46px"
 								/>
@@ -420,7 +445,8 @@ const EmployeeTable = ({
 											? 'Введите пароль'
 											: 'Оставьте пустым, если менять не нужно'
 									}
-									bg="white"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
 									borderRadius="12px"
 									h="46px"
 								/>
@@ -436,7 +462,8 @@ const EmployeeTable = ({
 								<Select
 									value={status}
 									onChange={(event) => setStatus(event.target.value)}
-									bg="white"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
 									borderRadius="12px"
 									h="46px"
 								>

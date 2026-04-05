@@ -30,9 +30,20 @@ const Documents = ({ title, data, fixedHeight = '855px' }) => {
 	useEffect(() => {
 		const element = scrollRef.current;
 		if (!element) return;
+		let frameId = null;
+		let lastHasScrollbar = null;
 
 		const updateScrollbarState = () => {
-			setHasScrollbar(element.scrollHeight > element.clientHeight);
+			if (frameId !== null) {
+				cancelAnimationFrame(frameId);
+			}
+			frameId = requestAnimationFrame(() => {
+				const nextHasScrollbar = element.scrollHeight > element.clientHeight;
+				if (nextHasScrollbar !== lastHasScrollbar) {
+					lastHasScrollbar = nextHasScrollbar;
+					setHasScrollbar((prev) => (prev === nextHasScrollbar ? prev : nextHasScrollbar));
+				}
+			});
 		};
 
 		updateScrollbarState();
@@ -42,6 +53,9 @@ const Documents = ({ title, data, fixedHeight = '855px' }) => {
 		window.addEventListener('resize', updateScrollbarState);
 
 		return () => {
+			if (frameId !== null) {
+				cancelAnimationFrame(frameId);
+			}
 			resizeObserver.disconnect();
 			window.removeEventListener('resize', updateScrollbarState);
 		};
