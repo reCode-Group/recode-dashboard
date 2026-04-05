@@ -13,7 +13,9 @@ import CompanySettings from './components/CompanySettings';
 
 function Company() {
 	const location = useLocation();
-	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [location.search]);
+	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [
+		location.search,
+	]);
 	const [activeTab, setActiveTab] = useState(
 		queryTab === 'employees' || queryTab === 'documents' ? queryTab : 'settings'
 	);
@@ -38,24 +40,33 @@ function Company() {
 	];
 
 	return (
-		<Flex direction='column'>
-			<Box bgImage={ProfileBgImage} w='100%' h='300px' borderRadius='25px' bgPosition='50%' bgRepeat='no-repeat' />
+		<Flex direction="column">
+			<Box
+				bgImage={ProfileBgImage}
+				w="100%"
+				h="300px"
+				borderRadius="25px"
+				bgPosition="50%"
+				bgRepeat="no-repeat"
+			/>
 
 			<Grid
 				templateColumns={{ base: '1fr', xl: '493px minmax(0, 1fr)' }}
-				gap='22px'
-				alignItems='start'
+				gap="22px"
+				alignItems="start"
 				mt={{ base: '24px', xl: '-64px' }}
-				mx='1.5rem'
+				mx="1.5rem"
 				w={{ base: 'calc(100% - 3rem)', xl: '95%' }}
-				alignSelf='center'
+				alignSelf="center"
 			>
 				<GridItem>
 					<CompanyInformation
 						title={'Информация'}
 						company={'ООО «РЕКОД»'}
 						email={'one@recode.su'}
-						description={'Описание компании ... Может быть длинным и может быть коротким, пофиг кароче'}
+						description={
+							'Описание компании ... Может быть длинным и может быть коротким, пофиг кароче'
+						}
 						fullName={'ООО «РЕКОД РЕШЕНИЯ»'}
 						inn={'770356092098'}
 						ogrn={'8786543679887665'}
@@ -66,27 +77,33 @@ function Company() {
 				<GridItem>
 					<Box
 						minH={{ xl: '113px' }}
-						p='16px'
-						borderRadius='15px'
-						backdropFilter='saturate(200%) blur(50px)'
-						boxShadow='0px 2px 5.5px rgba(0, 0, 0, 0.02)'
-						border='2px solid'
+						p="16px"
+						borderRadius="15px"
+						backdropFilter="saturate(200%) blur(50px)"
+						boxShadow="0px 2px 5.5px rgba(0, 0, 0, 0.02)"
+						border="2px solid"
 						borderColor={borderProfileColor}
 						bg={navGlassBg}
-						display='flex'
-						alignItems='center'
+						display="flex"
+						alignItems="center"
 					>
 						<Flex direction={{ base: 'column', lg: 'row' }} gap={{ base: '8px', lg: '12px' }}>
 							{tabs.map((tab) => {
 								const isActive = activeTab === tab.id;
 								return (
-									<Button key={tab.id} p='0px' bg='transparent' onClick={() => setActiveTab(tab.id)} _hover={{ bg: 'none' }}>
+									<Button
+										key={tab.id}
+										p="0px"
+										bg="transparent"
+										onClick={() => setActiveTab(tab.id)}
+										_hover={{ bg: 'none' }}
+									>
 										<Flex
-											align='center'
+											align="center"
 											w={{ sm: '100%', lg: '135px' }}
 											bg={isActive ? 'hsla(0,0%,100%,.3)' : 'transparent'}
-											borderRadius='15px'
-											justifyContent='center'
+											borderRadius="15px"
+											justifyContent="center"
 											py={isActive ? '12px' : '10px'}
 											boxShadow={
 												isActive
@@ -97,7 +114,7 @@ function Company() {
 											borderColor={isActive ? 'gray.200' : 'transparent'}
 										>
 											<Icon as={tab.icon.type || tab.icon} color={textColor} />
-											<Text fontSize='xs' color={textColor} fontWeight='bold' ms='6px'>
+											<Text fontSize="xs" color={textColor} fontWeight="bold" ms="6px">
 												{tab.name}
 											</Text>
 										</Flex>
@@ -107,11 +124,16 @@ function Company() {
 						</Flex>
 					</Box>
 
-					<Grid mt='24px'>
+					<Grid mt="24px">
 						{activeTab === 'documents' ? (
-							<DocumentsFull title={'Документы компании'} data={invoicesData} fixedHeight='346px' />
+							<DocumentsFull title={'Документы компании'} data={invoicesData} fixedHeight="346px" />
 						) : activeTab === 'employees' ? (
-							<EmployeeTable withPageContainer={false} title={'Сотрудники'} />
+							<EmployeeTable
+								withPageContainer={false}
+								showFullListButton="false"
+								title={'Сотрудники'}
+								hiddenColumns={['role']}
+							/>
 						) : (
 							<CompanySettings title={'Настройки компании'} />
 						)}
@@ -119,7 +141,7 @@ function Company() {
 				</GridItem>
 
 				<GridItem colSpan={{ base: 1, xl: 2 }}>
-					<Grid templateColumns={{ sm: '1fr' }} gap='24px' mt='24px'>
+					<Grid templateColumns={{ sm: '1fr' }} gap="24px" mt="24px">
 						<ConversionHistory
 							title={'Последние конвертации'}
 							amount={9}
@@ -136,5 +158,3 @@ function Company() {
 }
 
 export default Company;
-
-
