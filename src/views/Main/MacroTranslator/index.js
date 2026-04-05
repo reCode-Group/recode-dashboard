@@ -210,7 +210,7 @@ export default function MacroTranslatorPage() {
 								size="sm"
 								px="1rem"
 								bg="gray.200"
-								color={textColor}
+								color="gray.700"
 								fontSize="xs"
 								fontWeight="semibold"
 								borderRadius="8px"

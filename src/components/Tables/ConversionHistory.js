@@ -182,7 +182,7 @@ const ConversionHistory = ({
 							<Button
 								variant="ghost"
 								bg="transparent"
-								color="black"
+								color={textColor}
 								fontWeight="500"
 								rightIcon={<IoArrowForwardSharp />}
 								_hover={{ bg: 'transparent', textDecoration: 'underline' }}
