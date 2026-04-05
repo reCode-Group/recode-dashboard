@@ -143,7 +143,7 @@ const CompanyInformation = ({ title, company, email, description, fullName, inn,
 
 						<Flex direction="column" gap="14px" mb="16px">
 							<Text fontSize="sm" color={textColor} fontWeight="medium">
-								Полное название:{' '}
+								ПОЛНОЕ НАИМЕНОВАНИЕ:{' '}
 								<Text as="span" fontSize="sm" color="gray.400" fontWeight="400">
 									{fullName}
 								</Text>
@@ -161,7 +161,7 @@ const CompanyInformation = ({ title, company, email, description, fullName, inn,
 								</Text>
 							</Text>
 							<Text fontSize="sm" color={textColor} fontWeight="medium">
-								Телефон:{' '}
+								ТЕЛЕФОН:{' '}
 								<Text as="span" fontSize="sm" color="gray.400" fontWeight="400">
 									{phone}
 								</Text>
