@@ -1,4 +1,4 @@
-﻿// Chakra imports
+// Chakra imports
 import {
 	Alert,
 	AlertIcon,
@@ -29,7 +29,6 @@ import {
 	Tr,
 	useColorModeValue,
 } from '@chakra-ui/react';
-// Custom components
 import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
@@ -42,6 +41,9 @@ import { tablesTableData } from 'variables/general';
 const defaultCaptions = ['Пользователь', 'Роль', 'Статус', 'Остаток токенов', ''];
 const defaultColumnKeys = ['user', 'role', 'status', 'tokens', 'actions'];
 const TOTAL_EMPLOYEE_TOKENS = 50000;
+const ROLE_EMPLOYEE = 'Сотрудник';
+const STATUS_ACTIVE = 'Активен';
+const STATUS_INACTIVE = 'Неактивен';
 
 function parseTokenValue(value) {
 	const numericValue = Number(String(value ?? '').replace(/[^\d]/g, ''));
@@ -68,12 +70,16 @@ const EmployeeTable = ({
 	const sectionBg = useColorModeValue('rgba(255, 255, 255, 0.72)', 'rgba(26, 32, 44, 0.65)');
 	const modalSubtitleColor = useColorModeValue('gray.500', 'gray.300');
 	const hiddenColumnsSet = new Set(hiddenColumns);
+
 	const [rows, setRows] = useState(data);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [modalMode, setModalMode] = useState('create');
+	const [editingRowEmail, setEditingRowEmail] = useState('');
 	const [fullName, setFullName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [role] = useState('Сотрудник');
+	const [role] = useState(ROLE_EMPLOYEE);
+	const [status, setStatus] = useState(STATUS_ACTIVE);
 	const [tokens, setTokens] = useState(0);
 	const [formError, setFormError] = useState('');
 
@@ -84,57 +90,120 @@ const EmployeeTable = ({
 	const usedTokens = useMemo(() => rows.reduce((sum, row) => sum + parseTokenValue(row.date), 0), [
 		rows,
 	]);
-	const availableTokens = Math.max(TOTAL_EMPLOYEE_TOKENS - usedTokens, 0);
+	const editingOriginalTokens = useMemo(() => {
+		if (modalMode !== 'edit' || !editingRowEmail) return 0;
+		const editingRow = rows.find((row) => row.email === editingRowEmail);
+		return editingRow ? parseTokenValue(editingRow.date) : 0;
+	}, [editingRowEmail, modalMode, rows]);
+	const availableTokens = Math.max(
+		TOTAL_EMPLOYEE_TOKENS - usedTokens + (modalMode === 'edit' ? editingOriginalTokens : 0),
+		0
+	);
 
 	const visibleCaptions = captions.filter((_, idx) => {
 		const columnKey = defaultColumnKeys[idx] ?? `column-${idx}`;
 		return !hiddenColumnsSet.has(columnKey);
 	});
+
 	const resolvedFullListPath = fullListPath.startsWith('/admin/')
 		? fullListPath
 		: `/admin${fullListPath.startsWith('/') ? fullListPath : `/${fullListPath}`}`;
 	const handleFullListClick = onFullListClick ?? (() => history.push(resolvedFullListPath));
-	const closeModal = () => {
-		setIsModalOpen(false);
+
+	const resetForm = () => {
 		setFullName('');
 		setEmail('');
 		setPassword('');
+		setStatus(STATUS_ACTIVE);
 		setTokens(0);
 		setFormError('');
+		setEditingRowEmail('');
 	};
 
-	const handleCreateEmployee = () => {
-		if (!fullName.trim() || !email.trim() || !password.trim()) {
-			setFormError('Заполните ФИО, email и пароль.');
-			return;
+	const closeModal = () => {
+		setIsModalOpen(false);
+		resetForm();
+	};
+
+	const openCreateModal = () => {
+		setModalMode('create');
+		resetForm();
+		setIsModalOpen(true);
+	};
+
+	const openEditModal = (row) => {
+		setModalMode('edit');
+		setEditingRowEmail(row.email);
+		setFullName(row.name || '');
+		setEmail(row.email || '');
+		setPassword('');
+		setStatus(row.status || STATUS_ACTIVE);
+		setTokens(parseTokenValue(row.date));
+		setFormError('');
+		setIsModalOpen(true);
+	};
+
+	const validateForm = () => {
+		if (!fullName.trim() || !email.trim()) {
+			return 'Заполните ФИО и email.';
+		}
+		if (modalMode === 'create' && !password.trim()) {
+			return 'Укажите пароль.';
 		}
 		const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 		if (!emailIsValid) {
-			setFormError('Укажите корректный email.');
-			return;
+			return 'Укажите корректный email.';
 		}
 		if (tokens > availableTokens) {
-			setFormError('Недостаточно токенов для распределения.');
-			return;
+			return 'Недостаточно токенов для распределения.';
 		}
 		if (tokens <= 0) {
-			setFormError('Укажите количество токенов больше нуля.');
-			return;
+			return 'Укажите количество токенов больше нуля.';
 		}
-		if (rows.some((row) => String(row.email).toLowerCase() === email.trim().toLowerCase())) {
-			setFormError('Сотрудник с таким email уже существует.');
+		const duplicateEmail = rows.some((row) => {
+			if (modalMode === 'edit' && row.email === editingRowEmail) return false;
+			return String(row.email).toLowerCase() === email.trim().toLowerCase();
+		});
+		if (duplicateEmail) {
+			return 'Сотрудник с таким email уже существует.';
+		}
+		return '';
+	};
+
+	const handleSubmitModal = () => {
+		const validationError = validateForm();
+		if (validationError) {
+			setFormError(validationError);
 			return;
 		}
 
-		const newEmployee = {
-			name: fullName.trim(),
-			email: email.trim(),
-			subdomain: 'Права ограничены',
-			domain: role,
-			status: 'Активен',
-			date: formatTokenValue(tokens),
-		};
-		setRows((prev) => [newEmployee, ...prev]);
+		if (modalMode === 'create') {
+			const newEmployee = {
+				name: fullName.trim(),
+				email: email.trim(),
+				subdomain: 'Права ограничены',
+				domain: role,
+				status,
+				date: formatTokenValue(tokens),
+			};
+			setRows((prev) => [newEmployee, ...prev]);
+		} else {
+			setRows((prev) =>
+				prev.map((row) =>
+					row.email === editingRowEmail
+						? {
+								...row,
+								name: fullName.trim(),
+								email: email.trim(),
+								domain: role,
+								status,
+								date: formatTokenValue(tokens),
+						  }
+						: row
+				)
+			);
+		}
+
 		closeModal();
 	};
 
@@ -164,31 +233,28 @@ const EmployeeTable = ({
 				<Table variant="simple" color={textColor}>
 					<Thead>
 						<Tr my=".8rem" pl="0px" color="gray.400">
-							{visibleCaptions.map((caption, idx) => {
-								return (
-									<Th color="gray.400" key={idx} ps={idx === 0 ? '0px' : null}>
-										{caption}
-									</Th>
-								);
-							})}
+							{visibleCaptions.map((caption, idx) => (
+								<Th color="gray.400" key={idx} ps={idx === 0 ? '0px' : null}>
+									{caption}
+								</Th>
+							))}
 						</Tr>
 					</Thead>
 					<Tbody>
-						{rows.map((row) => {
-							return (
-								<TablesTableRow
-									key={`${row.email}-${row.name}`}
-									name={row.name}
-									logo={row.logo}
-									email={row.email}
-									subdomain={row.subdomain}
-									domain={row.domain}
-									status={row.status}
-									date={row.date}
-									hiddenColumns={hiddenColumns}
-								/>
-							);
-						})}
+						{rows.map((row) => (
+							<TablesTableRow
+								key={`${row.email}-${row.name}`}
+								name={row.name}
+								logo={row.logo}
+								email={row.email}
+								subdomain={row.subdomain}
+								domain={row.domain}
+								status={row.status}
+								date={row.date}
+								hiddenColumns={hiddenColumns}
+								onEdit={() => openEditModal(row)}
+							/>
+						))}
 					</Tbody>
 				</Table>
 				<Flex mt="18px">
@@ -204,12 +270,13 @@ const EmployeeTable = ({
 						p="0px"
 						height="auto"
 						fontWeight="bold"
-						onClick={() => setIsModalOpen(true)}
+						onClick={openCreateModal}
 					>
 						ДОБАВИТЬ СОТРУДНИКА
 					</Button>
 				</Flex>
 			</CardBody>
+
 			<Modal isOpen={isModalOpen} onClose={closeModal} isCentered size="2xl">
 				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
 				<ModalContent
@@ -228,10 +295,12 @@ const EmployeeTable = ({
 						bg={sectionBg}
 					>
 						<Text fontSize="24px" fontWeight="600" color={textColor} lineHeight="1.1">
-							Добавить сотрудника
+							{modalMode === 'create' ? 'Добавить сотрудника' : 'Редактировать сотрудника'}
 						</Text>
 						<Text mt="6px" fontSize="14px" color={modalSubtitleColor}>
-							Распределите токены сотруднику из общего лимита компании.
+							{modalMode === 'create'
+								? 'Распределите токены сотруднику из общего лимита компании.'
+								: 'Обновите данные сотрудника и статус аккаунта.'}
 						</Text>
 					</ModalHeader>
 					<ModalBody px="32px" py="24px" bg={sectionBg}>
@@ -242,6 +311,7 @@ const EmployeeTable = ({
 									<Text>{formError}</Text>
 								</Alert>
 							) : null}
+
 							<FormControl isInvalid={Boolean(formError) && !fullName.trim()}>
 								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
 									ФИО
@@ -258,14 +328,16 @@ const EmployeeTable = ({
 									<FormErrorMessage>Укажите ФИО</FormErrorMessage>
 								) : null}
 							</FormControl>
+
 							<FormControl>
 								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
 									Роль
 								</FormLabel>
 								<Select value={role} isDisabled bg="white" borderRadius="12px" h="46px">
-									<option value="Сотрудник">Сотрудник</option>
+									<option value={ROLE_EMPLOYEE}>{ROLE_EMPLOYEE}</option>
 								</Select>
 							</FormControl>
+
 							<FormControl isInvalid={Boolean(formError) && !email.trim()}>
 								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
 									Email
@@ -283,7 +355,10 @@ const EmployeeTable = ({
 									<FormErrorMessage>Укажите email</FormErrorMessage>
 								) : null}
 							</FormControl>
-							<FormControl isInvalid={Boolean(formError) && !password.trim()}>
+
+							<FormControl
+								isInvalid={Boolean(formError) && modalMode === 'create' && !password.trim()}
+							>
 								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
 									Пароль
 								</FormLabel>
@@ -291,15 +366,36 @@ const EmployeeTable = ({
 									type="password"
 									value={password}
 									onChange={(event) => setPassword(event.target.value)}
-									placeholder="Введите пароль"
+									placeholder={
+										modalMode === 'create'
+											? 'Введите пароль'
+											: 'Оставьте пустым, если менять не нужно'
+									}
 									bg="white"
 									borderRadius="12px"
 									h="46px"
 								/>
-								{Boolean(formError) && !password.trim() ? (
+								{Boolean(formError) && modalMode === 'create' && !password.trim() ? (
 									<FormErrorMessage>Укажите пароль</FormErrorMessage>
 								) : null}
 							</FormControl>
+
+							<FormControl>
+								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
+									Статус аккаунта
+								</FormLabel>
+								<Select
+									value={status}
+									onChange={(event) => setStatus(event.target.value)}
+									bg="white"
+									borderRadius="12px"
+									h="46px"
+								>
+									<option value={STATUS_ACTIVE}>Активный</option>
+									<option value={STATUS_INACTIVE}>Неактивный</option>
+								</Select>
+							</FormControl>
+
 							<FormControl>
 								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
 									Токены: {formatTokenValue(tokens)}
@@ -318,8 +414,7 @@ const EmployeeTable = ({
 									<SliderThumb boxSize={5} />
 								</Slider>
 								<Text mt="8px" fontSize="12px" color={modalSubtitleColor}>
-									Доступно для распределения: {formatTokenValue(availableTokens)}
-									{' / '}
+									Доступно для распределения: {formatTokenValue(availableTokens)} /{' '}
 									{formatTokenValue(TOTAL_EMPLOYEE_TOKENS)}
 								</Text>
 							</FormControl>
@@ -336,8 +431,8 @@ const EmployeeTable = ({
 							<Button variant="ghost" onClick={closeModal}>
 								Отмена
 							</Button>
-							<Button colorScheme="recode" onClick={handleCreateEmployee}>
-								Добавить
+							<Button colorScheme="recode" onClick={handleSubmitModal}>
+								{modalMode === 'create' ? 'Добавить' : 'Сохранить'}
 							</Button>
 						</Flex>
 					</ModalFooter>

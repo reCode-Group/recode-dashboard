@@ -1,13 +1,13 @@
 import { Avatar, Badge, Button, Flex, Td, Text, Tr, useColorModeValue } from '@chakra-ui/react';
 
 function TablesTableRow(props) {
-	const { logo, name, email, subdomain, domain, status, date, hiddenColumns = [] } = props;
+	const { logo, name, email, subdomain, domain, status, date, hiddenColumns = [], onEdit } = props;
 	const textColor = useColorModeValue('gray.700', 'white');
 	const bgStatus = useColorModeValue('gray.400', '#1a202c');
 	const colorStatus = useColorModeValue('white', 'gray.400');
 	const hiddenColumnsSet = new Set(hiddenColumns);
 	const normalizedStatus = String(status || '').toLowerCase();
-	const isActiveStatus = normalizedStatus.includes('актив') || normalizedStatus.includes('рђрєс');
+	const isActiveStatus = normalizedStatus.includes('акт') || normalizedStatus.includes('рђ');
 
 	return (
 		<Tr>
@@ -64,7 +64,7 @@ function TablesTableRow(props) {
 
 			{!hiddenColumnsSet.has('actions') && (
 				<Td>
-					<Button p="0px" bg="transparent" variant="no-hover">
+					<Button p="0px" bg="transparent" variant="no-hover" onClick={onEdit}>
 						<Text fontSize="md" color="recode.300" fontWeight="bold" cursor="pointer">
 							Ред.
 						</Text>
