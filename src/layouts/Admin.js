@@ -27,17 +27,30 @@ export default function Dashboard(props) {
 	const getRoute = () => {
 		return window.location.pathname !== '/admin/full-screen-maps';
 	};
-	const getCurrentHashPath = () => {
+	const getCurrentPath = () => {
+		const rawPath = window.location.pathname || '';
+		const noQuery = rawPath.split('?')[0];
+		const normalized = noQuery.replace(/\/+$/, '');
+		if (normalized) {
+			return normalized;
+		}
 		const rawHash = window.location.hash || '';
 		const hashPath = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash;
-		const noQuery = hashPath.split('?')[0];
-		const normalized = noQuery.replace(/\/+$/, '');
-		return normalized || '/';
+		const hashNoQuery = hashPath.split('?')[0];
+		const normalizedHash = hashNoQuery.replace(/\/+$/, '');
+		return normalizedHash || '/';
 	};
 	const isRouteActive = (route) => {
 		const routePath = `${route.layout}${route.path}`;
 		const normalizedRoute = routePath.replace(/\/+$/, '');
-		return getCurrentHashPath() === (normalizedRoute || '/');
+		const currentPath = getCurrentPath();
+		if (currentPath === (normalizedRoute || '/')) {
+			return true;
+		}
+		// Fallback for hash-based paths (e.g. /#/admin/profile)
+		const hashPrefixedPath = `/#${currentPath}`;
+		const hashPrefixedNormalizedRoute = `/#${normalizedRoute}`;
+		return hashPrefixedPath === (hashPrefixedNormalizedRoute || '/#');
 	};
 	const getActiveRoute = (routes) => {
 		let activeRoute = 'reCode Dashboard';
