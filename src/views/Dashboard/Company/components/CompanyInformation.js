@@ -1,10 +1,15 @@
-﻿import {
+import {
+	Alert,
+	AlertIcon,
 	Avatar,
 	Box,
 	Button,
 	Flex,
+	FormControl,
+	FormLabel,
 	Icon,
 	Input,
+	Link,
 	Modal,
 	ModalBody,
 	ModalContent,
@@ -22,6 +27,7 @@ import { Separator } from 'components/Separator/Separator';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaPen } from 'react-icons/fa';
 import { FiUploadCloud, FiX } from 'react-icons/fi';
+import { Link as RouterLink } from 'react-router-dom';
 
 const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
 const ALLOWED_AVATAR_TYPES = ['image/png', 'image/jpeg'];
@@ -32,6 +38,7 @@ const CompanyInformation = ({
 	email,
 	description,
 	fullName,
+	responsibleFullName,
 	legalAddress,
 	inn,
 	ogrn,
@@ -45,11 +52,27 @@ const CompanyInformation = ({
 		'linear-gradient(113.34deg, rgba(26, 32, 44, 0.82) 0%, rgba(26, 32, 44, 0.8) 110.84%)'
 	);
 
-	const { isOpen, onOpen, onClose } = useDisclosure();
+	const {
+		isOpen: isAvatarModalOpen,
+		onOpen: onAvatarModalOpen,
+		onClose: onAvatarModalClose,
+	} = useDisclosure();
+	const {
+		isOpen: isContactsModalOpen,
+		onOpen: onContactsModalOpen,
+		onClose: onContactsModalClose,
+	} = useDisclosure();
+
 	const fileInputRef = useRef(null);
 	const [avatarFile, setAvatarFile] = useState(null);
 	const [avatarPreviewUrl, setAvatarPreviewUrl] = useState('');
 	const [avatarError, setAvatarError] = useState('');
+	const [editableResponsibleFullName, setEditableResponsibleFullName] = useState(
+		responsibleFullName || ''
+	);
+	const [editableEmail, setEditableEmail] = useState(email || '');
+	const [editablePhone, setEditablePhone] = useState(phone || '');
+	const [editableLegalAddress, setEditableLegalAddress] = useState(legalAddress || '');
 
 	useEffect(() => {
 		if (!avatarFile) {
@@ -82,9 +105,25 @@ const CompanyInformation = ({
 		setAvatarFile(file);
 	};
 
-	const handleCloseModal = () => {
+	const resetContactsToProps = () => {
+		setEditableResponsibleFullName(responsibleFullName || '');
+		setEditableEmail(email || '');
+		setEditablePhone(phone || '');
+		setEditableLegalAddress(legalAddress || '');
+	};
+
+	const handleCloseAvatarModal = () => {
 		setAvatarError('');
-		onClose();
+		onAvatarModalClose();
+	};
+
+	const handleCloseContactsModal = () => {
+		resetContactsToProps();
+		onContactsModalClose();
+	};
+
+	const handleSaveContacts = () => {
+		onContactsModalClose();
 	};
 
 	return (
@@ -123,7 +162,7 @@ const CompanyInformation = ({
 									alignItems="center"
 									justifyContent="center"
 									cursor="pointer"
-									onClick={onOpen}
+									onClick={onAvatarModalOpen}
 								>
 									<Icon as={FaPen} boxSize="10px" color="gray.600" />
 								</Box>
@@ -133,7 +172,7 @@ const CompanyInformation = ({
 									{company}
 								</Text>
 								<Text fontSize="sm" color="gray.500" fontWeight="400">
-									{email}
+									{editableEmail}
 								</Text>
 							</Flex>
 						</Flex>
@@ -148,7 +187,7 @@ const CompanyInformation = ({
 							{description}
 						</Text>
 
-						<Separator mb="14px" />
+						<Separator mb="10px" />
 
 						<Flex direction="column" gap="14px" mb="16px">
 							<Text fontSize="sm" color={textColor} fontWeight="medium">
@@ -160,7 +199,7 @@ const CompanyInformation = ({
 							<Text fontSize="sm" color={textColor} fontWeight="medium">
 								ЮРИДИЧЕСКИЙ АДРЕС:{' '}
 								<Text as="span" fontSize="sm" color="gray.400" fontWeight="400">
-									{legalAddress}
+									{editableLegalAddress}
 								</Text>
 							</Text>
 							<Text fontSize="sm" color={textColor} fontWeight="medium">
@@ -175,16 +214,25 @@ const CompanyInformation = ({
 									{ogrn}
 								</Text>
 							</Text>
+
+							<Separator mb="10px" />
+
+							<Text fontSize="sm" color={textColor} fontWeight="medium">
+								ФИО ОТВЕТСТВЕННОГО ЛИЦА:{' '}
+								<Text as="span" fontSize="sm" color="gray.400" fontWeight="400">
+									{editableResponsibleFullName}
+								</Text>
+							</Text>
 							<Text fontSize="sm" color={textColor} fontWeight="medium">
 								ТЕЛЕФОН:{' '}
 								<Text as="span" fontSize="sm" color="gray.400" fontWeight="400">
-									{phone}
+									{editablePhone}
 								</Text>
 							</Text>
 						</Flex>
 
 						<Box mt="auto">
-							<Separator mb="14px" />
+							<Separator mb="10px" />
 							<Button
 								variant="ghost"
 								p="0"
@@ -198,6 +246,7 @@ const CompanyInformation = ({
 								_hover={{ bg: 'transparent', textDecoration: 'underline' }}
 								_active={{ bg: 'transparent' }}
 								_focus={{ boxShadow: 'none' }}
+								onClick={onContactsModalOpen}
 							>
 								РЕДАКТИРОВАТЬ
 							</Button>
@@ -206,7 +255,7 @@ const CompanyInformation = ({
 				</CardBody>
 			</Card>
 
-			<Modal isOpen={isOpen} onClose={handleCloseModal} isCentered size="lg">
+			<Modal isOpen={isAvatarModalOpen} onClose={handleCloseAvatarModal} isCentered size="lg">
 				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
 				<ModalContent
 					bg={useColorModeValue('rgba(255, 255, 255, 0.9)', 'rgba(26, 32, 44, 0.86)')}
@@ -226,7 +275,7 @@ const CompanyInformation = ({
 								p="0"
 								minW="32px"
 								h="32px"
-								onClick={handleCloseModal}
+								onClick={handleCloseAvatarModal}
 								leftIcon={<FiX />}
 							>
 								&nbsp;
@@ -297,9 +346,96 @@ const CompanyInformation = ({
 						</Flex>
 					</ModalBody>
 					<ModalFooter px="24px" py="16px" borderTop="1px solid" borderColor="blackAlpha.200">
-						<Button colorScheme="blue" borderRadius="12px" onClick={handleCloseModal}>
+						<Button colorScheme="blue" borderRadius="12px" onClick={handleCloseAvatarModal}>
 							Готово
 						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+
+			<Modal isOpen={isContactsModalOpen} onClose={handleCloseContactsModal} isCentered size="xl">
+				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
+				<ModalContent
+					bg={useColorModeValue('rgba(255, 255, 255, 0.9)', 'rgba(26, 32, 44, 0.86)')}
+					border="1px solid"
+					borderColor="whiteAlpha.400"
+					borderRadius="20px"
+					boxShadow="0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+					overflow="hidden"
+				>
+					<ModalHeader px="24px" py="20px" borderBottom="1px solid" borderColor="blackAlpha.200">
+						<Text fontSize="24px" fontWeight="600">
+							Редактирование контактных данных
+						</Text>
+					</ModalHeader>
+					<ModalBody px="24px" py="20px">
+						<Flex direction="column" gap="14px">
+							<Alert status="info" borderRadius="12px">
+								<AlertIcon />
+								<Text fontSize="sm">
+									ИНН, ОГРН и название компании можно изменить только обратившись в{' '}
+									<Link as={RouterLink} to="/admin/support" color="recode.300" fontWeight="600">
+										техподдержку
+									</Link>
+									.
+								</Text>
+							</Alert>
+
+							<FormControl>
+								<FormLabel fontSize="14px">ФИО ответственного лица</FormLabel>
+								<Input
+									value={editableResponsibleFullName}
+									onChange={(event) => setEditableResponsibleFullName(event.target.value)}
+									placeholder="Иванов Иван Иванович"
+									bg="white"
+									borderRadius="12px"
+								/>
+							</FormControl>
+
+							<FormControl>
+								<FormLabel fontSize="14px">Корпоративная почта</FormLabel>
+								<Input
+									type="email"
+									value={editableEmail}
+									onChange={(event) => setEditableEmail(event.target.value)}
+									placeholder="company@example.ru"
+									bg="white"
+									borderRadius="12px"
+								/>
+							</FormControl>
+
+							<FormControl>
+								<FormLabel fontSize="14px">Контактный телефон</FormLabel>
+								<Input
+									value={editablePhone}
+									onChange={(event) => setEditablePhone(event.target.value)}
+									placeholder="+7 (___) ___-__-__"
+									bg="white"
+									borderRadius="12px"
+								/>
+							</FormControl>
+
+							<FormControl>
+								<FormLabel fontSize="14px">Юридический адрес</FormLabel>
+								<Input
+									value={editableLegalAddress}
+									onChange={(event) => setEditableLegalAddress(event.target.value)}
+									placeholder="г. Москва, ул. Примерная, д. 1"
+									bg="white"
+									borderRadius="12px"
+								/>
+							</FormControl>
+						</Flex>
+					</ModalBody>
+					<ModalFooter px="24px" py="16px" borderTop="1px solid" borderColor="blackAlpha.200">
+						<Flex w="100%" justify="space-between" gap="10px">
+							<Button variant="ghost" borderRadius="12px" onClick={handleCloseContactsModal}>
+								Отмена
+							</Button>
+							<Button colorScheme="recode" borderRadius="12px" onClick={handleSaveContacts}>
+								Сохранить
+							</Button>
+						</Flex>
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
