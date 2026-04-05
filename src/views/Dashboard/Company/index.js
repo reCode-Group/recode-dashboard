@@ -6,7 +6,7 @@ import { FaCog, FaUsers } from 'react-icons/fa';
 import { IoDocumentsSharp } from 'react-icons/io5';
 import { useLocation } from 'react-router-dom';
 import { dashboardTableData, invoicesData } from 'variables/general';
-import DocumentsFull from 'views/Dashboard/Billing/components/DocumentsFull';
+import Documents from 'views/Dashboard/Billing/components/Documents';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
 import CompanyInformation from './components/CompanyInformation';
 import CompanySettings from './components/CompanySettings';
@@ -128,13 +128,14 @@ function Company() {
 
 					<Grid mt="24px">
 						{activeTab === 'documents' ? (
-							<DocumentsFull title={'Документы компании'} data={invoicesData} fixedHeight="346px" />
+							<Documents title={'Документы компании'} data={invoicesData} fixedHeight="403px" />
 						) : activeTab === 'employees' ? (
 							<EmployeeTable
 								withPageContainer={false}
-								showFullListButton="false"
+								showFullListButton={true}
 								title={'Сотрудники'}
 								hiddenColumns={['role']}
+								fixedHeight="403px"
 							/>
 						) : (
 							<CompanySettings title={'Настройки компании'} />

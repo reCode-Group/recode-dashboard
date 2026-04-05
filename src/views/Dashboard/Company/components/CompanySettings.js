@@ -17,6 +17,7 @@ const CompanySettings = ({ title }) => {
 		{ label: 'Параметр 3', checked: true },
 		{ label: 'Параметр 4', checked: true },
 		{ label: 'Параметр 5', checked: true },
+		{ label: 'Параметр 6', checked: false },
 	];
 
 	const notificationOptions = [
@@ -54,7 +55,7 @@ const CompanySettings = ({ title }) => {
 				</Text>
 			</CardHeader>
 			<CardBody px="5px">
-				<Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="24px">
+				<Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="120px">
 					<Flex direction="column">
 						<Text fontSize="sm" color="gray.500" fontWeight="600" mb="20px">
 							КОМПАНИЯ

@@ -2,6 +2,7 @@
 import {
 	Alert,
 	AlertIcon,
+	Box,
 	Button,
 	Flex,
 	FormControl,
@@ -33,7 +34,7 @@ import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import TablesTableRow from 'components/Tables/TablesTableRow';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
 import { tablesTableData } from 'variables/general';
@@ -63,15 +64,19 @@ const EmployeeTable = ({
 	showFullListButton = false,
 	onFullListClick,
 	fullListPath = '/employees',
+	fixedHeight = '550px',
 }) => {
 	const history = useHistory();
 	const textColor = useColorModeValue('gray.700', 'white');
+	const cardBg = useColorModeValue('white', 'gray.700');
 	const glassBg = useColorModeValue('rgba(255, 255, 255, 0.92)', 'rgba(26, 32, 44, 0.9)');
 	const sectionBg = useColorModeValue('rgba(255, 255, 255, 0.72)', 'rgba(26, 32, 44, 0.65)');
 	const modalSubtitleColor = useColorModeValue('gray.500', 'gray.300');
 	const hiddenColumnsSet = new Set(hiddenColumns);
+	const scrollRef = useRef(null);
 
 	const [rows, setRows] = useState(data);
+	const [hasScrollbar, setHasScrollbar] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [modalMode, setModalMode] = useState('create');
 	const [editingRowEmail, setEditingRowEmail] = useState('');
@@ -86,6 +91,26 @@ const EmployeeTable = ({
 	useEffect(() => {
 		setRows(data);
 	}, [data]);
+
+	useEffect(() => {
+		const element = scrollRef.current;
+		if (!element) return;
+
+		const updateScrollbarState = () => {
+			setHasScrollbar(element.scrollHeight > element.clientHeight);
+		};
+
+		updateScrollbarState();
+
+		const resizeObserver = new ResizeObserver(updateScrollbarState);
+		resizeObserver.observe(element);
+		window.addEventListener('resize', updateScrollbarState);
+
+		return () => {
+			resizeObserver.disconnect();
+			window.removeEventListener('resize', updateScrollbarState);
+		};
+	}, [rows, hiddenColumns]);
 
 	const usedTokens = useMemo(() => rows.reduce((sum, row) => sum + parseTokenValue(row.date), 0), [
 		rows,
@@ -208,7 +233,13 @@ const EmployeeTable = ({
 	};
 
 	const tableContent = (
-		<Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
+		<Card
+			h={fixedHeight}
+			minH={fixedHeight}
+			display="flex"
+			flexDirection="column"
+			overflow="hidden"
+		>
 			<CardHeader p="6px 0px 22px 0px">
 				<Flex align="center" justify="space-between" gap="12px" width="100%">
 					<Text fontSize="xl" color={textColor} fontWeight="bold">
@@ -229,34 +260,52 @@ const EmployeeTable = ({
 					)}
 				</Flex>
 			</CardHeader>
-			<CardBody style={{ flexDirection: 'column' }}>
-				<Table variant="simple" color={textColor}>
-					<Thead>
-						<Tr my=".8rem" pl="0px" color="gray.400">
-							{visibleCaptions.map((caption, idx) => (
-								<Th color="gray.400" key={idx} ps={idx === 0 ? '0px' : null}>
-									{caption}
-								</Th>
+			<CardBody style={{ flexDirection: 'column' }} flex="1" minH="0">
+				<Box
+					ref={scrollRef}
+					w="100%"
+					flex="1"
+					minH="0"
+					overflow="auto"
+					pr={{ base: '0px', lg: hasScrollbar ? '14px' : '0px' }}
+					sx={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y' }}
+				>
+					<Table variant="simple" color={textColor} minW={{ base: '640px', md: '100%' }}>
+						<Thead position="sticky" top="0" zIndex="1" bg={cardBg}>
+							<Tr my=".8rem" pl="0px" color="gray.400">
+								{visibleCaptions.map((caption, idx) => (
+									<Th
+										color="gray.400"
+										key={idx}
+										ps={idx === 0 ? '0px' : null}
+										position="sticky"
+										top="0"
+										zIndex="1"
+										bg={cardBg}
+									>
+										{caption}
+									</Th>
+								))}
+							</Tr>
+						</Thead>
+						<Tbody>
+							{rows.map((row) => (
+								<TablesTableRow
+									key={`${row.email}-${row.name}`}
+									name={row.name}
+									logo={row.logo}
+									email={row.email}
+									subdomain={row.subdomain}
+									domain={row.domain}
+									status={row.status}
+									date={row.date}
+									hiddenColumns={hiddenColumns}
+									onEdit={() => openEditModal(row)}
+								/>
 							))}
-						</Tr>
-					</Thead>
-					<Tbody>
-						{rows.map((row) => (
-							<TablesTableRow
-								key={`${row.email}-${row.name}`}
-								name={row.name}
-								logo={row.logo}
-								email={row.email}
-								subdomain={row.subdomain}
-								domain={row.domain}
-								status={row.status}
-								date={row.date}
-								hiddenColumns={hiddenColumns}
-								onEdit={() => openEditModal(row)}
-							/>
-						))}
-					</Tbody>
-				</Table>
+						</Tbody>
+					</Table>
+				</Box>
 				<Flex mt="18px">
 					<Button
 						leftIcon={<Icon as={FaPlus} boxSize="10px" />}
@@ -446,7 +495,7 @@ const EmployeeTable = ({
 	}
 
 	return (
-		<Flex direction="column" pt={{ base: '120px', md: '75px' }}>
+		<Flex direction="column" my={{ base: '120px', md: '75px' }} h="85vh">
 			{tableContent}
 		</Flex>
 	);
