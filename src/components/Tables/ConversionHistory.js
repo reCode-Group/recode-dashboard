@@ -319,6 +319,7 @@ const ConversionHistory = ({
 					borderRadius="20px"
 					boxShadow="0 25px 50px -12px rgba(0, 0, 0, 0.25)"
 					overflow="hidden"
+					maxH={{ base: '90vh', md: '85vh' }}
 				>
 					<ModalHeader
 						px="28px"
@@ -334,7 +335,7 @@ const ConversionHistory = ({
 							Тип перевода: {selectedConversion?.type || '-'}
 						</Text>
 					</ModalHeader>
-					<ModalBody px="28px" py="22px" bg={modalSectionBg}>
+					<ModalBody px="28px" py="22px" bg={modalSectionBg} overflowY="auto">
 						<Flex direction={{ base: 'column', xl: 'row' }} gap="18px">
 							<Flex direction="column" flex="1" minW="0">
 								<Flex justify="space-between" align="center" mb="8px">
@@ -359,11 +360,12 @@ const ConversionHistory = ({
 								<Textarea
 									value={selectedConversion?.sourceCode || ''}
 									readOnly
-									minH="360px"
+									h={{ base: '180px', md: '240px', xl: '360px' }}
 									bg={inputBg}
 									borderColor={tableBorder}
 									borderRadius="15px"
 									resize="none"
+									overflowY="auto"
 									fontSize="sm"
 								/>
 							</Flex>
@@ -392,11 +394,12 @@ const ConversionHistory = ({
 								<Textarea
 									value={selectedConversion?.translatedMacro || ''}
 									readOnly
-									minH="360px"
+									h={{ base: '180px', md: '240px', xl: '360px' }}
 									bg={inputBg}
 									borderColor={tableBorder}
 									borderRadius="15px"
 									resize="none"
+									overflowY="auto"
 									fontSize="sm"
 								/>
 							</Flex>
