@@ -2,8 +2,8 @@
 import { Box, Button, Flex, HStack, Image, Link, Text, useColorModeValue } from '@chakra-ui/react';
 import recode_logo_colored from 'assets/svg/recode-logo-colored.svg';
 import recode_logo_white from 'assets/svg/recode-logo-white.svg';
-import { MAIN_CONTAINER_MAX_WIDTH, MAIN_NAVBAR_WIDTH } from 'constants/layout';
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive';
+import { MAIN_CONTAINER_MAX_WIDTH, MAIN_NAVBAR_WIDTH } from 'constants/layout';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
@@ -184,7 +184,7 @@ export default function AuthNavbar(props) {
 					/>
 				</Box>
 				{linksAuth}
-				<Link href="https://creative-tim.com/product/purity-ui-dashboard">
+				<Link href="/admin/dashboard">
 					<Button
 						bg={bgButton}
 						color={colorButton}
