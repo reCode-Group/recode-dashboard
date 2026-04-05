@@ -7,7 +7,7 @@ function TablesTableRow(props) {
 	const colorStatus = useColorModeValue('white', 'gray.400');
 	const hiddenColumnsSet = new Set(hiddenColumns);
 	const normalizedStatus = String(status || '').toLowerCase();
-	const isActiveStatus = normalizedStatus.includes('акт') || normalizedStatus.includes('рђ');
+	const isActiveStatus = !normalizedStatus.includes('неакт');
 
 	return (
 		<Tr>
