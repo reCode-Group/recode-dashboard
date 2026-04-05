@@ -6,7 +6,7 @@ function ConversionHistoryPage() {
 	return (
 		<Flex direction="column" pt={{ base: '120px', md: '75px' }} h={{ base: '85vh', md: '100vh' }}>
 			<ConversionHistory
-				title={'История переводов'}
+				title={'История конвертаций'}
 				amount={dashboardTableData.length}
 				captions={['ID', 'Тип', 'Статус', 'Результат перевода', 'Затраченные токены', 'Дата']}
 				data={dashboardTableData}

@@ -1,6 +1,7 @@
 ﻿import Billing from 'views/Dashboard/Billing';
 import BillingPay from 'views/Dashboard/BillingPay';
 import CompanyRegistration from 'views/Dashboard/CompanyRegistration';
+import Company from 'views/Dashboard/Company';
 import ConversionHistoryPage from 'views/Dashboard/ConversionHistory';
 import Dashboard from 'views/Dashboard/Dashboard';
 import Profile from 'views/Dashboard/Profile';
@@ -8,13 +9,13 @@ import ProfileComplete from 'views/Dashboard/ProfileComplete';
 import Support from 'views/Dashboard/Support';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
 import Tariff from 'views/Dashboard/Tariff';
-import DocumentationPage from 'views/Main/Documentation';
-import BlogArticlePage from 'views/Main/Blog/Article';
 import BlogPage from 'views/Main/Blog';
+import BlogArticlePage from 'views/Main/Blog/Article';
 import ContactsPage from 'views/Main/Contacts';
-import MacroTranslatorPage from 'views/Main/MacroTranslator';
+import DocumentationPage from 'views/Main/Documentation';
 import PrivacyPolicyPage from 'views/Main/Legal/PrivacyPolicy';
 import PublicOfferPage from 'views/Main/Legal/PublicOffer';
+import MacroTranslatorPage from 'views/Main/MacroTranslator';
 
 import {
 	CompanyIcon,
@@ -93,18 +94,19 @@ const dashRoutes = [
 		state: 'pageCollapse',
 		views: [
 			{
-				path: '/tables',
+				path: '/company',
 				name: 'Компания',
+				secondaryNavbar: true,
 				icon: <CompanyIcon color="inherit" />,
-				component: EmployeeTable,
+				component: Company,
 				layout: '/admin',
 			},
 			{
-				path: '/tables',
+				path: '/employees',
 				name: 'Сотрудники',
 				icon: <EmployersIcon color="inherit" />,
 				component: EmployeeTable,
-				layout: '/main',
+				layout: '/admin',
 			},
 			{
 				path: '/documentation',
@@ -167,4 +169,6 @@ const dashRoutes = [
 ];
 
 export default dashRoutes;
+
+
 
