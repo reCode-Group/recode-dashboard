@@ -104,8 +104,10 @@ export default function Dashboard() {
 				templateColumns={{ sm: '1fr' }}
 				templateRows={{ sm: '1fr auto', md: '1fr', lg: '1fr' }}
 				gap="24px"
+				minW="0"
 			>
-				<ConversionHistory
+				<Flex minW="0" w="100%">
+					<ConversionHistory
 					title={'Конвертации'}
 					amount={30}
 					captions={['ID', 'Тип', 'Статус', 'Результат перевода', 'Затраченные токены', 'Дата']}
@@ -113,7 +115,8 @@ export default function Dashboard() {
 					enablePagination={false}
 					initialRowsPerPage={5}
 					showFullHistoryButton={true}
-				/>
+					/>
+				</Flex>
 			</Grid>
 
 			<CreateSupportTicketModal
