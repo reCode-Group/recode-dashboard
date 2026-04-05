@@ -6,6 +6,8 @@ function TablesTableRow(props) {
 	const bgStatus = useColorModeValue('gray.400', '#1a202c');
 	const colorStatus = useColorModeValue('white', 'gray.400');
 	const hiddenColumnsSet = new Set(hiddenColumns);
+	const normalizedStatus = String(status || '').toLowerCase();
+	const isActiveStatus = normalizedStatus.includes('актив') || normalizedStatus.includes('рђрєс');
 
 	return (
 		<Tr>
@@ -41,8 +43,8 @@ function TablesTableRow(props) {
 			{!hiddenColumnsSet.has('status') && (
 				<Td>
 					<Badge
-						bg={status === 'Активен' ? 'green.400' : bgStatus}
-						color={status === 'Активен' ? 'white' : colorStatus}
+						bg={isActiveStatus ? 'green.400' : bgStatus}
+						color={isActiveStatus ? 'white' : colorStatus}
 						fontSize="16px"
 						p="3px 10px"
 						borderRadius="8px"

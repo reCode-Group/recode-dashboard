@@ -1,8 +1,26 @@
 ﻿// Chakra imports
 import {
+	Alert,
+	AlertIcon,
 	Button,
 	Flex,
+	FormControl,
+	FormErrorMessage,
+	FormLabel,
 	Icon,
+	Input,
+	Modal,
+	ModalBody,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
+	ModalOverlay,
+	Select,
+	Slider,
+	SliderFilledTrack,
+	SliderThumb,
+	SliderTrack,
+	Stack,
 	Table,
 	Tbody,
 	Text,
@@ -16,12 +34,23 @@ import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import TablesTableRow from 'components/Tables/TablesTableRow';
+import { useEffect, useMemo, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
 import { tablesTableData } from 'variables/general';
 
 const defaultCaptions = ['Пользователь', 'Роль', 'Статус', 'Остаток токенов', ''];
 const defaultColumnKeys = ['user', 'role', 'status', 'tokens', 'actions'];
+const TOTAL_EMPLOYEE_TOKENS = 50000;
+
+function parseTokenValue(value) {
+	const numericValue = Number(String(value ?? '').replace(/[^\d]/g, ''));
+	return Number.isFinite(numericValue) ? numericValue : 0;
+}
+
+function formatTokenValue(value) {
+	return new Intl.NumberFormat('ru-RU').format(value).replace(/,/g, ' ');
+}
 
 const EmployeeTable = ({
 	title = 'Таблица сотрудников',
@@ -35,7 +64,28 @@ const EmployeeTable = ({
 }) => {
 	const history = useHistory();
 	const textColor = useColorModeValue('gray.700', 'white');
+	const glassBg = useColorModeValue('rgba(255, 255, 255, 0.92)', 'rgba(26, 32, 44, 0.9)');
+	const sectionBg = useColorModeValue('rgba(255, 255, 255, 0.72)', 'rgba(26, 32, 44, 0.65)');
+	const modalSubtitleColor = useColorModeValue('gray.500', 'gray.300');
 	const hiddenColumnsSet = new Set(hiddenColumns);
+	const [rows, setRows] = useState(data);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [fullName, setFullName] = useState('');
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [role] = useState('Сотрудник');
+	const [tokens, setTokens] = useState(0);
+	const [formError, setFormError] = useState('');
+
+	useEffect(() => {
+		setRows(data);
+	}, [data]);
+
+	const usedTokens = useMemo(() => rows.reduce((sum, row) => sum + parseTokenValue(row.date), 0), [
+		rows,
+	]);
+	const availableTokens = Math.max(TOTAL_EMPLOYEE_TOKENS - usedTokens, 0);
+
 	const visibleCaptions = captions.filter((_, idx) => {
 		const columnKey = defaultColumnKeys[idx] ?? `column-${idx}`;
 		return !hiddenColumnsSet.has(columnKey);
@@ -44,6 +94,49 @@ const EmployeeTable = ({
 		? fullListPath
 		: `/admin${fullListPath.startsWith('/') ? fullListPath : `/${fullListPath}`}`;
 	const handleFullListClick = onFullListClick ?? (() => history.push(resolvedFullListPath));
+	const closeModal = () => {
+		setIsModalOpen(false);
+		setFullName('');
+		setEmail('');
+		setPassword('');
+		setTokens(0);
+		setFormError('');
+	};
+
+	const handleCreateEmployee = () => {
+		if (!fullName.trim() || !email.trim() || !password.trim()) {
+			setFormError('Заполните ФИО, email и пароль.');
+			return;
+		}
+		const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+		if (!emailIsValid) {
+			setFormError('Укажите корректный email.');
+			return;
+		}
+		if (tokens > availableTokens) {
+			setFormError('Недостаточно токенов для распределения.');
+			return;
+		}
+		if (tokens <= 0) {
+			setFormError('Укажите количество токенов больше нуля.');
+			return;
+		}
+		if (rows.some((row) => String(row.email).toLowerCase() === email.trim().toLowerCase())) {
+			setFormError('Сотрудник с таким email уже существует.');
+			return;
+		}
+
+		const newEmployee = {
+			name: fullName.trim(),
+			email: email.trim(),
+			subdomain: 'Права ограничены',
+			domain: role,
+			status: 'Активен',
+			date: formatTokenValue(tokens),
+		};
+		setRows((prev) => [newEmployee, ...prev]);
+		closeModal();
+	};
 
 	const tableContent = (
 		<Card overflowX={{ sm: 'scroll', xl: 'hidden' }}>
@@ -81,7 +174,7 @@ const EmployeeTable = ({
 						</Tr>
 					</Thead>
 					<Tbody>
-						{data.map((row) => {
+						{rows.map((row) => {
 							return (
 								<TablesTableRow
 									key={`${row.email}-${row.name}`}
@@ -111,11 +204,145 @@ const EmployeeTable = ({
 						p="0px"
 						height="auto"
 						fontWeight="bold"
+						onClick={() => setIsModalOpen(true)}
 					>
 						ДОБАВИТЬ СОТРУДНИКА
 					</Button>
 				</Flex>
 			</CardBody>
+			<Modal isOpen={isModalOpen} onClose={closeModal} isCentered size="2xl">
+				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
+				<ModalContent
+					bg={glassBg}
+					border="1px solid"
+					borderColor="whiteAlpha.400"
+					borderRadius="20px"
+					boxShadow="0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+					overflow="hidden"
+				>
+					<ModalHeader
+						px="32px"
+						py="24px"
+						borderBottom="1px solid"
+						borderColor="blackAlpha.200"
+						bg={sectionBg}
+					>
+						<Text fontSize="24px" fontWeight="600" color={textColor} lineHeight="1.1">
+							Добавить сотрудника
+						</Text>
+						<Text mt="6px" fontSize="14px" color={modalSubtitleColor}>
+							Распределите токены сотруднику из общего лимита компании.
+						</Text>
+					</ModalHeader>
+					<ModalBody px="32px" py="24px" bg={sectionBg}>
+						<Stack spacing="14px">
+							{formError ? (
+								<Alert status="error" borderRadius="12px">
+									<AlertIcon />
+									<Text>{formError}</Text>
+								</Alert>
+							) : null}
+							<FormControl isInvalid={Boolean(formError) && !fullName.trim()}>
+								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
+									ФИО
+								</FormLabel>
+								<Input
+									value={fullName}
+									onChange={(event) => setFullName(event.target.value)}
+									placeholder="Иванов Иван Иванович"
+									bg="white"
+									borderRadius="12px"
+									h="46px"
+								/>
+								{Boolean(formError) && !fullName.trim() ? (
+									<FormErrorMessage>Укажите ФИО</FormErrorMessage>
+								) : null}
+							</FormControl>
+							<FormControl>
+								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
+									Роль
+								</FormLabel>
+								<Select value={role} isDisabled bg="white" borderRadius="12px" h="46px">
+									<option value="Сотрудник">Сотрудник</option>
+								</Select>
+							</FormControl>
+							<FormControl isInvalid={Boolean(formError) && !email.trim()}>
+								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
+									Email
+								</FormLabel>
+								<Input
+									type="email"
+									value={email}
+									onChange={(event) => setEmail(event.target.value)}
+									placeholder="name@company.ru"
+									bg="white"
+									borderRadius="12px"
+									h="46px"
+								/>
+								{Boolean(formError) && !email.trim() ? (
+									<FormErrorMessage>Укажите email</FormErrorMessage>
+								) : null}
+							</FormControl>
+							<FormControl isInvalid={Boolean(formError) && !password.trim()}>
+								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
+									Пароль
+								</FormLabel>
+								<Input
+									type="password"
+									value={password}
+									onChange={(event) => setPassword(event.target.value)}
+									placeholder="Введите пароль"
+									bg="white"
+									borderRadius="12px"
+									h="46px"
+								/>
+								{Boolean(formError) && !password.trim() ? (
+									<FormErrorMessage>Укажите пароль</FormErrorMessage>
+								) : null}
+							</FormControl>
+							<FormControl>
+								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
+									Токены: {formatTokenValue(tokens)}
+								</FormLabel>
+								<Slider
+									value={tokens}
+									onChange={(value) => setTokens(value)}
+									min={0}
+									max={availableTokens}
+									step={100}
+									colorScheme="recode"
+								>
+									<SliderTrack bg="blackAlpha.200">
+										<SliderFilledTrack />
+									</SliderTrack>
+									<SliderThumb boxSize={5} />
+								</Slider>
+								<Text mt="8px" fontSize="12px" color={modalSubtitleColor}>
+									Доступно для распределения: {formatTokenValue(availableTokens)}
+									{' / '}
+									{formatTokenValue(TOTAL_EMPLOYEE_TOKENS)}
+								</Text>
+							</FormControl>
+						</Stack>
+					</ModalBody>
+					<ModalFooter
+						px="32px"
+						py="20px"
+						borderTop="1px solid"
+						borderColor="blackAlpha.200"
+						bg={sectionBg}
+					>
+						<Flex w="100%" justify="space-between" gap="12px">
+							<Button variant="ghost" onClick={closeModal}>
+								Отмена
+							</Button>
+							<Button colorScheme="recode" onClick={handleCreateEmployee}>
+								Добавить
+							</Button>
+						</Flex>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
 		</Card>
 	);
 
