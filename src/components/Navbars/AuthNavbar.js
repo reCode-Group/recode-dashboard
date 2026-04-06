@@ -84,7 +84,7 @@ export default function AuthNavbar(props) {
 					<Text>О ПРОЕКТЕ</Text>
 				</Button>
 			</NavLink>
-			<NavLink to="/admin/profile">
+			<NavLink to="main/macro-translator">
 				<Button
 					fontSize="sm"
 					fontWeight="medium"
