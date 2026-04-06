@@ -13,8 +13,8 @@ import heroOffice2010 from 'assets/img/landing/exact/hero-office2010.png';
 import heroOffice2016 from 'assets/img/landing/exact/hero-office2016.png';
 import heroR7 from 'assets/img/landing/exact/hero-r7.png';
 import heroYandex from 'assets/img/landing/exact/hero-yandex.png';
-import supportBanner from 'assets/img/support-banner.png';
 import videoPreview from 'assets/img/landing/exact/video.png';
+import supportBanner from 'assets/img/support-banner.png';
 import forBusinessIcon from 'assets/svg/for-business.svg';
 import forItIcon from 'assets/svg/for-it.svg';
 import habrLogo from 'assets/svg/habr-logo.svg';
@@ -98,12 +98,20 @@ export default function LandingPage() {
 
 	return (
 		<div className="relative overflow-x-hidden bg-white">
-			{/* Hero background image disabled temporarily */}
+			{/* СДЕЛАЙ ЭТОТ БЛОК чтобы не заслонял шапку */}
+			<div className="bg-[#f8f9fa]">
+				<div className="mx-auto flex h-[100px] w-full max-w-[1224px] items-center gap-4 px-4 md:px-0">
+					<img src={bottomFondLogo} alt="Фонд" className="h-[47px] w-auto" />
+					<img src={bottomFondLogo2} alt="Студенческий стартап" className="h-[58px] w-auto" />
+					<p className="text-[10px] leading-[1.2] text-[#718096] md:text-[18px]">
+						Проект реализован при поддержке Фонда содействия инновациям в рамках программы
+						«Студенческий стартап» мероприятия «Платформа университетского технологического
+						предпринимательства» федерального проекта «Технологии».
+					</p>
+				</div>
+			</div>
 
 			<section id="about" className="mx-auto w-[calc(100%-24px)] max-w-[990.717px] pt-[150px]">
-				<div className="mx-auto flex h-7 w-[288px] items-center justify-center rounded-[100px] border border-[#005de0] bg-[rgba(0,93,224,0.11)] text-[14px] text-[#005de0]">
-					Подходит для P7-Офис и МойОфис
-				</div>
 				<h1 className="mx-auto mt-8 max-w-[778px] text-center text-[46px] font-bold leading-none text-[#2d3748] md:text-[60px]">
 					Автоматический перевод <span className="text-[#005de0]">в один клик</span>
 				</h1>

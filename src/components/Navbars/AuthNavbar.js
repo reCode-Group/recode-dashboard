@@ -6,15 +6,34 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive';
 import { MAIN_CONTAINER_MAX_WIDTH, MAIN_NAVBAR_WIDTH } from 'constants/layout';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import routes from 'routes.js';
 
 export default function AuthNavbar(props) {
 	const [open, setOpen] = React.useState(false);
+	const location = useLocation();
+	const isLandingPage = location.pathname === '/main/landing';
+	const [isTopOnLanding, setIsTopOnLanding] = React.useState(true);
 	const handleDrawerToggle = () => {
 		setOpen(!open);
 	};
 	const { logo, logoText, secondary, ...rest } = props;
+
+	React.useEffect(() => {
+		if (secondary || !isLandingPage) {
+			setIsTopOnLanding(false);
+			return undefined;
+		}
+
+		const handleScroll = () => {
+			setIsTopOnLanding(window.scrollY <= 8);
+		};
+
+		handleScroll();
+		window.addEventListener('scroll', handleScroll, { passive: true });
+
+		return () => window.removeEventListener('scroll', handleScroll);
+	}, [secondary, isLandingPage]);
 	// verifies if routeName is the one active (in browser input)
 	const activeRoute = (routeName) => {
 		return window.location.href.indexOf(routeName) > -1 ? true : false;
@@ -51,6 +70,10 @@ export default function AuthNavbar(props) {
 		mainText = 'white';
 		navbarPosition = 'absolute';
 	}
+	const shouldUseTopLandingOffset = !secondary && isLandingPage && isTopOnLanding;
+	const navbarTop = shouldUseTopLandingOffset
+		? { base: '14px', md: '18px', xl: '120px' }
+		: { base: '8px', md: '12px', xl: '16px' };
 	var brand = (
 		<Link
 			href={`${process.env.PUBLIC_URL}/#/`}
@@ -155,7 +178,7 @@ export default function AuthNavbar(props) {
 	return (
 		<Flex
 			position={navbarPosition}
-			top={{ base: '8px', md: '12px', xl: '16px' }}
+			top={navbarTop}
 			left="50%"
 			transform="translate(-50%, 0px)"
 			background={navbarBg}
@@ -171,6 +194,7 @@ export default function AuthNavbar(props) {
 			maxW={MAIN_CONTAINER_MAX_WIDTH}
 			alignItems="center"
 			zIndex={1000}
+			transition="top 0.2s ease"
 		>
 			<Flex w="100%" justifyContent={{ sm: 'start', lg: 'space-between' }}>
 				{brand}
