@@ -13,6 +13,7 @@ import BlogPage from 'views/Main/Blog';
 import BlogArticlePage from 'views/Main/Blog/Article';
 import ContactsPage from 'views/Main/Contacts';
 import DocumentationPage from 'views/Main/Documentation';
+import LandingPage from 'views/Main/Landing';
 import PrivacyPolicyPage from 'views/Main/Legal/PrivacyPolicy';
 import PublicOfferPage from 'views/Main/Legal/PublicOffer';
 import MacroTranslatorPage from 'views/Main/MacroTranslator';
@@ -107,6 +108,13 @@ const dashRoutes = [
 				icon: <EmployersIcon color="inherit" />,
 				component: EmployeeTable,
 				layout: '/admin',
+			},
+			{
+				path: '/landing',
+				name: 'Лендинг',
+				component: LandingPage,
+				layout: '/main',
+				hiddenInSidebar: true,
 			},
 			{
 				path: '/documentation',

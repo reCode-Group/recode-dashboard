@@ -16,8 +16,9 @@ export default function MainLayout(props) {
 	const { ...rest } = props;
 	const location = useLocation();
 	const isDocumentationRoute = location.pathname === '/main/documentation';
-	const contentMaxWidth = isDocumentationRoute ? '100%' : MAIN_CONTAINER_MAX_WIDTH;
-	const contentPaddingX = isDocumentationRoute ? '0px' : MAIN_CONTAINER_PADDING_X;
+	const isLandingRoute = location.pathname === '/main/landing';
+	const contentMaxWidth = isDocumentationRoute || isLandingRoute ? '100%' : MAIN_CONTAINER_MAX_WIDTH;
+	const contentPaddingX = isDocumentationRoute || isLandingRoute ? '0px' : MAIN_CONTAINER_PADDING_X;
 	// ref for the wrapper div
 	const wrapper = React.createRef();
 	React.useEffect(() => {
@@ -95,12 +96,12 @@ export default function MainLayout(props) {
 					<Box ref={wrapper} w="100%" maxW={contentMaxWidth} px={contentPaddingX} mx="auto">
 						<Switch>
 							{getRoutes(routes)}
-							<Redirect from="/main" to="/main/macro-translator" />
+							<Redirect from="/main" to="/main/landing" />
 							<Redirect from="/auth" to="/auth/login-page" />
 						</Switch>
 					</Box>
 				</Box>
-				{!isDocumentationRoute && (
+				{!isDocumentationRoute && !isLandingRoute && (
 					<Box px={MAIN_CONTAINER_PADDING_X} mx="auto" width="100%" maxW={MAIN_CONTAINER_MAX_WIDTH}>
 						<Footer />
 					</Box>

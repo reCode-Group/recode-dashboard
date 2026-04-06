@@ -1,6 +1,7 @@
 import AdminLayout from 'layouts/Admin.js';
 import AuthLayout from 'layouts/Auth.js';
 import MainLayout from 'layouts/Main';
+import 'styles/tailwind.css';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 

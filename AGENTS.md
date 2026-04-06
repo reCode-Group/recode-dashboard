@@ -1,7 +1,10 @@
-﻿## Encoding Safety (mandatory)
+## Encoding Safety (mandatory)
 
-- Files containing Cyrillic text dont be unicode symbols.
-- Do not rewrite such files with `Set-Content` / `Out-File` unless `-Encoding UTF8` is explicitly provided.
-- If shell rewriting is unavoidable, always use explicit UTF-8 output encoding.
-- After editing Cyrillic strings, verify there is no mojibake in touched files (examples: `Р`, `С`, `Ð`, `Ñ` inside Russian text).
+- Any file that contains Cyrillic must stay UTF-8 and must not get mojibake.
+- Prefer `apply_patch` for edits in files with Cyrillic.
+- Never use PowerShell `Set-Content` / `Out-File` for Cyrillic files unless `-Encoding UTF8` is explicitly set.
+- If shell rewrite is unavoidable, force UTF-8 output encoding and preserve existing line endings.
+- After every edit that touches Russian text, run a mojibake check in touched files (look for broken patterns like `Р`, `С`, `Ð`, `Ñ` inside words).
+- If mojibake is detected, stop and fix encoding before any further changes.
+- Before final response, re-check all touched Cyrillic files for encoding integrity.
 - Do not run broad repo-wide encoding rewrites unless the user explicitly asks.
