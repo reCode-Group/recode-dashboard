@@ -160,7 +160,7 @@ export default function DocumentationPage() {
 			<Box
 				as="aside"
 				display={{ base: 'none', md: 'block' }}
-				w={{ md: '280px', xl: '320px' }}
+				w={{ md: '280px', xl: '450px' }}
 				flexShrink={0}
 				bg={panelBg}
 			>
@@ -336,7 +336,7 @@ export default function DocumentationPage() {
 					</Button>
 				</Flex>
 
-				<Box mx="4vw">
+				<Box mx="4vw" mb="280px">
 					{sections.map((section) => (
 						<Box as="section" id={section.id} key={section.id} my={{ base: '10vw', md: '4vw' }}>
 							<Heading

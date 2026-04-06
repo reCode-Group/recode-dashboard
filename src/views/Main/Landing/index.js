@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FiArrowRight, FiChevronDown, FiHelpCircle } from 'react-icons/fi';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 
 import businessSiteCard from 'assets/img/landing/business-site-card.png';
 import bottomFondLogo from 'assets/img/landing/exact/bottom-fond.png';
@@ -8,13 +8,12 @@ import bottomFondLogo2 from 'assets/img/landing/exact/bottom-fond2.png';
 import featureJs from 'assets/img/landing/exact/feature-js.png';
 import featureMainBg from 'assets/img/landing/exact/feature-main-bg.png';
 import featurePuzzle from 'assets/img/landing/exact/feature-puzzle.png';
-import gridPattern from 'assets/img/landing/exact/grid-pattern.png';
 import heroMyOffice from 'assets/img/landing/exact/hero-myoffice.png';
 import heroOffice2010 from 'assets/img/landing/exact/hero-office2010.png';
 import heroOffice2016 from 'assets/img/landing/exact/hero-office2016.png';
 import heroR7 from 'assets/img/landing/exact/hero-r7.png';
 import heroYandex from 'assets/img/landing/exact/hero-yandex.png';
-import supportRings from 'assets/img/landing/exact/support-rings.png';
+import supportBanner from 'assets/img/support-banner.png';
 import videoPreview from 'assets/img/landing/exact/video.png';
 import forBusinessIcon from 'assets/svg/for-business.svg';
 import forItIcon from 'assets/svg/for-it.svg';
@@ -80,16 +79,26 @@ const priceCards = [
 
 export default function LandingPage() {
 	const [openFaqId, setOpenFaqId] = useState(faqRows[0].id);
+	const history = useHistory();
 
 	const toggleFaq = (id) => {
 		setOpenFaqId((current) => (current === id ? null : id));
 	};
 
+	const handleStartWorkClick = () => {
+		history.push('/main/macro-translator');
+	};
+
+	const handleFeaturesClick = () => {
+		const featuresSection = document.getElementById('features');
+		if (featuresSection) {
+			featuresSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
+	};
+
 	return (
 		<div className="relative overflow-x-hidden bg-white">
-			<div className="absolute inset-x-0 top-[76px] h-[629px] opacity-[0.07]">
-				<img src={gridPattern} alt="" className="h-full w-full object-cover" />
-			</div>
+			{/* Hero background image disabled temporarily */}
 
 			<section id="about" className="mx-auto w-[calc(100%-24px)] max-w-[990.717px] pt-[150px]">
 				<div className="mx-auto flex h-7 w-[288px] items-center justify-center rounded-[100px] border border-[#005de0] bg-[rgba(0,93,224,0.11)] text-[14px] text-[#005de0]">
@@ -107,18 +116,21 @@ export default function LandingPage() {
 					Всё работает в облаке - ничего не нужно устанавливать.
 				</p>
 				<div className="mt-10 flex flex-wrap items-center justify-center gap-[15px]">
-					<NavLink
-						to="/main/macro-translator"
-						className="flex h-[59.66px] w-[245px] items-center justify-center gap-1 rounded-[12px] bg-[#005de0] text-[14px] font-bold uppercase text-white"
+					<button
+						type="button"
+						onClick={handleStartWorkClick}
+						className="appearance-none flex h-[59.66px] w-[245px] items-center justify-center gap-1 rounded-[12px] text-[14px] font-bold uppercase text-white transition-colors hover:bg-[#0051c2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#005de0] focus-visible:ring-offset-2"
+						style={{ backgroundColor: '#005de0' }}
 					>
 						Начать работу <FiArrowRight />
-					</NavLink>
-					<a
-						href="#features"
-						className="flex h-[59.66px] w-[245px] items-center justify-center rounded-[12px] border border-[#005de0] text-[14px] font-bold uppercase text-[#005de0]"
+					</button>
+					<button
+						type="button"
+						onClick={handleFeaturesClick}
+						className="appearance-none flex h-[59.66px] w-[245px] items-center justify-center rounded-[12px] border border-[#005de0] bg-white text-[14px] font-bold uppercase text-[#005de0] transition-colors hover:bg-[#ebf3ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#005de0] focus-visible:ring-offset-2"
 					>
 						Смотреть возможности
-					</a>
+					</button>
 				</div>
 
 				<div className="mt-[112px]">
@@ -131,8 +143,8 @@ export default function LandingPage() {
 							{ title: 'Microsoft Office 2016+', image: heroOffice2016 },
 							{ title: 'Microsoft Office 2010', image: heroOffice2010 },
 						].map((item) => (
-							<div key={item.title} className="text-center">
-								<div className="mx-auto flex size-[120px] items-center justify-center rounded-[24px] border-2 border-[#e2e8f0] bg-white">
+							<div key={item.title} className="group text-center">
+								<div className="mx-auto flex size-[120px] items-center justify-center rounded-[24px] border-2 border-[#e2e8f0] bg-white transition-transform duration-300 group-hover:scale-105">
 									<img
 										src={item.image}
 										alt={item.title}
@@ -383,12 +395,10 @@ export default function LandingPage() {
 			</section>
 
 			<section id="support" className="mx-auto w-[calc(100%-24px)] max-w-[990.717px] pt-[134px]">
-				<div className="relative h-[320px] overflow-hidden rounded-[15px] bg-[#005de0] p-[32px_50px]">
-					<img
-						src={supportRings}
-						alt=""
-						className="absolute -right-[330px] -top-[17px] h-[672px] w-[672px]"
-					/>
+				<div
+					className="relative h-[320px] overflow-hidden rounded-[15px] bg-[#005de0] bg-cover bg-center p-[32px_50px]"
+					style={{ backgroundImage: `url(${supportBanner})` }}
+				>
 					<div className="relative z-10">
 						<div className="flex size-[54px] items-center justify-center rounded-[15px] bg-white text-[#005de0]">
 							<FiHelpCircle size={28} />
