@@ -4,16 +4,14 @@ import React from "react";
 
 const ChartStatistics = ({ title, amount, icon, percentage }) => {
   const iconRecode = useColorModeValue("recode.300", "recode.300");
-  const iconBoxInside = useColorModeValue("white", "white");
   const textColor = useColorModeValue("gray.700", "white");
-  const overlayRef = React.useRef();
   return (
     <Flex direction='column'>
-      <Flex alignItems='center'>
+      <Flex alignItems='center' minW='0'>
         <IconBox as='box' h={"30px"} w={"30px"} bg={iconRecode} me='6px'>
           {icon}
         </IconBox>
-        <Text fontSize='sm' color='gray.400' fontWeight='semibold'>
+        <Text fontSize='sm' color='gray.400' fontWeight='semibold' noOfLines={1}>
           {title}
         </Text>
       </Flex>

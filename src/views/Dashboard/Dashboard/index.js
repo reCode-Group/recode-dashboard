@@ -48,6 +48,14 @@ function isCompanyAdminUser(user) {
 	return user?.has_organization && COMPANY_ADMIN_ROLES.includes(user?.organization_role);
 }
 
+function getTokenBalancePercentage(tokensRemain, packageTokens) {
+	if (!Number.isFinite(packageTokens) || packageTokens <= 0) {
+		return null;
+	}
+
+	return Math.round(((tokensRemain - packageTokens) / packageTokens) * 100);
+}
+
 export default function Dashboard() {
 	const iconBoxInside = useColorModeValue('white', 'white');
 	const history = useHistory();
@@ -58,6 +66,8 @@ export default function Dashboard() {
 	const [subscriptionStats, setSubscriptionStats] = useState({
 		packageName: 'Загрузка...',
 		tokensRemain: '...',
+		tokensRemainValue: 0,
+		packageTokensValue: 0,
 	});
 	const [conversions, setConversions] = useState([]);
 
@@ -69,9 +79,14 @@ export default function Dashboard() {
 				const subscription = await getUserSubscription();
 				if (!isMounted) return;
 
+				const tokensRemainValue = Number(subscription?.tokens_remain) || 0;
+				const packageTokensValue = Number(subscription?.package_tokens) || 0;
+
 				setSubscriptionStats({
 					packageName: subscription?.package_name || 'Нет тарифа',
-					tokensRemain: formatTokenValue(subscription?.tokens_remain),
+					tokensRemain: formatTokenValue(tokensRemainValue),
+					tokensRemainValue,
+					packageTokensValue,
 				});
 			} catch (error) {
 				if (!isMounted) return;
@@ -79,6 +94,8 @@ export default function Dashboard() {
 				setSubscriptionStats({
 					packageName: isNoSubscriptionError(error) ? 'Нет тарифа' : 'Нет данных',
 					tokensRemain: '0',
+					tokensRemainValue: 0,
+					packageTokensValue: 0,
 				});
 			}
 		}
@@ -157,6 +174,10 @@ export default function Dashboard() {
 
 	const showEmployeesStats = isCompanyAdmin === true;
 	const isSupportStatsWide = isCompanyAdmin === false;
+	const tokenBalancePercentage = getTokenBalancePercentage(
+		subscriptionStats.tokensRemainValue,
+		subscriptionStats.packageTokensValue
+	);
 
 	return (
 		<Flex flexDirection="column" pt={{ base: '120px', md: '75px' }}>
@@ -169,6 +190,7 @@ export default function Dashboard() {
 				<MiniStatistics
 					title={'Остаток токенов'}
 					amount={subscriptionStats.tokensRemain}
+					percentage={tokenBalancePercentage}
 					icon={<TokensRemainIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
 				/>
 				{showEmployeesStats ? (
@@ -245,6 +267,7 @@ export default function Dashboard() {
 						amount={conversions.length}
 						captions={['ID', 'Тип', 'Статус', 'Результат перевода', 'Затраченные токены', 'Дата']}
 						data={conversions}
+						fixedHeight="520px"
 						enablePagination={false}
 						initialRowsPerPage={5}
 						showFullHistoryButton={true}

@@ -161,7 +161,7 @@ const TokenOperationsFeed = ({ viewerContext }) => {
 		<Card
 			p="28px 24px"
 			mb={{ sm: '26px', lg: '0px' }}
-			h={{ base: 'auto', lg: '440px' }}
+			h={{ base: '540px', lg: '440px' }}
 			display="flex"
 			flexDirection="column"
 			minH="0"

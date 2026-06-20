@@ -37,6 +37,7 @@ const ConversionHistory = ({
 	amount,
 	captions,
 	data,
+	fixedHeight,
 	enablePagination = true,
 	initialRowsPerPage = 5,
 	showFullHistoryButton = false,
@@ -54,6 +55,7 @@ const ConversionHistory = ({
 	const copyButtonBg = useColorModeValue('gray.200', 'gray.600');
 	const copyButtonHoverBg = useColorModeValue('gray.300', 'gray.500');
 	const historyDividerColor = useColorModeValue('gray.100', 'whiteAlpha.200');
+	const stickyHeaderBg = useColorModeValue('white', '#111827');
 	const [page, setPage] = useState(1);
 	const [rowsPerPage, setRowsPerPage] = useState(Math.max(1, initialRowsPerPage));
 	const [selectedConversion, setSelectedConversion] = useState(null);
@@ -163,7 +165,16 @@ const ConversionHistory = ({
 
 	return (
 		<Flex direction="column" gap="14px" minW="0" w="100%">
-			<Card p="16px" overflow="hidden" maxW="100%" minW="0">
+			<Card
+				p="16px"
+				overflow="hidden"
+				maxW="100%"
+				minW="0"
+				h={fixedHeight}
+				minH={fixedHeight}
+				display={fixedHeight ? 'flex' : undefined}
+				flexDirection={fixedHeight ? 'column' : undefined}
+			>
 				<CardHeader p="12px 0px 28px 0px">
 					<Flex direction="column">
 						<Text fontSize="lg" color={textColor} fontWeight="bold" pb=".5rem">
@@ -184,9 +195,11 @@ const ConversionHistory = ({
 					w="100%"
 					maxW="100%"
 					minW="0"
-					maxH={{ base: '55vh', lg: 'unset' }}
+					maxH={fixedHeight ? { base: '55vh', lg: '100%' } : { base: '55vh', lg: 'unset' }}
+					flex={fixedHeight ? '1' : undefined}
+					minH={fixedHeight ? '0' : undefined}
 					overflowX="auto"
-					overflowY={{ base: 'auto', lg: 'visible' }}
+					overflowY={fixedHeight ? 'auto' : { base: 'auto', lg: 'visible' }}
 					borderTop="1px solid"
 					borderBottom="1px solid"
 					borderColor={historyDividerColor}
@@ -199,6 +212,10 @@ const ConversionHistory = ({
 						sx={{
 							th: {
 								borderColor: historyDividerColor,
+								position: 'sticky',
+								top: 0,
+								zIndex: 1,
+								bg: stickyHeaderBg,
 							},
 							td: {
 								borderColor: historyDividerColor,
