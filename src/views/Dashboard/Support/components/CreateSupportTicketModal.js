@@ -61,6 +61,18 @@ export default function CreateSupportTicketModal({
   const subtitleColor = useColorModeValue("gray.500", "gray.300");
   const glassBg = useColorModeValue("rgba(255, 255, 255, 0.9)", "rgba(26, 32, 44, 0.86)");
   const sectionBg = useColorModeValue("rgba(255, 255, 255, 0.65)", "rgba(26, 32, 44, 0.6)");
+  const modalBorderColor = useColorModeValue("whiteAlpha.400", "whiteAlpha.200");
+  const dividerColor = useColorModeValue("blackAlpha.200", "whiteAlpha.200");
+  const closeButtonBg = useColorModeValue("blackAlpha.100", "whiteAlpha.100");
+  const closeButtonHoverBg = useColorModeValue("blackAlpha.200", "whiteAlpha.200");
+  const inputBg = useColorModeValue("white", "whiteAlpha.100");
+  const inputBorderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+  const attachmentAreaBg = useColorModeValue("whiteAlpha.700", "whiteAlpha.50");
+  const attachmentAreaBorderColor = useColorModeValue("blue.200", "whiteAlpha.300");
+  const fileItemBg = useColorModeValue("white", "whiteAlpha.100");
+  const fileItemBorderColor = useColorModeValue("blackAlpha.100", "whiteAlpha.200");
+  const successAlertBg = useColorModeValue("green.50", "green.900");
+  const successAlertColor = useColorModeValue("green.700", "green.100");
   const allowedMimes = useMemo(() => getAllowedAttachmentTypes(), []);
 
   const isSending = submitState === "sending";
@@ -155,13 +167,13 @@ export default function CreateSupportTicketModal({
       <ModalContent
         bg={glassBg}
         border="1px solid"
-        borderColor="whiteAlpha.400"
+        borderColor={modalBorderColor}
         borderRadius="20px"
         boxShadow="0 25px 50px -12px rgba(0, 0, 0, 0.25)"
         overflow="hidden"
         maxH="88vh"
       >
-        <ModalHeader px="32px" py="24px" borderBottom="1px solid" borderColor="blackAlpha.200" bg={sectionBg}>
+        <ModalHeader px="32px" py="24px" borderBottom="1px solid" borderColor={dividerColor} bg={sectionBg}>
           <Flex justify="space-between" align="flex-start" gap="16px">
             <Box>
               <Text fontSize="24px" fontWeight="600" color={titleColor} lineHeight="1.1">
@@ -177,8 +189,8 @@ export default function CreateSupportTicketModal({
               borderRadius="full"
               onClick={onClose}
               isDisabled={isSending}
-              bg="blackAlpha.100"
-              _hover={{ bg: "blackAlpha.200" }}
+              bg={closeButtonBg}
+              _hover={{ bg: closeButtonHoverBg }}
             />
           </Flex>
         </ModalHeader>
@@ -195,7 +207,7 @@ export default function CreateSupportTicketModal({
             ) : null}
 
             {isSuccess ? (
-              <Alert status="success" borderRadius="12px" bg="green.50" color="green.700">
+              <Alert status="success" borderRadius="12px" bg={successAlertBg} color={successAlertColor}>
                 <AlertIcon />
                 <Box>
                   <Text fontWeight="600">Обращение отправлено</Text>
@@ -222,7 +234,8 @@ export default function CreateSupportTicketModal({
                     onChange={(event) => setSubject(event.target.value)}
                     placeholder="Например: Не работает загрузка файла"
                     isDisabled={isSending}
-                    bg="white"
+                    bg={inputBg}
+                    borderColor={inputBorderColor}
                     borderRadius="12px"
                     h="46px"
                   />
@@ -238,7 +251,8 @@ export default function CreateSupportTicketModal({
                     placeholder="Опишите проблему максимально подробно"
                     minH="160px"
                     isDisabled={isSending}
-                    bg="white"
+                    bg={inputBg}
+                    borderColor={inputBorderColor}
                     borderRadius="12px"
                     resize="none"
                   />
@@ -247,10 +261,10 @@ export default function CreateSupportTicketModal({
 
                 <Box
                   border="1.5px dashed"
-                  borderColor="blue.200"
+                  borderColor={attachmentAreaBorderColor}
                   borderRadius="16px"
                   p="16px"
-                  bg="whiteAlpha.700"
+                  bg={attachmentAreaBg}
                 >
                   <Flex justify="space-between" align={{ base: "stretch", md: "center" }} gap="12px" flexDir={{ base: "column", md: "row" }}>
                     <Flex align="center" gap="10px">
@@ -304,8 +318,8 @@ export default function CreateSupportTicketModal({
                           align="center"
                           borderRadius="10px"
                           borderWidth="1px"
-                          borderColor="blackAlpha.100"
-                          bg="white"
+                          borderColor={fileItemBorderColor}
+                          bg={fileItemBg}
                           p="8px 10px"
                         >
                           <Box minW="0" flex="1" mr="8px">
@@ -335,7 +349,7 @@ export default function CreateSupportTicketModal({
           </Stack>
         </ModalBody>
 
-        <ModalFooter px="32px" py="20px" borderTop="1px solid" borderColor="blackAlpha.200" bg={sectionBg}>
+        <ModalFooter px="32px" py="20px" borderTop="1px solid" borderColor={dividerColor} bg={sectionBg}>
           {isSuccess ? (
             <Flex w="100%" justify="flex-end" gap="10px">
               <Button borderRadius="12px" onClick={onClose}>
