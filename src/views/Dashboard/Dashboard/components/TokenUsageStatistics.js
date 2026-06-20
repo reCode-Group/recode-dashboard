@@ -22,18 +22,18 @@ const NO_SUBSCRIPTION_MESSAGES = [
 	'ErrSubscriptionNotActive',
 ];
 const MONTH_LABELS = [
-	'\u042f\u043d\u0432',
-	'\u0424\u0435\u0432',
-	'\u041c\u0430\u0440',
-	'\u0410\u043f\u0440',
-	'\u041c\u0430\u0439',
-	'\u0418\u044e\u043d',
-	'\u0418\u044e\u043b',
-	'\u0410\u0432\u0433',
-	'\u0421\u0435\u043d',
-	'\u041e\u043a\u0442',
-	'\u041d\u043e\u044f',
-	'\u0414\u0435\u043a',
+	'Янв',
+	'Фев',
+	'Мар',
+	'Апр',
+	'Май',
+	'Июн',
+	'Июл',
+	'Авг',
+	'Сен',
+	'Окт',
+	'Ноя',
+	'Дек',
 ];
 
 function formatTokenValue(value) {
@@ -204,38 +204,46 @@ const TokenUsageStatistics = () => {
 	}, [months]);
 
 	const chartMaxValue = usageStats.maxMonthlyTokens || subscription.packageTokens || 1;
-	const tokensRemainProgress = getProgressValue(subscription.tokensRemain, subscription.packageTokens);
+	const tokensRemainProgress = getProgressValue(
+		subscription.tokensRemain,
+		subscription.packageTokens
+	);
 	const macrosProgress = getProgressValue(usageStats.macrosThisMonth, usageStats.maxMonthlyMacros);
 
 	return (
 		<Card p="16px">
-			<CardBody>
-				<Flex direction="column" w="100%">
+			<CardBody h="100%">
+				<Flex direction="column" justifyContent="space-between" w="100%" h="100%">
 					<BarChart
 						categories={months.map((month) => month.label)}
 						maxValue={chartMaxValue}
 						variant="usage"
 						series={[
 							{
-								name: '\u0422\u043e\u043a\u0435\u043d\u043e\u0432',
+								name: 'Токенов',
 								data: usageStats.tokensByMonth,
 							},
 						]}
 					/>
-					<Flex direction="column" mt="24px" mb="36px" alignSelf="flex-start">
+					<Flex direction="column" mt="24px" mb="36px">
 						<Text fontSize="lg" color={textColor} fontWeight="bold" mb="6px">
-							{'\u0420\u0430\u0441\u0445\u043e\u0434 \u0442\u043e\u043a\u0435\u043d\u043e\u0432'}
+							{'Расход токенов'}
 						</Text>
 						<Text fontSize="md" fontWeight="medium" color="gray.400">
 							<Text as="span" color="red.400" fontWeight="bold">
 								{formatTokenValue(usageStats.spentThisMonth)}
 							</Text>{' '}
-							{'\u0437\u0430 \u044d\u0442\u043e\u0442 \u043c\u0435\u0441\u044f\u0446'}
+							{'за этот месяц'}
 						</Text>
 					</Flex>
-					<SimpleGrid gap={{ sm: '12px' }} columns={2}>
+					<SimpleGrid
+						gap="40px"
+						marginBottom="16px"
+						columns={{ base: 1, md: 2 }}
+						justifySelf={{ base: 'flex-end', md: 'flex-start' }}
+					>
 						<ChartStatistics
-							title={'\u0422\u043e\u043a\u0435\u043d\u043e\u0432 \u043e\u0441\u0442\u0430\u043b\u043e\u0441\u044c'}
+							title={'Токенов осталось'}
 							amount={`${formatTokenValue(subscription.tokensRemain)} / ${formatTokenValue(
 								subscription.packageTokens
 							)}`}
@@ -243,7 +251,7 @@ const TokenUsageStatistics = () => {
 							icon={<TokensRemainIcon h="15px" w="15px" color={iconBoxInside} />}
 						/>
 						<ChartStatistics
-							title={'\u041c\u0430\u043a\u0440\u043e\u0441\u043e\u0432 \u043f\u0435\u0440\u0435\u0432\u0435\u0434\u0435\u043d\u043e'}
+							title={'Макросов переведено'}
 							amount={formatTokenValue(usageStats.macrosThisMonth)}
 							percentage={macrosProgress}
 							icon={<RocketIcon h="15px" w="15px" color={iconBoxInside} />}

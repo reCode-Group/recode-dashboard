@@ -23,7 +23,7 @@ import { mapConversion } from 'utils/conversions';
 import CreateSupportTicketModal from 'views/Dashboard/Support/components/CreateSupportTicketModal';
 import BuiltByDevelopers from './components/BuiltByDevelopers';
 import MiniStatistics from './components/MiniStatistics';
-import SalesOverview from './components/SalesOverview';
+import TokenOperationsFeed from './components/TokenOperationsFeed';
 import TokenUsageStatistics from './components/TokenUsageStatistics';
 import WorkWithTheRockets from './components/WorkWithTheRockets';
 
@@ -53,6 +53,7 @@ export default function Dashboard() {
 	const history = useHistory();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [isCompanyAdmin, setIsCompanyAdmin] = useState(null);
+	const [viewerContext, setViewerContext] = useState(null);
 	const [employeesCount, setEmployeesCount] = useState('...');
 	const [subscriptionStats, setSubscriptionStats] = useState({
 		packageName: 'Загрузка...',
@@ -121,6 +122,7 @@ export default function Dashboard() {
 				const canViewEmployees = isCompanyAdminUser(currentUser);
 				if (!isMounted) return;
 
+				setViewerContext(currentUser);
 				setIsCompanyAdmin(Boolean(canViewEmployees));
 				if (!canViewEmployees) {
 					setEmployeesCount('0');
@@ -140,6 +142,7 @@ export default function Dashboard() {
 			} catch (error) {
 				if (!isMounted) return;
 
+				setViewerContext(null);
 				setIsCompanyAdmin(false);
 				setEmployeesCount('0');
 			}
@@ -228,7 +231,7 @@ export default function Dashboard() {
 				mb={{ lg: '26px' }}
 			>
 				<TokenUsageStatistics />
-				<SalesOverview title={'Операции над токенами'} />
+				<TokenOperationsFeed viewerContext={viewerContext} />
 			</Grid>
 			<Grid
 				templateColumns={{ sm: '1fr' }}

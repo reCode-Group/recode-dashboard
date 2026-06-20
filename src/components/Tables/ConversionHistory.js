@@ -53,6 +53,7 @@ const ConversionHistory = ({
 	const modalTextColor = useColorModeValue('gray.600', 'gray.200');
 	const copyButtonBg = useColorModeValue('gray.200', 'gray.600');
 	const copyButtonHoverBg = useColorModeValue('gray.300', 'gray.500');
+	const historyDividerColor = useColorModeValue('gray.100', 'whiteAlpha.200');
 	const [page, setPage] = useState(1);
 	const [rowsPerPage, setRowsPerPage] = useState(Math.max(1, initialRowsPerPage));
 	const [selectedConversion, setSelectedConversion] = useState(null);
@@ -186,9 +187,24 @@ const ConversionHistory = ({
 					maxH={{ base: '55vh', lg: 'unset' }}
 					overflowX="auto"
 					overflowY={{ base: 'auto', lg: 'visible' }}
+					borderTop="1px solid"
+					borderBottom="1px solid"
+					borderColor={historyDividerColor}
 					sx={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y' }}
 				>
-					<Table variant="simple" color={textColor} minW={{ base: '700px', lg: '100%' }}>
+					<Table
+						variant="simple"
+						color={textColor}
+						minW={{ base: '700px', lg: '100%' }}
+						sx={{
+							th: {
+								borderColor: historyDividerColor,
+							},
+							td: {
+								borderColor: historyDividerColor,
+							},
+						}}
+					>
 						<Thead>
 							<Tr my=".8rem" ps="0px">
 								{captions.map((caption, idx) => (
