@@ -2,18 +2,18 @@
 import { BellIcon, SearchIcon } from "@chakra-ui/icons";
 // Chakra Imports
 import {
-	Button,
-	Flex,
-	IconButton,
-	Input,
-	InputGroup,
-	InputLeftElement,
-	Menu,
-	MenuButton,
-	MenuItem,
-	MenuList,
-	Text,
-	useColorModeValue,
+  Button,
+  Flex,
+  IconButton,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+  useColorModeValue,
 } from "@chakra-ui/react";
 // Assets
 import avatar1 from "assets/img/avatars/avatar1.png";
@@ -28,6 +28,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { NavLink } from "react-router-dom";
 import routes from "routes.js";
+import { clearAuthState } from "services/session";
 
 export default function HeaderLinks(props) {
   const { variant, children, fixed, secondary, onOpen, ...rest } = props;
@@ -93,7 +94,7 @@ export default function HeaderLinks(props) {
           borderRadius="inherit"
         />
       </InputGroup>
-      <NavLink to="/auth/signin">
+      <NavLink to="/auth/login-page" onClick={clearAuthState}>
         <Button
           ms="0px"
           px="0px"

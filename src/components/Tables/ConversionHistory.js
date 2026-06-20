@@ -13,6 +13,7 @@ import {
 	Table,
 	TableContainer,
 	Tbody,
+	Td,
 	Text,
 	Textarea,
 	Th,
@@ -32,7 +33,7 @@ import { IoArrowForwardSharp, IoCheckmarkDoneCircleSharp } from 'react-icons/io5
 const buildCodePreview = (row) => {
 	const sourceCode = `Sub Convert_${row.id}()
     Dim sourceUrl As String
-    sourceUrl = "${row.result_url}"
+    sourceUrl = "${row.result_url || ''}"
 
     If sourceUrl = "" Then
         MsgBox "Empty source URL"
@@ -43,7 +44,7 @@ const buildCodePreview = (row) => {
 End Sub`;
 
 	const translatedMacro = `function convert_${row.id}() {
-  const sourceUrl = "${row.result_url}";
+  const sourceUrl = "${row.result_url || ''}";
 
   if (!sourceUrl) {
     throw new Error("Empty source URL");
@@ -65,6 +66,7 @@ const ConversionHistory = ({
 	showFullHistoryButton = false,
 	fullHistoryPath = '/admin/conversion-history',
 	fullHistoryButtonLabel = 'Показать всю историю',
+	emptyText = 'Нет данных',
 }) => {
 	const history = useHistory();
 	const textColor = useColorModeValue('gray.700', 'white');
@@ -82,6 +84,7 @@ const ConversionHistory = ({
 	const [copiedTranslated, setCopiedTranslated] = useState(false);
 
 	const totalPages = enablePagination ? Math.max(1, Math.ceil(data.length / rowsPerPage)) : 1;
+	const isEmpty = data.length === 0;
 
 	useEffect(() => {
 		setPage((currentPage) => Math.min(currentPage, totalPages));
@@ -208,40 +211,49 @@ const ConversionHistory = ({
 					<Table variant="simple" color={textColor} minW={{ base: '700px', lg: '100%' }}>
 						<Thead>
 							<Tr my=".8rem" ps="0px">
-								{captions.map((caption, idx) => {
-									return (
-										<Th color="gray.400" key={idx} ps={idx === 0 ? '0px' : null}>
-											{caption}
-										</Th>
-									);
-								})}
+								{captions.map((caption, idx) => (
+									<Th color="gray.400" key={idx} ps={idx === 0 ? '0px' : null}>
+										{caption}
+									</Th>
+								))}
 							</Tr>
 						</Thead>
 						<Tbody>
-							{visibleData.map((row) => {
-								const isViewCodeDisabled = (Number(row.id) * 13) % 5 === 0;
-								return (
-									<DashboardTableRow
-										key={row.id}
-										id={row.id}
-										type={row.type}
-										tokens_remain={row.tokens_remain}
-										result_url={row.result_url}
-										status={row.status}
-										date={row.date}
-										isViewCodeDisabled={isViewCodeDisabled}
-										onViewCode={() => {
-											const preview = buildCodePreview(row);
-											setSelectedConversion({
-												...row,
-												...preview,
-											});
-											setCopiedSource(false);
-											setCopiedTranslated(false);
-										}}
-									/>
-								);
-							})}
+							{isEmpty ? (
+								<Tr>
+									<Td colSpan={captions.length} ps="0px" border="none">
+										<Text fontSize="sm" color="gray.500" fontWeight="normal">
+											{emptyText}
+										</Text>
+									</Td>
+								</Tr>
+							) : (
+								visibleData.map((row) => {
+									const numericID = Number(row.id);
+									const isViewCodeDisabled = Number.isFinite(numericID) && (numericID * 13) % 5 === 0;
+									return (
+										<DashboardTableRow
+											key={row.id}
+											id={row.id}
+											type={row.type}
+											tokens_remain={row.tokens_remain}
+											result_url={row.result_url}
+											status={row.status}
+											date={row.date}
+											isViewCodeDisabled={isViewCodeDisabled}
+											onViewCode={() => {
+												const preview = buildCodePreview(row);
+												setSelectedConversion({
+													...row,
+													...preview,
+												});
+												setCopiedSource(false);
+												setCopiedTranslated(false);
+											}}
+										/>
+									);
+								})
+							)}
 						</Tbody>
 					</Table>
 				</TableContainer>
@@ -276,13 +288,7 @@ const ConversionHistory = ({
 						)}
 					</Flex>
 
-					<Flex
-						display={{ base: 'flex', md: 'none' }}
-						align="center"
-						wrap="wrap"
-						gap="12px"
-						mt="2px"
-					>
+					<Flex display={{ base: 'flex', md: 'none' }} align="center" w="100%" wrap="wrap" gap="12px" mt="2px">
 						{enablePagination && renderPaginationControls()}
 
 						{showFullHistoryButton && (
@@ -305,12 +311,7 @@ const ConversionHistory = ({
 				</>
 			)}
 
-			<Modal
-				isOpen={Boolean(selectedConversion)}
-				onClose={() => setSelectedConversion(null)}
-				isCentered
-				size="6xl"
-			>
+			<Modal isOpen={Boolean(selectedConversion)} onClose={() => setSelectedConversion(null)} isCentered size="6xl">
 				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
 				<ModalContent
 					bg={modalGlassBg}
@@ -321,13 +322,7 @@ const ConversionHistory = ({
 					overflow="hidden"
 					maxH={{ base: '90vh', md: '85vh' }}
 				>
-					<ModalHeader
-						px="28px"
-						py="20px"
-						borderBottom="1px solid"
-						borderColor="blackAlpha.200"
-						bg={modalSectionBg}
-					>
+					<ModalHeader px="28px" py="20px" borderBottom="1px solid" borderColor="blackAlpha.200" bg={modalSectionBg}>
 						<Text fontSize="24px" fontWeight="600" color={textColor} lineHeight="1.1">
 							Просмотр кода
 						</Text>
@@ -384,9 +379,7 @@ const ConversionHistory = ({
 										fontSize="xs"
 										fontWeight="700"
 										_hover={{ bg: copyButtonHoverBg }}
-										onClick={() =>
-											handleCopy(selectedConversion?.translatedMacro || '', 'translated')
-										}
+										onClick={() => handleCopy(selectedConversion?.translatedMacro || '', 'translated')}
 									>
 										{copiedTranslated ? 'Скопировано' : 'Копировать'}
 									</Button>
@@ -405,18 +398,8 @@ const ConversionHistory = ({
 							</Flex>
 						</Flex>
 					</ModalBody>
-					<ModalFooter
-						px="28px"
-						py="18px"
-						borderTop="1px solid"
-						borderColor="blackAlpha.200"
-						bg={modalSectionBg}
-					>
-						<Button
-							colorScheme="recode"
-							borderRadius="12px"
-							onClick={() => setSelectedConversion(null)}
-						>
+					<ModalFooter px="28px" py="18px" borderTop="1px solid" borderColor="blackAlpha.200" bg={modalSectionBg}>
+						<Button colorScheme="recode" borderRadius="12px" onClick={() => setSelectedConversion(null)}>
 							Закрыть
 						</Button>
 					</ModalFooter>

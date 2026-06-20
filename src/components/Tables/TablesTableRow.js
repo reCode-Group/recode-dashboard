@@ -1,20 +1,20 @@
 import { Avatar, Badge, Button, Flex, Td, Text, Tr, useColorModeValue } from '@chakra-ui/react';
 
 function TablesTableRow(props) {
-	const { logo, name, email, subdomain, domain, status, date, hiddenColumns = [], onEdit } = props;
+	const { logo, name, email, subdomain, domain, status, date, hiddenColumns = [], onEdit, onDeactivate } = props;
 	const textColor = useColorModeValue('gray.700', 'white');
 	const bgStatus = useColorModeValue('gray.400', '#1a202c');
 	const colorStatus = useColorModeValue('white', 'gray.400');
 	const hiddenColumnsSet = new Set(hiddenColumns);
 	const normalizedStatus = String(status || '').toLowerCase();
-	const isActiveStatus = !normalizedStatus.includes('неакт');
+	const isActiveStatus = normalizedStatus === 'active' || normalizedStatus === 'активен';
 
 	return (
 		<Tr>
 			{!hiddenColumnsSet.has('user') && (
 				<Td minWidth={{ sm: '250px' }} pl="0px">
 					<Flex align="center" py=".8rem" minWidth="100%" flexWrap="nowrap">
-						<Avatar src={logo} w="50px" borderRadius="12px" me="18px" />
+						<Avatar src={logo} name={name} w="50px" borderRadius="12px" me="18px" />
 						<Flex direction="column">
 							<Text fontSize="md" color={textColor} fontWeight="bold" minWidth="100%">
 								{name}
@@ -64,11 +64,20 @@ function TablesTableRow(props) {
 
 			{!hiddenColumnsSet.has('actions') && (
 				<Td>
-					<Button p="0px" bg="transparent" variant="no-hover" onClick={onEdit}>
-						<Text fontSize="md" color="recode.300" fontWeight="bold" cursor="pointer">
-							Ред.
-						</Text>
-					</Button>
+					<Flex gap="12px">
+						<Button p="0px" bg="transparent" variant="no-hover" onClick={onEdit}>
+							<Text fontSize="md" color="recode.300" fontWeight="bold" cursor="pointer">
+								Токены
+							</Text>
+						</Button>
+						{onDeactivate ? (
+							<Button p="0px" bg="transparent" variant="no-hover" onClick={onDeactivate}>
+								<Text fontSize="md" color="red.400" fontWeight="bold" cursor="pointer">
+									Отключить
+								</Text>
+							</Button>
+						) : null}
+					</Flex>
 				</Td>
 			)}
 		</Tr>

@@ -1,0 +1,877 @@
+{
+  "info": {
+    "_postman_id": "3953380c-cc07-450b-9ab6-5dedd34ea786",
+    "name": "recode",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "11131647"
+  },
+  "item": [
+    {
+      "name": "login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"khaliullin-73@mail.ru\",\n    \"password\": \"asdassd\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "register",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\":\"asdad\",\n    \"email\":\"khaliullin-73@mail.ru\",\n    \"password\":\"asdassd\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "code send",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\":\"khaliullin-73@mail.ru\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/verification-code/send",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "verification-code",
+            "send"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "vetrfy code",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\":\"khaliullin-73@mail.ru\",\n    \"code\":\"8922\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/verification-code/verify",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "verification-code",
+            "verify"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "reg complete",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\":\"khaliullin-73@mail.ru\",\n    \"name\":\"123\",\n    \"surname\":\"4444\",\n    \"lastname\":\"9999\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/registration/complete",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "registration",
+            "complete"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "userConversions",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/conversions",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "conversions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "org conversions history",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\":\"khaliullin-73@mail.ru\",\n    \"name\":\"123\",\n    \"surname\":\"4444\",\n    \"lastname\":\"9999\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/conversions",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "conversions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "convert free",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"origin_code\":\"asdasd\",\n    \"origin_language\":\"VBA\",\n    \"target_language\":\"JS\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/convert/free",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "convert",
+            "free"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "convert paid",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"origin_code\":\"asdasd\",\n    \"origin_language\":\"VBA\",\n    \"target_language\":\"JS\",\n    \"as_employee\":false\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/convert/paid",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "convert",
+            "paid"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "user details",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/user/details",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "user",
+            "details"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get subscription",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/user/subscription",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "user",
+            "subscription"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "organization/details",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/organization/details",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "details"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "employees/count",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/user/employees/count",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "user",
+            "employees",
+            "count"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "organization/employees",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\":\"khaliullin-73@mail.ru\",\n    \"name\":\"123\",\n    \"surname\":\"4444\",\n    \"lastname\":\"9999\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/organization/employees",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "employees"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "organization/employees/tokens/transfer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"organization_member_id\":2,\n    \"amount\":123\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/organization/employees/tokens/transfer",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "employees",
+            "tokens",
+            "transfer"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "organization/create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"full_name\": \"ООО «АРТИМЭЙК»\",\n    \"ogrn\": \"1250200030013\",\n    \"inn\": \"0273954430\",\n    \"kpp\": \"027301001\",\n    \"okpo\": \"0273954302\",\n    \"post_address\": \"респ. Башкортостан, м.р-н Иглинский, с. Иглино, ул. Якутова, д. 41, к. Б\",\n    \"address\": \"респ. Башкортостан, м.р-н Иглинский, с. Иглино, ул. Якутова, д. 41, к. Б\",\n    \"short_name\": \"ООО «АРТИМЭЙК»\",\n    \"email\": \"khaliullin-73@mail.ru\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/organization/create",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "create"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "organization/employees",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"full_name\": \"Forbidden Before Complete\",\n  \"ogrn\": \"1234567890123\",\n  \"inn\": \"1234567890\",\n  \"kpp\": \"123456789\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/organization/employees",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "employees"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "organization/employees/create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"khaliullin-73@yandex.ru\",\n  \"name\": \"Test\",\n  \"surname\": \"Employee\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/organization/employees/create",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "employees",
+            "create"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "organization/tokens/deposit",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"amount\": 110\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/organization/tokens/deposit",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "tokens",
+            "deposit"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "organization/employees/add",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"khaliullin1-73@mail.ru\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/organization/employees/add",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "employees",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "organization/elba/contractor",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/organization/elba/contractor",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "elba",
+            "contractor"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "subscription/purchase",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"token_package_id\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/subscription/purchase",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "subscription",
+            "purchase"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "token-history",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/token-history?",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "token-history"
+          ],
+          "query": [
+            {
+              "key": "",
+              "value": null
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "organization/bills/create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"full_name\": \"ООО «АРТИМЭЙК»\",\n    \"ogrn\": \"1250200030013\",\n    \"inn\": \"0273954430\",\n    \"kpp\": \"027301001\",\n    \"okpo\": \"0273954302\",\n    \"post_address\": \"респ. Башкортостан, м.р-н Иглинский, с. Иглино, ул. Якутова, д. 41, к. Б\",\n    \"address\": \"респ. Башкортостан, м.р-н Иглинский, с. Иглино, ул. Якутова, д. 41, к. Б\",\n    \"short_name\": \"ООО «АРТИМЭЙК»\",\n    \"email\": \"khaliullin-73@mail.ru\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/organization/bills/create",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "bills",
+            "create"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "api/organization/documents",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"full_name\": \"ООО «АРТИМЭЙК»\",\n    \"ogrn\": \"1250200030013\",\n    \"inn\": \"0273954430\",\n    \"kpp\": \"027301001\",\n    \"okpo\": \"0273954302\",\n    \"post_address\": \"респ. Башкортостан, м.р-н Иглинский, с. Иглино, ул. Якутова, д. 41, к. Б\",\n    \"address\": \"респ. Башкортостан, м.р-н Иглинский, с. Иглино, ул. Якутова, д. 41, к. Б\",\n    \"short_name\": \"ООО «АРТИМЭЙК»\",\n    \"email\": \"khaliullin-73@mail.ru\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/organization/documents",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "documents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "organization/documents/check-payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOjB9.lZ8LhJEvUyvJ0o6fLmExaDauLdaaY5Icsjgk_myAbHY",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"document_id\":\"dc6385d1-496b-4e9f-82a8-ae23fea3e1f0\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/organization/documents/check-payment",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "organization",
+            "documents",
+            "check-payment"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -13,6 +13,14 @@ import {
 	useColorModeValue,
 } from '@chakra-ui/react';
 import { useMemo, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { completeRegistration } from 'services/auth';
+import {
+	clearPendingProfileEmail,
+	clearPendingProfileName,
+	getPendingProfileEmail,
+	getPendingProfileName,
+} from 'services/session';
 
 const CYRILLIC_PATTERN = /^[А-Яа-яЁё-]+$/;
 const MAX_FIO_LENGTH = 32;
@@ -78,13 +86,28 @@ const getFioErrors = (label, value, { required = false } = {}) => {
 	return errors;
 };
 
+function getFriendlyError(error) {
+	const message = error.message || '';
+	if (message.includes('user not verified')) {
+		return 'Сначала подтвердите почту';
+	}
+	if (message.includes('already completed')) {
+		return 'Профиль уже заполнен';
+	}
+	if (message.includes('Invalid input')) {
+		return 'Проверьте заполнение полей';
+	}
+	return message || 'Не удалось сохранить профиль';
+}
+
 function ProfileComplete() {
+	const history = useHistory();
 	const [lastName, setLastName] = useState('');
-	const [firstName, setFirstName] = useState('');
+	const [firstName, setFirstName] = useState(getPendingProfileName());
 	const [middleName, setMiddleName] = useState('');
 	const [phone, setPhone] = useState('+7');
 	const [isSaving, setIsSaving] = useState(false);
-	const [isSaved, setIsSaved] = useState(false);
+	const [serverError, setServerError] = useState('');
 
 	const titleColor = useColorModeValue('gray.700', 'white');
 	const subtitleColor = useColorModeValue('gray.400', 'gray.300');
@@ -104,7 +127,7 @@ function ProfileComplete() {
 		() => [
 			...getFioErrors('Фамилия', lastName, { required: true }),
 			...getFioErrors('Имя', firstName, { required: true }),
-			...getFioErrors('Отчество', middleName),
+			...getFioErrors('Отчество', middleName, { required: true }),
 		],
 		[firstName, lastName, middleName]
 	);
@@ -136,132 +159,145 @@ function ProfileComplete() {
 		borderColor,
 	};
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		if (!canSave || isSaving) {
 			return;
 		}
 
+		const email = getPendingProfileEmail();
+		if (!email) {
+			setServerError('Не удалось определить почту аккаунта. Войдите снова.');
+			return;
+		}
+
 		setIsSaving(true);
-		window.setTimeout(() => {
+		setServerError('');
+
+		try {
+			await completeRegistration({
+				email,
+				name: firstName.trim(),
+				surname: lastName.trim(),
+				lastname: middleName.trim(),
+			});
+			clearPendingProfileEmail();
+			clearPendingProfileName();
+			history.replace('/admin/dashboard');
+		} catch (error) {
+			setServerError(getFriendlyError(error));
+		} finally {
 			setIsSaving(false);
-			setIsSaved(true);
-		}, 1200);
+		}
 	};
 
 	return (
 		<Flex direction="column" pt={{ base: '120px', md: '75px' }} minH="100vh">
-			{isSaved ? (
-				<Alert status="success" borderRadius="12px" mb="16px">
+			{serverError ? (
+				<Alert status="error" borderRadius="12px" mb="16px">
 					<AlertIcon />
-					Профиль сохранен успешно
+					{serverError}
 				</Alert>
 			) : null}
 
 			<Grid templateColumns={{ base: '1fr', xl: '1fr 1fr' }} gap="24px" alignItems="start">
 				<GridItem>
 					<Box maxW="500px" w="100%">
-						{isSaved ? null : (
-							<>
-								<Text fontSize="32px" lineHeight="1.3" fontWeight="bold" color={titleColor}>
-									Заполните профиль
-								</Text>
-								<Text
-									mt="4px"
-									mb="32px"
-									fontSize="14px"
-									lineHeight="1.4"
-									fontWeight="bold"
-									color={subtitleColor}
-								>
-									Это займет пару минут и откроет доступ ко всем возможностям платформы
-								</Text>
+						<Text fontSize="32px" lineHeight="1.3" fontWeight="bold" color={titleColor}>
+							Заполните профиль
+						</Text>
+						<Text
+							mt="4px"
+							mb="32px"
+							fontSize="14px"
+							lineHeight="1.4"
+							fontWeight="bold"
+							color={subtitleColor}
+						>
+							Это второй шаг регистрации. После сохранения откроется доступ к кабинету.
+						</Text>
 
-								<Flex direction="column" gap="16px">
-									<FormControl>
-										<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
-											Фамилия
-										</FormLabel>
-										<Input
-											placeholder="Иванов"
-											value={lastName}
-											onChange={(e) => setLastName(e.target.value)}
-											bg={inputBg}
-											{...inputStyles}
-										/>
-									</FormControl>
+						<Flex direction="column" gap="16px">
+							<FormControl>
+								<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
+									Фамилия
+								</FormLabel>
+								<Input
+									placeholder="Иванов"
+									value={lastName}
+									onChange={(e) => setLastName(e.target.value)}
+									bg={inputBg}
+									isDisabled={isSaving}
+									{...inputStyles}
+								/>
+							</FormControl>
 
-									<FormControl>
-										<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
-											Имя
-										</FormLabel>
-										<Input
-											placeholder="Иван"
-											value={firstName}
-											onChange={(e) => setFirstName(e.target.value)}
-											bg={inputBg}
-											{...inputStyles}
-										/>
-									</FormControl>
+							<FormControl>
+								<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
+									Имя
+								</FormLabel>
+								<Input
+									placeholder="Иван"
+									value={firstName}
+									onChange={(e) => setFirstName(e.target.value)}
+									bg={inputBg}
+									isDisabled={isSaving}
+									{...inputStyles}
+								/>
+							</FormControl>
 
-									<FormControl>
-										<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
-											Отчество
-										</FormLabel>
-										<Input
-											value={middleName}
-											onChange={(e) => setMiddleName(e.target.value)}
-											bg={inputBg}
-											placeholder="Иванович"
-											{...inputStyles}
-										/>
-									</FormControl>
+							<FormControl>
+								<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
+									Отчество
+								</FormLabel>
+								<Input
+									value={middleName}
+									onChange={(e) => setMiddleName(e.target.value)}
+									bg={inputBg}
+									placeholder="Иванович"
+									isDisabled={isSaving}
+									{...inputStyles}
+								/>
+							</FormControl>
 
-									<FormControl>
-										<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
-											Телефон
-										</FormLabel>
-										<Input
-											value={phone}
-											onChange={(e) => setPhone(formatPhone(e.target.value))}
-											placeholder="+7 (___) ___-__-__"
-											bg={inputBg}
-											{...inputStyles}
-										/>
-									</FormControl>
+							<FormControl>
+								<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
+									Телефон
+								</FormLabel>
+								<Input
+									value={phone}
+									onChange={(e) => setPhone(formatPhone(e.target.value))}
+									placeholder="+7 (___) ___-__-__"
+									bg={inputBg}
+									isDisabled={isSaving}
+									{...inputStyles}
+								/>
+							</FormControl>
 
-									<Button
-										mt="8px"
-										h="45px"
-										borderRadius="12px"
-										bg="#005DE0"
-										color="white"
-										fontSize="xs"
-										fontWeight="medium"
-										letterSpacing="0.02em"
-										isLoading={isSaving}
-										loadingText="Сохраняем..."
-										isDisabled={!canSave}
-										_hover={{ bg: '#0A54BE' }}
-										_active={{ bg: '#0A54BE' }}
-										onClick={handleSave}
-									>
-										СОХРАНИТЬ
-									</Button>
-								</Flex>
-							</>
-						)}
+							<Button
+								mt="8px"
+								h="45px"
+								borderRadius="12px"
+								bg="#005DE0"
+								color="white"
+								fontSize="xs"
+								fontWeight="medium"
+								letterSpacing="0.02em"
+								isLoading={isSaving}
+								loadingText="Сохраняем..."
+								isDisabled={!canSave}
+								_hover={{ bg: '#0A54BE' }}
+								_active={{ bg: '#0A54BE' }}
+								onClick={handleSave}
+							>
+								Сохранить
+							</Button>
+						</Flex>
 					</Box>
 				</GridItem>
 
 				<GridItem>
 					{shouldShowErrors ? (
-						<Box
-							bg={panelBg}
-							border="1px solid"
-							borderColor={borderColor}
-							borderRadius="15px"
-							p="24px"
-						>
+						<Box bg={panelBg} border="1px solid" borderColor={borderColor} borderRadius="15px" p="24px">
 							<Text fontSize="24px" lineHeight="1.3" fontWeight="bold" color={panelTitleColor}>
 								Ошибки заполнения
 							</Text>

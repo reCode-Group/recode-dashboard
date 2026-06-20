@@ -1,5 +1,5 @@
 // Chakra imports
-import { ChakraProvider, Portal, useDisclosure } from '@chakra-ui/react';
+import { Box, ChakraProvider, Portal, Spinner, useDisclosure } from '@chakra-ui/react';
 import Configurator from 'components/Configurator/Configurator';
 import Footer from 'components/Footer/Footer.js';
 // Layout components
@@ -8,9 +8,11 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import AdminNavbar from 'components/Navbars/AdminNavbar.js';
 import Sidebar from 'components/Sidebar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import routes from 'routes.js';
+import { getCurrentUser } from 'services/auth';
+import { clearAuthState, clearPendingProfileEmail, getPendingProfileEmail, hasAuthState } from 'services/session';
 // Custom Chakra theme
 import theme from 'theme/theme.js';
 import FixedPlugin from '../components/FixedPlugin/FixedPlugin';
@@ -23,6 +25,7 @@ export default function Dashboard(props) {
 	// states and functions
 	const [sidebarVariant, setSidebarVariant] = useState('transparent');
 	const [fixed, setFixed] = useState(false);
+	const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 	// functions for changing the states from components
 	const getRoute = () => {
 		return window.location.pathname !== '/admin/full-screen-maps';
@@ -108,7 +111,54 @@ export default function Dashboard(props) {
 		});
 	};
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	useEffect(() => {
+		let isMounted = true;
+
+		async function checkAuth() {
+			const currentPath = window.location.pathname;
+			const isProfileCompleteRoute = currentPath === '/admin/profile/complete';
+
+			if (!hasAuthState()) {
+				props.history.replace('/auth/login-page');
+				return;
+			}
+
+			if (isProfileCompleteRoute && getPendingProfileEmail()) {
+				if (isMounted) {
+					setIsCheckingAuth(false);
+				}
+				return;
+			}
+
+			try {
+				await getCurrentUser();
+				clearPendingProfileEmail();
+				if (isMounted) {
+					setIsCheckingAuth(false);
+				}
+			} catch (error) {
+				clearAuthState();
+				props.history.replace('/auth/login-page');
+			}
+		}
+
+		checkAuth();
+
+		return () => {
+			isMounted = false;
+		};
+	}, [props.history]);
 	// Chakra Color Mode
+	if (isCheckingAuth) {
+		return (
+			<ChakraProvider theme={theme} resetCss={false}>
+				<Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
+					<Spinner color="recode.300" size="xl" />
+				</Box>
+			</ChakraProvider>
+		);
+	}
+
 	return (
 		<ChakraProvider theme={theme} resetCss={false}>
 			<Sidebar

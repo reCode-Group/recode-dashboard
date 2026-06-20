@@ -1,6 +1,8 @@
 // Chakra imports
 import {
+  Button,
   Flex,
+  Icon,
   Stat,
   StatHelpText,
   StatLabel,
@@ -20,13 +22,17 @@ const MiniStatistics = ({
   enableIconAction = false,
   onIconAction,
   iconActionLabel = "statistics action",
+  wideAction = false,
+  actionText = "Создать",
+  actionIcon,
+  ...rest
 }) => {
   const iconRecode = useColorModeValue("recode.300", "recode.300");
   const textColor = useColorModeValue("gray.700", "white");
   const isIconActionEnabled = enableIconAction && typeof onIconAction === "function";
 
   return (
-    <Card minH='83px'>
+    <Card minH='83px' {...rest}>
       <CardBody>
         <Flex flexDirection='row' align='center' justify='center' w='100%'>
           <Stat me='auto'>
@@ -53,19 +59,39 @@ const MiniStatistics = ({
               </StatHelpText>
             </Flex>
           </Stat>
-          <IconBox
-            as={isIconActionEnabled ? "button" : "box"}
-            type={isIconActionEnabled ? "button" : undefined}
-            aria-label={isIconActionEnabled ? iconActionLabel : undefined}
-            onClick={isIconActionEnabled ? onIconAction : undefined}
-            cursor={isIconActionEnabled ? "pointer" : "default"}
-            border='none'
-            appearance='none'
-            h={'45px'}
-            w={'45px'}
-            bg={iconRecode}>
-            {icon}
-          </IconBox>
+          {wideAction && isIconActionEnabled ? (
+            <Button
+              leftIcon={actionIcon ? <Icon as={actionIcon} w='14px' h='14px' /> : icon}
+              bg={iconRecode}
+              color='white'
+              border='none'
+              borderRadius='12px'
+              minW={{ base: '112px', md: '132px' }}
+              h='45px'
+              px='18px'
+              fontSize='sm'
+              fontWeight='bold'
+              aria-label={iconActionLabel}
+              onClick={onIconAction}
+              _hover={{ bg: iconRecode }}
+              _active={{ bg: iconRecode }}>
+              {actionText}
+            </Button>
+          ) : (
+            <IconBox
+              as={isIconActionEnabled ? "button" : "box"}
+              type={isIconActionEnabled ? "button" : undefined}
+              aria-label={isIconActionEnabled ? iconActionLabel : undefined}
+              onClick={isIconActionEnabled ? onIconAction : undefined}
+              cursor={isIconActionEnabled ? "pointer" : "default"}
+              border='none'
+              appearance='none'
+              h={'45px'}
+              w={'45px'}
+              bg={iconRecode}>
+              {icon}
+            </IconBox>
+          )}
         </Flex>
       </CardBody>
     </Card>

@@ -9,6 +9,8 @@ import ProfileComplete from 'views/Dashboard/ProfileComplete';
 import Support from 'views/Dashboard/Support';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
 import Tariff from 'views/Dashboard/Tariff';
+import SignIn from 'views/Auth/SignIn';
+import SignUp from 'views/Auth/SignUp';
 import BlogPage from 'views/Main/Blog';
 import BlogArticlePage from 'views/Main/Blog/Article';
 import ContactsPage from 'views/Main/Contacts';
@@ -31,6 +33,20 @@ import {
 } from 'components/Icons/Icons';
 
 const dashRoutes = [
+	{
+		path: '/login-page',
+		name: 'Вход',
+		component: SignIn,
+		layout: '/auth',
+		hiddenInSidebar: true,
+	},
+	{
+		path: '/sign-up',
+		name: 'Регистрация',
+		component: SignUp,
+		layout: '/auth',
+		hiddenInSidebar: true,
+	},
 	{
 		path: '/dashboard',
 		name: 'Главная',

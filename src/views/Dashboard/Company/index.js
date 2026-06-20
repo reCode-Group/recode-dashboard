@@ -1,24 +1,73 @@
-﻿import { Box, Button, Flex, Grid, GridItem, Icon, Text, useColorModeValue } from '@chakra-ui/react';
+import {
+	Alert,
+	AlertIcon,
+	Box,
+	Button,
+	Flex,
+	Grid,
+	GridItem,
+	Icon,
+	Spinner,
+	Text,
+	useColorModeValue,
+} from '@chakra-ui/react';
 import ProfileBgImage from 'assets/img/ProfileBackground.png';
 import ConversionHistory from 'components/Tables/ConversionHistory';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaCog, FaUsers } from 'react-icons/fa';
 import { IoDocumentsSharp } from 'react-icons/io5';
-import { useLocation } from 'react-router-dom';
-import { dashboardTableData, invoicesData } from 'variables/general';
+import { useHistory, useLocation } from 'react-router-dom';
+import { getCurrentUser } from 'services/auth';
+import { getOrganizationConversions } from 'services/conversions';
+import { getOrganizationDetails } from 'services/organization';
+import { invoicesData } from 'variables/general';
 import Documents from 'views/Dashboard/Billing/components/Documents';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
 import CompanyInformation from './components/CompanyInformation';
 import CompanySettings from './components/CompanySettings';
 
+const emptyValue = 'Не указано';
+
+function formatDate(value) {
+	if (!value) return emptyValue;
+
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return emptyValue;
+
+	return new Intl.DateTimeFormat('ru-RU', {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
+	}).format(date);
+}
+
+function mapConversion(row) {
+	const origin = row.origin_language || row.origin_code || '-';
+	const target = row.target_language || row.target_code || '-';
+
+	return {
+		id: row.id,
+		type: `${origin} → ${target}`,
+		tokens_remain: row.total_tokens,
+		result_url: '',
+		status: row.status || emptyValue,
+		date: formatDate(row.created_at),
+	};
+}
+
 function Company() {
+	const history = useHistory();
 	const location = useLocation();
-	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [
-		location.search,
-	]);
+	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [location.search]);
 	const [activeTab, setActiveTab] = useState(
 		queryTab === 'employees' || queryTab === 'documents' ? queryTab : 'settings'
 	);
+	const [organization, setOrganization] = useState(null);
+	const [conversions, setConversions] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState('');
 
 	const textColor = useColorModeValue('gray.700', 'white');
 	const borderProfileColor = useColorModeValue('white', 'rgba(255, 255, 255, 0.31)');
@@ -26,6 +75,35 @@ function Company() {
 		'linear-gradient(165.45deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.8) 110.84%)',
 		'linear-gradient(165.45deg, rgba(26, 32, 44, 0.82) 0%, rgba(26, 32, 44, 0.8) 110.84%)'
 	);
+
+	const loadCompany = useCallback(async () => {
+		setIsLoading(true);
+		setError('');
+
+		try {
+			const currentUser = await getCurrentUser();
+			if (!currentUser.has_organization) {
+				history.replace('/admin/company/reg');
+				return;
+			}
+
+			const [organizationResult, conversionsResult] = await Promise.all([
+				getOrganizationDetails(),
+				getOrganizationConversions(9).catch(() => ({ items: [] })),
+			]);
+
+			setOrganization(organizationResult);
+			setConversions((conversionsResult?.items || []).map(mapConversion));
+		} catch (requestError) {
+			setError(requestError.message || 'Не удалось загрузить данные компании');
+		} finally {
+			setIsLoading(false);
+		}
+	}, [history]);
+
+	useEffect(() => {
+		loadCompany();
+	}, [loadCompany]);
 
 	useEffect(() => {
 		if (queryTab === 'settings' || queryTab === 'employees' || queryTab === 'documents') {
@@ -38,6 +116,30 @@ function Company() {
 		{ id: 'employees', name: 'СОТРУДНИКИ', icon: <FaUsers /> },
 		{ id: 'documents', name: 'ДОКУМЕНТЫ', icon: <IoDocumentsSharp /> },
 	];
+
+	if (isLoading) {
+		return (
+			<Flex direction="column" minH="60vh" align="center" justify="center">
+				<Spinner color="recode.300" size="xl" />
+			</Flex>
+		);
+	}
+
+	if (error) {
+		return (
+			<Flex direction="column" my={{ base: '120px', md: '75px' }} mx="1.5rem">
+				<Alert status="error" borderRadius="12px">
+					<AlertIcon />
+					<Flex align="center" justify="space-between" gap="12px" w="100%">
+						<Text>{error}</Text>
+						<Button size="sm" onClick={loadCompany}>
+							Повторить
+						</Button>
+					</Flex>
+				</Alert>
+			</Flex>
+		);
+	}
 
 	return (
 		<Flex direction="column">
@@ -61,18 +163,18 @@ function Company() {
 			>
 				<GridItem>
 					<CompanyInformation
-						title={'Информация'}
-						company={'ООО «РЕКОД»'}
-						email={'one@recode.su'}
-						description={
-							'Описание компании ... Может быть длинным и может быть коротким, пофиг кароче'
-						}
-						fullName={'ООО «РЕКОД РЕШЕНИЯ»'}
-						responsibleFullName={'Виктория Генадиевна Кузнецова'}
-						legalAddress={'620000, г. Екатеринбург, ул. Малышева, д. 51, офис 1204'}
-						inn={'770356092098'}
-						ogrn={'8786543679887665'}
-						phone={'+7 (900) 356-92-98'}
+						title="Информация"
+						company={organization?.full_name}
+						email={emptyValue}
+						fullName={organization?.full_name}
+						responsibleFullName={emptyValue}
+						legalAddress={emptyValue}
+						inn={organization?.inn || emptyValue}
+						kpp={organization?.kpp || emptyValue}
+						ogrn={organization?.ogrn || emptyValue}
+						phone={emptyValue}
+						tokensRemain={organization?.tokens_remain}
+						employeesCount={organization?.employees_count}
 					/>
 				</GridItem>
 
@@ -128,17 +230,18 @@ function Company() {
 
 					<Grid mt="24px">
 						{activeTab === 'documents' ? (
-							<Documents title={'Документы компании'} data={invoicesData} fixedHeight="403px" />
+							<Documents title="Документы компании" data={invoicesData} fixedHeight="403px" />
 						) : activeTab === 'employees' ? (
 							<EmployeeTable
 								withPageContainer={false}
 								showFullListButton={true}
-								title={'Сотрудники'}
+								title="Сотрудники"
 								hiddenColumns={['role']}
 								fixedHeight="403px"
+								enforceOrganizationGuard={false}
 							/>
 						) : (
-							<CompanySettings title={'Настройки компании'} />
+							<CompanySettings title="Настройки компании" />
 						)}
 					</Grid>
 				</GridItem>
@@ -146,12 +249,13 @@ function Company() {
 				<GridItem colSpan={{ base: 1, xl: 2 }}>
 					<Grid templateColumns={{ sm: '1fr' }} gap="24px" mt="24px">
 						<ConversionHistory
-							title={'Последние конвертации'}
-							amount={9}
-							captions={['ID', 'Дата', 'Результат перевода', 'Затраченные токены', 'Статус']}
-							data={dashboardTableData}
+							title="Последние конвертации"
+							amount={conversions.length}
+							captions={['ID', 'Тип', 'Статус', 'Результат перевода', 'Затраченные токены', 'Дата']}
+							data={conversions}
 							enablePagination={true}
 							showFullHistoryButton={true}
+							emptyText="Конвертаций пока нет"
 						/>
 					</Grid>
 				</GridItem>
