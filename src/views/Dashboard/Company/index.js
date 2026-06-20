@@ -20,6 +20,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
 import { getOrganizationConversions } from 'services/conversions';
 import { getOrganizationDetails } from 'services/organization';
+import { mapConversion } from 'utils/conversions';
 import { invoicesData } from 'variables/general';
 import Documents from 'views/Dashboard/Billing/components/Documents';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
@@ -28,34 +29,13 @@ import CompanySettings from './components/CompanySettings';
 
 const emptyValue = 'Не указано';
 
-function formatDate(value) {
-	if (!value) return emptyValue;
-
-	const date = new Date(value);
-	if (Number.isNaN(date.getTime())) return emptyValue;
-
-	return new Intl.DateTimeFormat('ru-RU', {
-		day: '2-digit',
-		month: '2-digit',
-		year: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
-	}).format(date);
-}
-
-function mapConversion(row) {
-	const origin = row.origin_language || row.origin_code || '-';
-	const target = row.target_language || row.target_code || '-';
-
-	return {
-		id: row.id,
-		type: `${origin} → ${target}`,
-		tokens_remain: row.total_tokens,
-		result_url: '',
-		status: row.status || emptyValue,
-		date: formatDate(row.created_at),
-	};
-}
+const conversionDateFormat = {
+	day: '2-digit',
+	month: '2-digit',
+	year: 'numeric',
+	hour: '2-digit',
+	minute: '2-digit',
+};
 
 function Company() {
 	const history = useHistory();
@@ -93,7 +73,11 @@ function Company() {
 			]);
 
 			setOrganization(organizationResult);
-			setConversions((conversionsResult?.items || []).map(mapConversion));
+			setConversions(
+				(conversionsResult?.items || []).map((conversion) =>
+					mapConversion(conversion, { dateFormat: conversionDateFormat })
+				)
+			);
 		} catch (requestError) {
 			setError(requestError.message || 'Не удалось загрузить данные компании');
 		} finally {

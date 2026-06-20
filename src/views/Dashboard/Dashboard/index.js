@@ -10,7 +10,6 @@ import {
 // assets
 import peopleImage from 'assets/img/people-image.png';
 import logoRecode from 'assets/svg/recode-logo-white.svg';
-import BarChart from 'components/Charts/BarChart';
 // Custom icons
 import { EmployersIcon, TokensRemainIcon } from 'components/Icons/Icons';
 import { PlusIcon, WalletIcon } from 'components/Icons/Icons.js';
@@ -18,13 +17,14 @@ import ConversionHistory from 'components/Tables/ConversionHistory';
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { getCurrentUser, getEmployeesCount } from 'services/auth';
+import { getUserConversions } from 'services/conversions';
 import { getUserSubscription } from 'services/subscription';
-import { dashboardTableData } from 'variables/general';
+import { mapConversion } from 'utils/conversions';
 import CreateSupportTicketModal from 'views/Dashboard/Support/components/CreateSupportTicketModal';
-import ActiveUsers from './components/ActiveUsers';
 import BuiltByDevelopers from './components/BuiltByDevelopers';
 import MiniStatistics from './components/MiniStatistics';
 import SalesOverview from './components/SalesOverview';
+import TokenUsageStatistics from './components/TokenUsageStatistics';
 import WorkWithTheRockets from './components/WorkWithTheRockets';
 
 const NO_SUBSCRIPTION_MESSAGES = [
@@ -58,6 +58,7 @@ export default function Dashboard() {
 		packageName: 'Загрузка...',
 		tokensRemain: '...',
 	});
+	const [conversions, setConversions] = useState([]);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -82,6 +83,29 @@ export default function Dashboard() {
 		}
 
 		loadSubscription();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
+	useEffect(() => {
+		let isMounted = true;
+
+		async function loadConversions() {
+			try {
+				const conversionsResult = await getUserConversions(9);
+				if (!isMounted) return;
+
+				setConversions((conversionsResult?.items || []).map(mapConversion));
+			} catch (error) {
+				if (!isMounted) return;
+
+				setConversions([]);
+			}
+		}
+
+		loadConversions();
 
 		return () => {
 			isMounted = false;
@@ -203,7 +227,7 @@ export default function Dashboard() {
 				gap="24px"
 				mb={{ lg: '26px' }}
 			>
-				<ActiveUsers title={'Расход токенов'} percentage={2300} chart={<BarChart />} />
+				<TokenUsageStatistics />
 				<SalesOverview title={'Операции над токенами'} />
 			</Grid>
 			<Grid
@@ -214,13 +238,14 @@ export default function Dashboard() {
 			>
 				<Flex minW="0" w="100%">
 					<ConversionHistory
-					title={'Конвертации'}
-					amount={30}
-					captions={['ID', 'Тип', 'Статус', 'Результат перевода', 'Затраченные токены', 'Дата']}
-					data={dashboardTableData}
-					enablePagination={false}
-					initialRowsPerPage={5}
-					showFullHistoryButton={true}
+						title={'Конвертации'}
+						amount={conversions.length}
+						captions={['ID', 'Тип', 'Статус', 'Результат перевода', 'Затраченные токены', 'Дата']}
+						data={conversions}
+						enablePagination={false}
+						initialRowsPerPage={5}
+						showFullHistoryButton={true}
+						emptyText="Конвертаций пока нет"
 					/>
 				</Flex>
 			</Grid>

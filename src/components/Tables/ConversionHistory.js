@@ -30,31 +30,7 @@ import DashboardTableRow from 'components/Tables/DashboardTableRow';
 import { FiCheck, FiCopy } from 'react-icons/fi';
 import { IoArrowForwardSharp, IoCheckmarkDoneCircleSharp } from 'react-icons/io5';
 
-const buildCodePreview = (row) => {
-	const sourceCode = `Sub Convert_${row.id}()
-    Dim sourceUrl As String
-    sourceUrl = "${row.result_url || ''}"
-
-    If sourceUrl = "" Then
-        MsgBox "Empty source URL"
-        Exit Sub
-    End If
-
-    Debug.Print "Run conversion for RCD-${row.id}"
-End Sub`;
-
-	const translatedMacro = `function convert_${row.id}() {
-  const sourceUrl = "${row.result_url || ''}";
-
-  if (!sourceUrl) {
-    throw new Error("Empty source URL");
-  }
-
-  console.log("Run conversion for RCD-${row.id}");
-}`;
-
-	return { sourceCode, translatedMacro };
-};
+const FAILED_STATUS = 'failed';
 
 const ConversionHistory = ({
 	title,
@@ -85,6 +61,8 @@ const ConversionHistory = ({
 
 	const totalPages = enablePagination ? Math.max(1, Math.ceil(data.length / rowsPerPage)) : 1;
 	const isEmpty = data.length === 0;
+	const selectedConversionFailed = selectedConversion?.rawStatus === FAILED_STATUS;
+	const translatedCodeValue = selectedConversionFailed ? '' : selectedConversion?.translatedCode || '';
 
 	useEffect(() => {
 		setPage((currentPage) => Math.min(currentPage, totalPages));
@@ -108,6 +86,8 @@ const ConversionHistory = ({
 	};
 
 	const handleCopy = async (value, type) => {
+		if (!value) return;
+
 		try {
 			await navigator.clipboard.writeText(value);
 			if (type === 'source') {
@@ -242,11 +222,7 @@ const ConversionHistory = ({
 											date={row.date}
 											isViewCodeDisabled={isViewCodeDisabled}
 											onViewCode={() => {
-												const preview = buildCodePreview(row);
-												setSelectedConversion({
-													...row,
-													...preview,
-												});
+												setSelectedConversion(row);
 												setCopiedSource(false);
 												setCopiedTranslated(false);
 											}}
@@ -347,6 +323,7 @@ const ConversionHistory = ({
 										fontSize="xs"
 										fontWeight="700"
 										_hover={{ bg: copyButtonHoverBg }}
+										isDisabled={!selectedConversion?.sourceCode}
 										onClick={() => handleCopy(selectedConversion?.sourceCode || '', 'source')}
 									>
 										{copiedSource ? 'Скопировано' : 'Копировать'}
@@ -379,14 +356,16 @@ const ConversionHistory = ({
 										fontSize="xs"
 										fontWeight="700"
 										_hover={{ bg: copyButtonHoverBg }}
-										onClick={() => handleCopy(selectedConversion?.translatedMacro || '', 'translated')}
+										isDisabled={selectedConversionFailed || !translatedCodeValue}
+										onClick={() => handleCopy(translatedCodeValue, 'translated')}
 									>
 										{copiedTranslated ? 'Скопировано' : 'Копировать'}
 									</Button>
 								</Flex>
 								<Textarea
-									value={selectedConversion?.translatedMacro || ''}
+									value={translatedCodeValue}
 									readOnly
+									isDisabled={selectedConversionFailed}
 									h={{ base: '180px', md: '240px', xl: '360px' }}
 									bg={inputBg}
 									borderColor={tableBorder}

@@ -10,10 +10,12 @@ import {
 // Custom components
 import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
+import { useHistory } from "react-router-dom";
 // react icons
 import { BsArrowRight } from "react-icons/bs";
 
 const BuiltByDevelopers = ({ title, name, description, image }) => {
+  const history = useHistory();
   const textColor = useColorModeValue("gray.700", "white");
 
   return (
@@ -40,7 +42,8 @@ const BuiltByDevelopers = ({ title, name, description, image }) => {
                 p='0px'
                 variant='no-hover'
                 bg='transparent'
-                my={{ sm: "1.5rem", lg: "0px" }}>
+                my={{ sm: "1.5rem", lg: "0px" }}
+                onClick={() => history.push("/main/documentation")}>
                 <Text
                   fontSize='sm'
                   color={textColor}

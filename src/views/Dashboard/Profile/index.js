@@ -13,6 +13,7 @@ import SupportTicketList from 'views/Dashboard/Support/components/SupportTicketL
 import { getUserConversions } from 'services/conversions';
 import { getOrganizationDetails } from 'services/organization';
 import { getCurrentUser } from 'services/auth';
+import { mapConversion } from 'utils/conversions';
 import Header from './components/Header';
 import PlatformSettings from './components/PlatformSettings';
 import ProfileInformation from './components/ProfileInformation';
@@ -32,27 +33,6 @@ function getRoleLabel(role) {
 	if (role === 'director') return 'Руководитель';
 	if (role === 'employee') return 'Сотрудник';
 	return emptyValue;
-}
-
-function formatDate(value) {
-	if (!value) return emptyValue;
-	const date = new Date(value);
-	if (Number.isNaN(date.getTime())) return emptyValue;
-	return date.toLocaleDateString('ru-RU');
-}
-
-function mapConversion(row) {
-	const origin = row.origin_language || row.origin_code || '-';
-	const target = row.target_language || row.target_code || '-';
-
-	return {
-		id: row.id,
-		type: `${origin} → ${target}`,
-		tokens_remain: row.total_tokens,
-		result_url: '',
-		status: row.status || emptyValue,
-		date: formatDate(row.created_at),
-	};
 }
 
 function Profile() {
