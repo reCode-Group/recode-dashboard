@@ -511,7 +511,6 @@ export default function MacroTranslatorPage() {
 							showFullHistoryButton={true}
 							fullHistoryPath="/admin/conversion-history"
 							fullHistoryButtonLabel="Показать полную историю"
-							emptyText="Конвертаций пока нет"
 						/>
 					</>
 				)}

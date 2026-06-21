@@ -1,12 +1,5 @@
 // Chakra imports
-import {
-	Flex,
-	Grid,
-	Image,
-	SimpleGrid,
-	useColorModeValue,
-	useDisclosure,
-} from '@chakra-ui/react';
+import { Flex, Grid, Image, SimpleGrid, useColorModeValue, useDisclosure } from '@chakra-ui/react';
 // assets
 import peopleImage from 'assets/img/people-image.png';
 import logoRecode from 'assets/svg/recode-logo-white.svg';
@@ -64,6 +57,7 @@ export default function Dashboard() {
 	const [isCompanyAdmin, setIsCompanyAdmin] = useState(null);
 	const [viewerContext, setViewerContext] = useState(null);
 	const [employeesCount, setEmployeesCount] = useState('...');
+	const [isSubscriptionLoaded, setIsSubscriptionLoaded] = useState(false);
 	const [subscriptionStats, setSubscriptionStats] = useState({
 		packageName: 'Загрузка...',
 		tokensRemain: '...',
@@ -84,7 +78,7 @@ export default function Dashboard() {
 				const packageTokensValue = Number(subscription?.package_tokens) || 0;
 
 				setSubscriptionStats({
-					packageName: subscription?.package_name || 'Нет тарифа',
+					packageName: 'Пакет «' + subscription?.package_name + '»' || 'Пакет «Старт»',
 					tokensRemain: formatTokenValue(tokensRemainValue),
 					tokensRemainValue,
 					packageTokensValue,
@@ -93,11 +87,14 @@ export default function Dashboard() {
 				if (!isMounted) return;
 
 				setSubscriptionStats({
-					packageName: isNoSubscriptionError(error) ? 'Нет тарифа' : 'Нет данных',
+					packageName: isNoSubscriptionError(error) ? 'Пакет «Старт»' : 'Нет данных',
 					tokensRemain: '0',
 					tokensRemainValue: 0,
 					packageTokensValue: 0,
 				});
+			} finally {
+				if (!isMounted) return;
+				setIsSubscriptionLoaded(true);
 			}
 		}
 
@@ -189,35 +186,46 @@ export default function Dashboard() {
 				/>
 			) : (
 				<SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing="24px">
-				<MiniStatistics
-					title={'Тариф'}
-					amount={subscriptionStats.packageName}
-					icon={<WalletIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
-				/>
-				<MiniStatistics
-					title={'Остаток токенов'}
-					amount={subscriptionStats.tokensRemain}
-					percentage={tokenBalancePercentage}
-					icon={<TokensRemainIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
-				/>
-				{showEmployeesStats ? (
 					<MiniStatistics
-						title={'Количество сотрудников'}
-						amount={employeesCount}
-						icon={<EmployersIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
+						title={'Тариф'}
+						amount={subscriptionStats.packageName}
+						icon={<WalletIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
 					/>
-				) : null}
-				<MiniStatistics
-					title={'Техподдержка'}
-					amount={'Обращений нет'}
-					icon={<PlusIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
-					gridColumn={isSupportStatsWide ? { md: '1 / -1', xl: 'span 2' } : undefined}
-					enableIconAction={true}
-					wideAction={isSupportStatsWide}
-					actionText="Создать"
-					onIconAction={onOpen}
-					iconActionLabel='Open support ticket modal'
-				/>
+					<MiniStatistics
+						title={'Остаток токенов'}
+						amount={subscriptionStats.tokensRemain}
+						percentage={tokenBalancePercentage}
+						icon={<TokensRemainIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
+						inlineActionText={
+							isSubscriptionLoaded && subscriptionStats.tokensRemainValue === 0
+								? 'Пополнить'
+								: undefined
+						}
+						onInlineAction={
+							isSubscriptionLoaded && subscriptionStats.tokensRemainValue === 0
+								? () => history.push('/admin/billing')
+								: undefined
+						}
+						inlineActionLabel="Перейти в финансы"
+					/>
+					{showEmployeesStats ? (
+						<MiniStatistics
+							title={'Количество сотрудников'}
+							amount={employeesCount}
+							icon={<EmployersIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
+						/>
+					) : null}
+					<MiniStatistics
+						title={'Техподдержка'}
+						amount={'Обращений нет'}
+						icon={<PlusIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
+						gridColumn={isSupportStatsWide ? { md: '1 / -1', xl: 'span 2' } : undefined}
+						enableIconAction={true}
+						wideAction={isSupportStatsWide}
+						actionText="Создать"
+						onIconAction={onOpen}
+						iconActionLabel="Open support ticket modal"
+					/>
 				</SimpleGrid>
 			)}
 			<Grid
@@ -279,7 +287,6 @@ export default function Dashboard() {
 						enablePagination={false}
 						initialRowsPerPage={5}
 						showFullHistoryButton={true}
-						emptyText="Конвертаций пока нет"
 					/>
 				</Flex>
 			</Grid>

@@ -13,6 +13,7 @@ import {
 import Card from 'components/Card/Card';
 import CardHeader from 'components/Card/CardHeader';
 import { useCallback, useEffect, useState } from 'react';
+import { FiInbox } from 'react-icons/fi';
 import { getTokenHistory } from 'services/tokenHistory';
 
 const HISTORY_LIMIT = 30;
@@ -120,6 +121,8 @@ const TokenOperationsFeed = ({ viewerContext }) => {
 	const borderColor = useColorModeValue('gray.100', 'whiteAlpha.200');
 	const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.100');
 	const badgeBg = useColorModeValue('white', 'gray.600');
+	const emptyStateBg = useColorModeValue('gray.50', 'whiteAlpha.50');
+	const emptyStateBorder = useColorModeValue('gray.200', 'whiteAlpha.200');
 	const scrollbarThumb = useColorModeValue('rgba(160, 174, 192, 0.9)', 'rgba(255, 255, 255, 0.28)');
 	const scrollbarTrack = useColorModeValue(
 		'rgba(226, 232, 240, 0.75)',
@@ -199,10 +202,27 @@ const TokenOperationsFeed = ({ viewerContext }) => {
 					</Button>
 				</Alert>
 			) : !items.length ? (
-				<Flex minH="220px" align="center" justify="center">
-					<Text color={mutedColor} fontWeight="medium">
-						Операций пока нет
-					</Text>
+				<Flex flex="1" minH="0" align="stretch" justify="stretch">
+					<Flex
+						direction="column"
+						align="center"
+						justify="center"
+						gap="8px"
+						w="100%"
+						h="100%"
+						px="24px"
+						py="28px"
+						border="1px solid"
+						borderColor={emptyStateBorder}
+						borderRadius="20px"
+						bg={emptyStateBg}
+						textAlign="center"
+					>
+						<Box as={FiInbox} boxSize="32px" color={mutedColor} />
+						<Text color={mutedColor} fontWeight="medium">
+							Записей пока нет
+						</Text>
+					</Flex>
 				</Flex>
 			) : (
 				<Box

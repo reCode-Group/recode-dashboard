@@ -68,7 +68,6 @@ function ConversionHistoryPage() {
 				enablePagination={true}
 				initialRowsPerPage={50}
 				showFullHistoryButton={false}
-				emptyText="Конвертаций пока нет"
 			/>
 		</Flex>
 	);

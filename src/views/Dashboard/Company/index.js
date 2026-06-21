@@ -248,7 +248,6 @@ function Company() {
 							enablePagination={true}
 							showFullHistoryButton={true}
 							fullHistoryPath="/admin/conversion-history?scope=organization"
-							emptyText="Конвертаций пока нет"
 						/>
 					</Grid>
 				</GridItem>

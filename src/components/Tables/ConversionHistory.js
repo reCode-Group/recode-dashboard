@@ -43,7 +43,6 @@ const ConversionHistory = ({
 	showFullHistoryButton = false,
 	fullHistoryPath = '/admin/conversion-history',
 	fullHistoryButtonLabel = 'Показать всю историю',
-	emptyText = 'Нет данных',
 }) => {
 	const history = useHistory();
 	const textColor = useColorModeValue('gray.700', 'white');
@@ -61,9 +60,11 @@ const ConversionHistory = ({
 	const [selectedConversion, setSelectedConversion] = useState(null);
 	const [copiedSource, setCopiedSource] = useState(false);
 	const [copiedTranslated, setCopiedTranslated] = useState(false);
+	const emptyText = 'Записей пока нет';
 
 	const totalPages = enablePagination ? Math.max(1, Math.ceil(data.length / rowsPerPage)) : 1;
 	const isEmpty = data.length === 0;
+	const hasFixedHeight = Boolean(fixedHeight) && !isEmpty;
 	const selectedConversionFailed = selectedConversion?.rawStatus === FAILED_STATUS;
 	const translatedCodeValue = selectedConversionFailed ? '' : selectedConversion?.translatedCode || '';
 
@@ -170,10 +171,10 @@ const ConversionHistory = ({
 				overflow="hidden"
 				maxW="100%"
 				minW="0"
-				h={fixedHeight}
-				minH={fixedHeight}
-				display={fixedHeight ? 'flex' : undefined}
-				flexDirection={fixedHeight ? 'column' : undefined}
+				h={hasFixedHeight ? fixedHeight : 'auto'}
+				minH={hasFixedHeight ? fixedHeight : 'auto'}
+				display={hasFixedHeight ? 'flex' : undefined}
+				flexDirection={hasFixedHeight ? 'column' : undefined}
 			>
 				<CardHeader p="12px 0px 28px 0px">
 					<Flex direction="column">
@@ -195,12 +196,11 @@ const ConversionHistory = ({
 					w="100%"
 					maxW="100%"
 					minW="0"
-					maxH={fixedHeight ? { base: '55vh', lg: '100%' } : { base: '55vh', lg: 'unset' }}
-					flex={fixedHeight ? '1' : undefined}
-					minH={fixedHeight ? '0' : undefined}
+					maxH={hasFixedHeight ? { base: '55vh', lg: '100%' } : { base: '55vh', lg: 'unset' }}
+					flex={hasFixedHeight ? '1' : undefined}
+					minH={hasFixedHeight ? '0' : undefined}
 					overflowX="auto"
-					overflowY={fixedHeight ? 'auto' : { base: 'auto', lg: 'visible' }}
-					borderTop="1px solid"
+					overflowY={hasFixedHeight ? 'auto' : { base: 'auto', lg: 'visible' }}
 					borderBottom="1px solid"
 					borderColor={historyDividerColor}
 					sx={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y' }}

@@ -208,7 +208,6 @@ function Profile() {
 							data={conversions}
 							enablePagination={true}
 							showFullHistoryButton={true}
-							emptyText="Конвертаций пока нет"
 						/>
 					</Grid>
 				</>
