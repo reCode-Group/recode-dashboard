@@ -2,8 +2,8 @@
 import { SearchIcon } from '@chakra-ui/icons';
 // Chakra Imports
 import {
-	Button,
 	Box,
+	Button,
 	Flex,
 	IconButton,
 	Input,
@@ -26,7 +26,15 @@ import { clearAuthState } from 'services/session';
 import { searchSite } from 'utils/siteSearch';
 
 export default function HeaderLinks(props) {
-	const { variant, children, fixed, secondary, onOpen, showOnlyMobileMenu = false, ...rest } = props;
+	const {
+		variant,
+		children,
+		fixed,
+		secondary,
+		onOpen,
+		showOnlyMobileMenu = false,
+		...rest
+	} = props;
 	const history = useHistory();
 	const location = useLocation();
 	const [searchQuery, setSearchQuery] = useState('');
@@ -48,7 +56,10 @@ export default function HeaderLinks(props) {
 		'0 14px 40px rgba(15, 23, 42, 0.12)',
 		'0 14px 40px rgba(0, 0, 0, 0.28)'
 	);
-	const scrollbarThumb = useColorModeValue('rgba(160, 174, 192, 0.95)', 'rgba(255, 255, 255, 0.28)');
+	const scrollbarThumb = useColorModeValue(
+		'rgba(160, 174, 192, 0.95)',
+		'rgba(255, 255, 255, 0.28)'
+	);
 	const scrollbarTrack = useColorModeValue('rgba(226, 232, 240, 0.8)', 'rgba(255, 255, 255, 0.08)');
 
 	if (secondary) {
@@ -162,9 +173,9 @@ export default function HeaderLinks(props) {
 				display={showOnlyMobileMenu ? 'none' : { base: 'none', md: 'block' }}
 				w={{
 					sm: '50%',
-					md: isSearchFocused || isSearchOpen ? '320px' : '200px',
+					md: isSearchFocused || isSearchOpen ? '400px' : '200px',
 				}}
-				maxW={{ sm: '100%', md: '320px' }}
+				maxW={{ sm: '100%', md: '400px' }}
 				me={{ sm: 'auto', md: '20px' }}
 				transition="width 0.2s ease"
 			>
