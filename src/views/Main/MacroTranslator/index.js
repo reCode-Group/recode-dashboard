@@ -1,4 +1,6 @@
-﻿import {
+import {
+	Alert,
+	AlertIcon,
 	Box,
 	Button,
 	Flex,
@@ -14,80 +16,93 @@
 	ModalFooter,
 	ModalHeader,
 	ModalOverlay,
+	Select,
+	Spinner,
+	Switch,
 	Text,
 	Textarea,
 	useColorModeValue,
 } from '@chakra-ui/react';
 import BannerConstructor from 'assets/img/banner_constructor.png';
 import ConversionHistory from 'components/Tables/ConversionHistory';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FiAlertCircle, FiCheck, FiCopy } from 'react-icons/fi';
 import { IoArrowForwardSharp } from 'react-icons/io5';
 import { useHistory } from 'react-router-dom';
+import { getCurrentUser } from 'services/auth';
+import { getUserConversions } from 'services/conversions';
+import { convertPaidMacro } from 'services/macroTranslator';
+import { getUserSubscription } from 'services/subscription';
+import { mapConversion } from 'utils/conversions';
 
-const CONVERSION_HISTORY_DATA = [
-	{
-		id: 43324,
-		type: '29.10.2026',
-		status: 'Ожидает доработки',
-		result_url: 'https://recode-group.ru',
-		tokens_remain: '14 000',
-		date: '29.10.2026',
-	},
-	{
-		id: 32524,
-		type: '26.10.2026',
-		status: 'Не удалось (подробнее)',
-		result_url: 'https://recode-group.ru',
-		tokens_remain: '3 000',
-		date: '26.10.2026',
-	},
-	{
-		id: 23524,
-		type: '23.10.2026',
-		status: 'Завершен',
-		result_url: 'https://recode-group.ru',
-		tokens_remain: '2 000',
-		date: '23.10.2026',
-	},
-	{
-		id: 13324,
-		type: '21.10.2026',
-		status: 'Завершен',
-		result_url: 'https://recode-group.ru',
-		tokens_remain: '22 000',
-		date: '21.10.2026',
-	},
-	{
-		id: 12354,
-		type: '20.10.2026',
-		status: 'Завершен',
-		result_url: 'https://recode-group.ru',
-		tokens_remain: '10 400',
-		date: '20.10.2026',
-	},
+const NO_SUBSCRIPTION_MESSAGES = [
+	'subscription not found',
+	'subscription is not active',
+	'ErrNoSubscription',
+	'ErrSubscriptionNotActive',
 ];
 
-function translateMacro(source) {
-	if (!source.trim()) return '';
+const LANGUAGE_OPTIONS = [
+	{ value: 'JS', label: 'JavaScript (JS)' },
+	{ value: 'LUA', label: 'Lua (LUA)' },
+];
 
-	return source
-		.replace(/\bFOR EACH\b/gi, 'for (const')
-		.replace(/\bEND FOR\b/gi, '}')
-		.replace(/\bIF\b/gi, 'if')
-		.replace(/\bELSE\b/gi, 'else')
-		.replace(/\bEND IF\b/gi, '}')
-		.replace(/\bSET\b/gi, 'let')
-		.replace(/\bPRINT\b/gi, 'console.log')
-		.replace(/\bSEND\b/gi, 'return');
+const TOKEN_SOURCE = {
+	PERSONAL: 'personal',
+	EMPLOYEE: 'employee',
+};
+
+const conversionDateFormat = {
+	day: '2-digit',
+	month: '2-digit',
+	year: 'numeric',
+	hour: '2-digit',
+	minute: '2-digit',
+};
+
+function formatTokenValue(value) {
+	return new Intl.NumberFormat('ru-RU').format(Number(value) || 0).replace(/,/g, ' ');
+}
+
+function isUnauthorizedError(error) {
+	const message = String(error?.message || '').toLowerCase();
+	return message.includes('unauthorized');
+}
+
+function isNoSubscriptionError(error) {
+	const message = error?.message || '';
+	return NO_SUBSCRIPTION_MESSAGES.some((knownMessage) => message.includes(knownMessage));
+}
+
+function getTokenPanelLabel(tokenSource) {
+	return tokenSource === TOKEN_SOURCE.EMPLOYEE ? 'СЧЕТ СОТРУДНИКА' : 'ЛИЧНЫЙ СЧЕТ';
+}
+
+function getTokenSourceHint(tokenSource) {
+	return tokenSource === TOKEN_SOURCE.EMPLOYEE
+		? 'Списание токенов со счета сотрудника в организации'
+		: 'Списание токенов с личного счета';
+}
+
+function getTariffLabel(subscriptionName) {
+	return subscriptionName || 'Нет тарифа';
 }
 
 export default function MacroTranslatorPage() {
 	const history = useHistory();
 	const [source, setSource] = useState('');
 	const [translated, setTranslated] = useState('');
+	const [targetLanguage, setTargetLanguage] = useState('JS');
 	const [copied, setCopied] = useState(false);
 	const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
+	const [isPageLoading, setIsPageLoading] = useState(true);
+	const [isConverting, setIsConverting] = useState(false);
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [user, setUser] = useState(null);
+	const [subscriptionName, setSubscriptionName] = useState('Нет тарифа');
+	const [selectedTokenSource, setSelectedTokenSource] = useState(TOKEN_SOURCE.PERSONAL);
+	const [historyItems, setHistoryItems] = useState([]);
+	const [errorMessage, setErrorMessage] = useState('');
 	const copyResetTimeoutRef = useRef(null);
 
 	const textColor = useColorModeValue('gray.700', 'white');
@@ -98,13 +113,68 @@ export default function MacroTranslatorPage() {
 	const modalTextColor = useColorModeValue('gray.600', 'gray.200');
 	const modalGlassBg = useColorModeValue('rgba(255, 255, 255, 0.92)', 'rgba(26, 32, 44, 0.92)');
 	const modalSectionBg = useColorModeValue('rgba(255, 255, 255, 0.72)', 'rgba(26, 32, 44, 0.72)');
+	const selectPlaceholderColor = useColorModeValue('gray.600', 'gray.200');
+	const toggleBg = useColorModeValue('gray.50', 'whiteAlpha.100');
 
 	const charCounter = useMemo(() => `${source.length} / 600`, [source.length]);
 
-	const handleTranslate = () => {
-		setTranslated(translateMacro(source));
-		setCopied(false);
-	};
+	const canUseEmployeeAccount =
+		user?.has_organization === true && user?.organization_status === 'active';
+	const personalTokens = Number(user?.personal_tokens_remain) || 0;
+	const employeeTokens = Number(user?.organization_tokens_remain) || 0;
+	const activeTokenBalance =
+		selectedTokenSource === TOKEN_SOURCE.EMPLOYEE ? employeeTokens : personalTokens;
+
+	const loadData = useCallback(async () => {
+		setIsPageLoading(true);
+		setErrorMessage('');
+
+		try {
+			const currentUser = await getCurrentUser();
+			setIsAuthenticated(true);
+			setUser(currentUser);
+			setSelectedTokenSource(TOKEN_SOURCE.PERSONAL);
+
+			const [subscriptionResult, conversionsResult] = await Promise.all([
+				getUserSubscription().catch((error) => {
+					if (isNoSubscriptionError(error)) {
+						return null;
+					}
+					throw error;
+				}),
+				getUserConversions(9).catch(() => ({ items: [] })),
+			]);
+
+			setSubscriptionName(getTariffLabel(subscriptionResult?.package_name));
+			setHistoryItems(
+				(conversionsResult?.items || []).map((conversion) =>
+					mapConversion(conversion, { dateFormat: conversionDateFormat })
+				)
+			);
+		} catch (error) {
+			if (isUnauthorizedError(error)) {
+				setIsAuthenticated(false);
+				setUser(null);
+				setSubscriptionName('Нет тарифа');
+				setHistoryItems([]);
+				setSelectedTokenSource(TOKEN_SOURCE.PERSONAL);
+			} else {
+				setErrorMessage(error.message || 'Не удалось загрузить данные переводчика');
+			}
+		} finally {
+			setIsPageLoading(false);
+		}
+	}, []);
+
+	useEffect(() => {
+		loadData();
+	}, [loadData]);
+
+	useEffect(() => {
+		if (!canUseEmployeeAccount && selectedTokenSource === TOKEN_SOURCE.EMPLOYEE) {
+			setSelectedTokenSource(TOKEN_SOURCE.PERSONAL);
+		}
+	}, [canUseEmployeeAccount, selectedTokenSource]);
 
 	useEffect(() => {
 		return () => {
@@ -130,6 +200,58 @@ export default function MacroTranslatorPage() {
 		}
 	};
 
+	const handleTranslate = async () => {
+		if (!source.trim()) {
+			setErrorMessage('Введите исходный макрос для перевода');
+			return;
+		}
+
+		if (!isAuthenticated) {
+			history.push('/auth/login-page');
+			return;
+		}
+
+		setIsConverting(true);
+		setErrorMessage('');
+		setCopied(false);
+
+		try {
+			const result = await convertPaidMacro({
+				origin_code: source.trim(),
+				origin_language: 'VBA',
+				target_language: targetLanguage,
+				as_employee: selectedTokenSource === TOKEN_SOURCE.EMPLOYEE,
+			});
+
+			setTranslated(result?.target_code || '');
+			await loadData();
+		} catch (error) {
+			if (isUnauthorizedError(error)) {
+				history.push('/auth/login-page');
+				return;
+			}
+
+			if (isNoSubscriptionError(error)) {
+				setErrorMessage('Для списания с личного счета нужна активная подписка');
+				return;
+			}
+
+			if (String(error?.message || '').includes('not enough tokens')) {
+				setErrorMessage('Недостаточно токенов на выбранном счете');
+				return;
+			}
+
+			if (String(error?.message || '').includes('unsupported language')) {
+				setErrorMessage('Выбранный язык перевода пока не поддерживается');
+				return;
+			}
+
+			setErrorMessage(error.message || 'Не удалось выполнить перевод');
+		} finally {
+			setIsConverting(false);
+		}
+	};
+
 	return (
 		<>
 			<Flex direction="column" py={{ base: '120px', md: '150px' }} gap="48px">
@@ -143,169 +265,256 @@ export default function MacroTranslatorPage() {
 						Переводчик макросов
 					</Text>
 					<Text mt="6px" fontSize="sm" fontWeight="medium" color={mutedColor}>
-						Перевод VBA макросов в другие форматы в один клик
+						Перевод VBA макросов в JavaScript и Lua в один клик
 					</Text>
 				</Box>
 
-				<Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="20px">
-					<Box>
-						<Text fontSize="sm" color={textColor} mb="8px">
-							Исходный макрос
-						</Text>
-						<Box position="relative">
-							<Textarea
-								value={source}
-								onChange={(event) => setSource(event.target.value.slice(0, 600))}
-								placeholder="Введите или вставьте ваш код здесь..."
-								minH={{ base: '250px', md: '320px' }}
-								bg={inputBg}
-								borderColor={tableBorder}
-								borderRadius="15px"
-								resize="none"
-								fontSize="sm"
-								pb="34px"
-								position="relative"
-								zIndex={1}
-							/>
-							<Text
-								position="absolute"
-								right="12px"
-								bottom="10px"
-								fontSize="xs"
-								color={mutedColor}
-								zIndex={2}
-								pointerEvents="none"
-							>
-								{charCounter}
-							</Text>
-						</Box>
+				{errorMessage ? (
+					<Alert status="error" borderRadius="15px">
+						<AlertIcon />
+						<Text fontSize="sm">{errorMessage}</Text>
+					</Alert>
+				) : null}
 
-						<Flex
-							borderWidth="1px"
-							borderColor={tableBorder}
-							borderRadius="15px"
-							mt="8px"
-							px="16px"
-							py="12px"
-							justify="space-between"
-							align={{ base: 'flex-start', sm: 'center' }}
-							direction={{ base: 'column', sm: 'row' }}
-							gap="12px"
-						>
+				{isPageLoading ? (
+					<Flex align="center" justify="center" minH="220px">
+						<Spinner color="recode.300" size="xl" />
+					</Flex>
+				) : (
+					<>
+						<Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="20px">
 							<Box>
-								<Text fontSize="xs" fontWeight="500" color={mutedColor}>
-									ОСТАЛОСЬ ТОКЕНОВ:{' '}
-									<Text as="span" color={textColor}>
-										4
+								<Text fontSize="sm" color={textColor} mb="8px">
+									Исходный макрос
+								</Text>
+								<Box position="relative">
+									<Textarea
+										value={source}
+										onChange={(event) => setSource(event.target.value.slice(0, 600))}
+										placeholder="Введите или вставьте ваш код здесь..."
+										minH={{ base: '250px', md: '320px' }}
+										bg={inputBg}
+										borderColor={tableBorder}
+										borderRadius="15px"
+										resize="none"
+										fontSize="sm"
+										pb="34px"
+										position="relative"
+										zIndex={1}
+									/>
+									<Text
+										position="absolute"
+										right="12px"
+										bottom="10px"
+										fontSize="xs"
+										color={mutedColor}
+										zIndex={2}
+										pointerEvents="none"
+									>
+										{charCounter}
 									</Text>
-								</Text>
-								<Text fontSize="xs" fontWeight="500" color={mutedColor}>
-									ТАРИФ:{' '}
-									<Link color={textColor} textDecor="underline">
-										Пробный
-									</Link>
-								</Text>
+								</Box>
+
+								<Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap="12px" mt="12px">
+									<Box>
+										<Text fontSize="xs" fontWeight="600" color={mutedColor} mb="6px">
+											ИСХОДНЫЙ ЯЗЫК
+										</Text>
+										<Select value="VBA" isDisabled bg={inputBg} borderColor={tableBorder} borderRadius="15px">
+											<option value="VBA">VBA</option>
+										</Select>
+									</Box>
+									<Box>
+										<Text fontSize="xs" fontWeight="600" color={mutedColor} mb="6px">
+											ЯЗЫК ПЕРЕВОДА
+										</Text>
+										<Select
+											value={targetLanguage}
+											onChange={(event) => setTargetLanguage(event.target.value)}
+											bg={inputBg}
+											borderColor={tableBorder}
+											borderRadius="15px"
+											color={selectPlaceholderColor}
+										>
+											{LANGUAGE_OPTIONS.map((option) => (
+												<option key={option.value} value={option.value}>
+													{option.label}
+												</option>
+											))}
+										</Select>
+									</Box>
+								</Grid>
+
+								<Flex
+									borderWidth="1px"
+									borderColor={tableBorder}
+									borderRadius="15px"
+									mt="12px"
+									px="16px"
+									py="12px"
+									justify="space-between"
+									align={{ base: 'flex-start', sm: 'center' }}
+									direction={{ base: 'column', sm: 'row' }}
+									gap="12px"
+								>
+									<Box>
+										<Text fontSize="xs" fontWeight="500" color={mutedColor}>
+											{getTokenPanelLabel(selectedTokenSource)}:{' '}
+											<Text as="span" color={textColor}>
+												{formatTokenValue(activeTokenBalance)}
+											</Text>
+										</Text>
+										<Text fontSize="xs" fontWeight="500" color={mutedColor}>
+											ТАРИФ:{' '}
+											<Link color={textColor} textDecor="underline">
+												{getTariffLabel(subscriptionName)}
+											</Link>
+										</Text>
+										<Text fontSize="11px" mt="4px" color={mutedColor}>
+											{getTokenSourceHint(selectedTokenSource)}
+										</Text>
+									</Box>
+									<Button
+										size="sm"
+										px="1rem"
+										bg="gray.200"
+										color="gray.700"
+										fontSize="xs"
+										fontWeight="semibold"
+										borderRadius="8px"
+										rightIcon={<IoArrowForwardSharp />}
+										onClick={() => history.push('/admin/tariff')}
+										_hover={{ bg: 'gray.300' }}
+									>
+										ТАРИФЫ
+									</Button>
+								</Flex>
+
+								{canUseEmployeeAccount ? (
+									<Flex
+										mt="12px"
+										px="16px"
+										py="12px"
+										borderRadius="15px"
+										borderWidth="1px"
+										borderColor={tableBorder}
+										bg={toggleBg}
+										justify="space-between"
+										align="center"
+										gap="12px"
+									>
+										<Box>
+											<Text fontSize="sm" fontWeight="600" color={textColor}>
+												Списывать токены со счета сотрудника
+											</Text>
+											<Text fontSize="12px" color={mutedColor} mt="2px">
+												Если выключено, списание идет с личного счета
+											</Text>
+										</Box>
+										<Switch
+											colorScheme="green"
+											isChecked={selectedTokenSource === TOKEN_SOURCE.EMPLOYEE}
+											onChange={(event) =>
+												setSelectedTokenSource(
+													event.target.checked ? TOKEN_SOURCE.EMPLOYEE : TOKEN_SOURCE.PERSONAL
+												)
+											}
+										/>
+									</Flex>
+								) : null}
 							</Box>
+
+							<Box>
+								<Text fontSize="sm" color={textColor} mb="8px">
+									Переведенный макрос
+								</Text>
+								<Box position="relative">
+									<Button
+										size="xs"
+										px="10px"
+										onClick={handleCopyResult}
+										bg="gray.200"
+										color="gray.400"
+										borderRadius="8px"
+										leftIcon={copied ? <FiCheck /> : <FiCopy />}
+										fontSize="xs"
+										fontWeight="700"
+										position="absolute"
+										top="10px"
+										right="10px"
+										zIndex={2}
+										_hover={{ bg: 'gray.300' }}
+										isDisabled={!translated}
+									>
+										{copied ? 'Скопировано.' : 'Копировать'}
+									</Button>
+									<Textarea
+										value={translated}
+										placeholder="..."
+										minH={{ base: '250px', md: '320px' }}
+										bg={inputBg}
+										borderColor={tableBorder}
+										borderRadius="15px"
+										resize="none"
+										fontSize="sm"
+										pt="8px"
+										position="relative"
+										zIndex={1}
+										readOnly
+									/>
+								</Box>
+								<HStack spacing="12px" mt="8px" align="flex-start">
+									<Icon as={FiAlertCircle} color={mutedColor} stroke={1} boxSize="48px" mt="2px" />
+									<Text fontSize="12px" color={mutedColor}>
+										Внимание! Переведенный макрос может содержать неточности и ошибки. Рекомендуем
+										проверять результат перевода вручную перед его использованием в своих проектах.{` `}
+										<Link
+											textDecor="underline"
+											color={mutedColor}
+											onClick={(event) => {
+												event.preventDefault();
+												setIsDisclaimerOpen(true);
+											}}
+										>
+											Подробнее
+										</Link>
+									</Text>
+								</HStack>
+							</Box>
+						</Grid>
+
+						<Flex justify="center" mb="22px">
 							<Button
-								size="sm"
-								px="1rem"
-								bg="gray.200"
-								color="gray.700"
+								onClick={handleTranslate}
+								bg="recode.300"
+								color="white"
+								borderRadius="15px"
+								h="50px"
+								minW={{ base: '220px', md: '300px' }}
 								fontSize="xs"
-								fontWeight="semibold"
-								borderRadius="8px"
-								rightIcon={<IoArrowForwardSharp />}
-								onClick={() => history.push('/admin/tariff')}
-								_hover={{ bg: 'gray.300' }}
+								letterSpacing="0.2px"
+								_hover={{ bg: 'recode.400' }}
+								isLoading={isConverting}
+								loadingText="Переводим"
 							>
-								ТАРИФЫ
+								ПРЕОБРАЗОВАТЬ
 							</Button>
 						</Flex>
-					</Box>
 
-					<Box>
-						<Text fontSize="sm" color={textColor} mb="8px">
-							Переведенный макрос
-						</Text>
-						<Box position="relative">
-							<Button
-								size="xs"
-								px="10px"
-								onClick={handleCopyResult}
-								bg="gray.200"
-								color="gray.400"
-								borderRadius="8px"
-								leftIcon={copied ? <FiCheck /> : <FiCopy />}
-								fontSize="xs"
-								fontWeight="700"
-								position="absolute"
-								top="10px"
-								right="10px"
-								zIndex={2}
-								_hover={{ bg: 'gray.300' }}
-							>
-								{copied ? 'Скопировано.' : 'Копировать'}
-							</Button>
-							<Textarea
-								value={translated}
-								placeholder="..."
-								minH={{ base: '250px', md: '320px' }}
-								bg={inputBg}
-								borderColor={tableBorder}
-								borderRadius="15px"
-								resize="none"
-								fontSize="sm"
-								pt="8px"
-								position="relative"
-								zIndex={1}
-							/>
-						</Box>
-						<HStack spacing="12px" mt="8px" align="flex-start">
-							<Icon as={FiAlertCircle} color={mutedColor} stroke={1} boxSize="48px" mt="2px" />
-							<Text fontSize="12px" color={mutedColor}>
-								Внимание! Переведенный макрос может содержать неточности и ошибки. Рекомендуем
-								проверять результат перевода вручную перед его использованием в своих проектах.{' '}
-								<Link
-									textDecor="underline"
-									color={mutedColor}
-									onClick={(event) => {
-										event.preventDefault();
-										setIsDisclaimerOpen(true);
-									}}
-								>
-									Подробнее
-								</Link>
-							</Text>
-						</HStack>
-					</Box>
-				</Grid>
-
-				<Flex justify="center" mb="22px">
-					<Button
-						onClick={handleTranslate}
-						bg="recode.300"
-						color="white"
-						borderRadius="15px"
-						h="50px"
-						minW={{ base: '220px', md: '300px' }}
-						fontSize="xs"
-						letterSpacing="0.2px"
-						_hover={{ bg: 'recode.400' }}
-					>
-						ПРЕОБРАЗОВАТЬ
-					</Button>
-				</Flex>
-
-				<ConversionHistory
-					title="Последние конвертации"
-					amount={9}
-					captions={['ID', 'ДАТА', 'СТАТУС', 'РЕЗУЛЬТАТ ПЕРЕВОДА', 'ЗАТРАЧЕННЫЕ ТОКЕНЫ', 'ДАТА']}
-					data={CONVERSION_HISTORY_DATA}
-					enablePagination={false}
-					showFullHistoryButton={true}
-					fullHistoryPath="/admin/conversion-history"
-					fullHistoryButtonLabel="Показать полную историю"
-				/>
+						<ConversionHistory
+							title="Последние конвертации"
+							amount={historyItems.length}
+							captions={['ID', 'ТИП', 'СТАТУС', 'РЕЗУЛЬТАТ ПЕРЕВОДА', 'ЗАТРАЧЕННЫЕ ТОКЕНЫ', 'ДАТА']}
+							data={historyItems}
+							fixedHeight="520px"
+							enablePagination={false}
+							showFullHistoryButton={true}
+							fullHistoryPath="/admin/conversion-history"
+							fullHistoryButtonLabel="Показать полную историю"
+							emptyText="Конвертаций пока нет"
+						/>
+					</>
+				)}
 
 				<Box borderRadius="15px" overflow="hidden">
 					<Image
@@ -349,10 +558,10 @@ export default function MacroTranslatorPage() {
 					<ModalBody px="28px" py="22px" bg={modalSectionBg}>
 						<Text fontSize="14px" lineHeight="1.6" color={modalTextColor}>
 							Наш онлайн-сервис предоставляет возможность автоматизированного перевода кода между
-							языками программирования исключительно "как есть" без каких-либо гарантий точности,
-							полноты или пригодности результата для конкретных целей использования. Пользователь
-							несет полную ответственность за проверку и исправление полученного кода перед его
-							применением в своих проектах.
+							языками программирования исключительно &quot;как есть&quot; без каких-либо гарантий
+							точности, полноты или пригодности результата для конкретных целей использования.
+							Пользователь несет полную ответственность за проверку и исправление полученного кода
+							перед его применением в своих проектах.
 						</Text>
 						<Text fontSize="14px" lineHeight="1.6" color={modalTextColor} mt="12px">
 							Мы не несем ответственности за любые возможные убытки, ущерб или другие последствия,

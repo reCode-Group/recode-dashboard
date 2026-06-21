@@ -29,6 +29,7 @@ const initialForm = {
 	inn: '',
 	kpp: '',
 	ogrn: '',
+	okpo: '',
 	legalAddress: '',
 	contactFio: '',
 	contactPosition: '',
@@ -56,6 +57,7 @@ function getErrorMessage(error) {
 
 function CompanyRegistration() {
 	const history = useHistory();
+	const [currentUser, setCurrentUser] = useState(null);
 	const [sameAsOwner, setSameAsOwner] = useState(false);
 	const [form, setForm] = useState(initialForm);
 	const [searchQuery, setSearchQuery] = useState('');
@@ -95,6 +97,9 @@ function CompanyRegistration() {
 		async function checkOrganization() {
 			try {
 				const user = await getCurrentUser();
+				if (isMounted) {
+					setCurrentUser(user);
+				}
 				if (user.has_organization) {
 					history.replace('/admin/company');
 					return;
@@ -164,6 +169,9 @@ function CompanyRegistration() {
 		if (form.ogrn.trim() && normalizeDigits(form.ogrn).length !== 13) {
 			nextErrors.ogrn = 'ОГРН должен содержать 13 цифр';
 		}
+		if (form.okpo.trim() && normalizeDigits(form.okpo).length !== 10) {
+			nextErrors.okpo = 'ОКПО должен содержать 10 цифр';
+		}
 		return nextErrors;
 	}, [form]);
 
@@ -171,7 +179,9 @@ function CompanyRegistration() {
 
 	const handleFieldChange = (field) => (event) => {
 		const rawValue = event.target.value;
-		const value = ['inn', 'kpp', 'ogrn'].includes(field) ? normalizeDigits(rawValue) : rawValue;
+		const value = ['inn', 'kpp', 'ogrn', 'okpo'].includes(field)
+			? normalizeDigits(rawValue)
+			: rawValue;
 		setForm((prev) => ({ ...prev, [field]: value }));
 	};
 
@@ -184,6 +194,7 @@ function CompanyRegistration() {
 			inn: mapped.inn,
 			kpp: mapped.kpp,
 			ogrn: mapped.ogrn,
+			okpo: mapped.okpo || prev.okpo,
 			legalAddress: mapped.legalAddress,
 			contactFio: prev.contactFio || mapped.managementName,
 			contactPosition: prev.contactPosition || mapped.managementPost,
@@ -207,6 +218,13 @@ function CompanyRegistration() {
 				inn: form.inn.trim() || null,
 				ogrn: form.ogrn.trim() || null,
 				kpp: form.kpp.trim(),
+				okpo: form.okpo.trim() || null,
+				post_address: form.legalAddress.trim() || null,
+				address: form.legalAddress.trim() || null,
+				short_name: form.shortName.trim() || null,
+				email: sameAsOwner
+					? currentUser?.email || form.contactEmail.trim() || null
+					: form.contactEmail.trim() || null,
 			});
 			history.replace('/admin/company');
 		} catch (error) {
@@ -377,6 +395,20 @@ function CompanyRegistration() {
 								/>
 								<FormErrorMessage>{errors.ogrn}</FormErrorMessage>
 							</FormControl>
+
+							<FormControl isInvalid={submitAttempted && Boolean(errors.okpo)}>
+								<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
+									ОКПО
+								</FormLabel>
+								<Input
+									placeholder="1234567890"
+									value={form.okpo}
+									onChange={handleFieldChange('okpo')}
+									maxLength={10}
+									{...inputStyles}
+								/>
+								<FormErrorMessage>{errors.okpo}</FormErrorMessage>
+							</FormControl>
 						</Grid>
 					</Box>
 
@@ -395,7 +427,7 @@ function CompanyRegistration() {
 								{...inputStyles}
 							/>
 							<Text mt="8px" fontSize="12px" color={mutedTextColor}>
-								Адрес пока не сохраняется в backend и используется только для проверки перед отправкой.
+								Адрес будет передан в backend как юридический и почтовый.
 							</Text>
 						</FormControl>
 					</Box>
@@ -472,7 +504,7 @@ function CompanyRegistration() {
 							</FormControl>
 						</Grid>
 						<Text mt="12px" fontSize="12px" color={mutedTextColor}>
-							Контактные данные пока не сохраняются в backend.
+							В backend будет отправлена только корпоративная почта. ФИО, должность и телефон остаются локальными полями формы.
 						</Text>
 					</Box>
 

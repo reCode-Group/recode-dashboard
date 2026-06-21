@@ -102,6 +102,7 @@ const CompanyInformation = ({
 
 					<Flex direction="column" gap="14px">
 						<InfoRow label="Юридический адрес" value={legalAddress} />
+						<InfoRow label="Email компании" value={email} />
 						<InfoRow label="ФИО ответственного" value={responsibleFullName} />
 						<InfoRow label="Телефон" value={phone} />
 					</Flex>

@@ -37,6 +37,14 @@ const conversionDateFormat = {
 	minute: '2-digit',
 };
 
+function getCompanyName(organization) {
+	return organization?.short_name || organization?.full_name || emptyValue;
+}
+
+function getCompanyAddress(organization) {
+	return organization?.address || organization?.post_address || emptyValue;
+}
+
 function Company() {
 	const history = useHistory();
 	const location = useLocation();
@@ -148,11 +156,11 @@ function Company() {
 				<GridItem>
 					<CompanyInformation
 						title="Информация"
-						company={organization?.full_name}
-						email={emptyValue}
+						company={getCompanyName(organization)}
+						email={organization?.email || emptyValue}
 						fullName={organization?.full_name}
 						responsibleFullName={emptyValue}
-						legalAddress={emptyValue}
+						legalAddress={getCompanyAddress(organization)}
 						inn={organization?.inn || emptyValue}
 						kpp={organization?.kpp || emptyValue}
 						ogrn={organization?.ogrn || emptyValue}
@@ -239,6 +247,7 @@ function Company() {
 							data={conversions}
 							enablePagination={true}
 							showFullHistoryButton={true}
+							fullHistoryPath="/admin/conversion-history?scope=organization"
 							emptyText="Конвертаций пока нет"
 						/>
 					</Grid>

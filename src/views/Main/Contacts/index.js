@@ -19,14 +19,14 @@ import { useLocation } from 'react-router-dom';
 const COMPANY_CONTACTS = {
 	name: 'ООО «Рекод Решения»',
 	phone: '+7 (800) 555-35-35',
-	email: 'hello@recode-group.ru',
+	email: 'info@recode-group.ru',
 	address: 'г. Екатеринбург, ул. Примерная, д. 10, офис 301',
 	workHours: 'Пн-Пт: 09:00 - 18:00 (МСК)',
 };
 
 const SUPPORT_CONTACTS = {
 	phone: '+7 (800) 777-10-10',
-	email: 'support@recode-group.ru',
+	email: 'help@recode-group.ru',
 	workHours: 'Ежедневно: 08:00 - 22:00 (МСК)',
 	sla: 'Среднее время ответа в рабочие часы - до 15 минут.',
 };

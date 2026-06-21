@@ -319,7 +319,7 @@
       "response": []
     },
     {
-      "name": "Get subscription",
+      "name": "user/subscription",
       "request": {
         "method": "GET",
         "header": [],
@@ -868,6 +868,37 @@
             "organization",
             "documents",
             "check-payment"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "subscription/payment/init",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"token_package_id\":1,\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/subscription/payment/init",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "subscription",
+            "payment",
+            "init"
           ]
         }
       },

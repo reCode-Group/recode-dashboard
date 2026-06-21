@@ -47,6 +47,7 @@ export function mapPartySuggestion(suggestion) {
 		inn: data.inn || '',
 		kpp: data.kpp || '',
 		ogrn: data.ogrn || '',
+		okpo: data.okpo || '',
 		legalAddress: address.unrestricted_value || address.value || '',
 		managementName: data.management?.name || '',
 		managementPost: data.management?.post || '',
