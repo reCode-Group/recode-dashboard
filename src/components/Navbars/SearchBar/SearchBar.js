@@ -46,8 +46,12 @@ export function SearchBar(props) {
       <Input
         fontSize="xs"
         py="11px"
+        color="black"
+        caretColor="black"
         placeholder="Type here..."
         borderRadius="inherit"
+        _placeholder={{ color: "gray.500" }}
+        _focus={{ color: "black", caretColor: "black" }}
       />
     </InputGroup>
   );

@@ -104,42 +104,56 @@ export default function AdminNavbar(props) {
 				alignItems={{ sm: 'start', md: 'center' }}
 				ps={{ base: '0px', md: leftInsetPadding }}
 			>
-				<Box mb={{ sm: '8px', md: '0px' }} fontSize="xs">
-					<Breadcrumb>
-						<BreadcrumbItem color={mainText}>
-							<BreadcrumbLink href="#" color={secondaryText}>
-								Личный кабинет
-							</BreadcrumbLink>
-						</BreadcrumbItem>
+				<Box mb={{ sm: '8px', md: '0px' }} fontSize="xs" w={{ base: '100%', md: 'auto' }}>
+					<Flex align={{ base: 'center', md: 'stretch' }} justify="space-between" gap="12px">
+						<Box minW="0">
+							<Breadcrumb>
+								<BreadcrumbItem color={mainText}>
+									<BreadcrumbLink href="#" color={secondaryText}>
+										Личный кабинет
+									</BreadcrumbLink>
+								</BreadcrumbItem>
 
-						<BreadcrumbItem color={mainText}>
-							<BreadcrumbLink href="#" color={mainText}>
+								<BreadcrumbItem color={mainText}>
+									<BreadcrumbLink href="#" color={mainText}>
+										{brandText}
+									</BreadcrumbLink>
+								</BreadcrumbItem>
+							</Breadcrumb>
+							{/* Here we create navbar brand, based on route name */}
+							<Link
+								color={mainText}
+								href="#"
+								bg="inherit"
+								borderRadius="inherit"
+								fontWeight="bold"
+								fontSize={24}
+								_hover={{ color: { mainText } }}
+								_active={{
+									bg: 'inherit',
+									transform: 'none',
+									borderColor: 'transparent',
+								}}
+								_focus={{
+									boxShadow: 'none',
+								}}
+							>
 								{brandText}
-							</BreadcrumbLink>
-						</BreadcrumbItem>
-					</Breadcrumb>
-					{/* Here we create navbar brand, based on route name */}
-					<Link
-						color={mainText}
-						href="#"
-						bg="inherit"
-						borderRadius="inherit"
-						fontWeight="bold"
-						fontSize={24}
-						_hover={{ color: { mainText } }}
-						_active={{
-							bg: 'inherit',
-							transform: 'none',
-							borderColor: 'transparent',
-						}}
-						_focus={{
-							boxShadow: 'none',
-						}}
-					>
-						{brandText}
-					</Link>
+							</Link>
+						</Box>
+						<Box display={{ base: 'flex', md: 'none' }} flexShrink={0} alignItems="center">
+							<AdminNavbarLinks
+								onOpen={props.onOpen}
+								logoText={props.logoText}
+								secondary={props.secondary}
+								fixed={props.fixed}
+								viewerContext={props.viewerContext}
+								showOnlyMobileMenu={true}
+							/>
+						</Box>
+					</Flex>
 				</Box>
-				<Box ms="auto" w={{ sm: '100%', md: 'unset' }}>
+				<Box ms="auto" w={{ sm: '100%', md: 'unset' }} display={{ base: 'none', md: 'block' }}>
 					<AdminNavbarLinks
 						onOpen={props.onOpen}
 						logoText={props.logoText}

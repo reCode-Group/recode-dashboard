@@ -13,57 +13,7 @@ import recodeLogoColored from 'assets/svg/recode-logo-colored.svg';
 import { useEffect, useMemo, useState } from 'react';
 import { FiChevronRight, FiFileText, FiSearch } from 'react-icons/fi';
 import { useHistory } from 'react-router-dom';
-
-const sections = [
-	{
-		id: 'services',
-		title: 'Все сервисы Ре-Код.рф',
-		items: [
-			{
-				title: 'Конвертер макросов',
-				description: 'Переводчик устаревших макросов и скриптов на новые языки программирования',
-				href: '/docs/Описание_продукта.pdf',
-			},
-		],
-	},
-	{
-		id: 'engineer',
-		title: 'Анализ и проектирование',
-		items: [
-			{
-				title: 'Анализ сферы макросов',
-				description: 'Системный анализ предметной области скриптовых языков и макросов',
-				href: '/docs/Анализ_предметной_области.pdf',
-			},
-			{
-				title: 'Анализ проекта и риски',
-				description: 'Анализ перспектив проекта и возможные риски',
-				href: '/docs/Анализ_проекта_и_риски.pdf',
-			},
-		],
-	},
-	{
-		id: 'program',
-		title: 'Программное обеспечение',
-		items: [
-			{
-				title: 'Описание продукта',
-				description: 'Переводчик устаревших макросов и скриптов на новые языки программирования',
-				href: '/docs/Описание_продукта.pdf',
-			},
-			{
-				title: 'Демонстрация работы',
-				description: 'Примеры взаимодействия с продуктом',
-				href: '/docs/Демонстрация_работы.pdf',
-			},
-			{
-				title: 'Модули продукта',
-				description: 'Функциональное описание работы переводчика',
-				href: '/docs/Модули_продукта.pdf',
-			},
-		],
-	},
-];
+import { DOCUMENTATION_SECTIONS } from './data';
 
 function DocumentIcon() {
 	return <Icon as={FiFileText} boxSize={{ base: 8, md: 10 }} color="blue.500" />;
@@ -75,7 +25,7 @@ function SearchIcon() {
 
 export default function DocumentationPage() {
 	const history = useHistory();
-	const [activeSectionId, setActiveSectionId] = useState(sections[0].id);
+	const [activeSectionId, setActiveSectionId] = useState(DOCUMENTATION_SECTIONS[0].id);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
 	const panelBg = useColorModeValue('gray.100', 'gray.700');
@@ -91,7 +41,7 @@ export default function DocumentationPage() {
 
 	const searchableItems = useMemo(
 		() =>
-			sections.flatMap((section) =>
+			DOCUMENTATION_SECTIONS.flatMap((section) =>
 				section.items.map((item) => ({
 					...item,
 					sectionId: section.id,
@@ -130,7 +80,7 @@ export default function DocumentationPage() {
 			}
 		);
 
-		sections.forEach((section) => {
+		DOCUMENTATION_SECTIONS.forEach((section) => {
 			const sectionElement = document.getElementById(section.id);
 			if (sectionElement) observer.observe(sectionElement);
 		});
@@ -181,7 +131,7 @@ export default function DocumentationPage() {
 						<Text color={mutedColor}>/ Документация</Text>
 					</Flex>
 					<Box as="ul" listStyleType="none" m="0" p="0">
-						{sections.map((section) => (
+						{DOCUMENTATION_SECTIONS.map((section) => (
 							<Box as="li" key={section.id}>
 								<Button
 									variant="unstyled"
@@ -337,7 +287,7 @@ export default function DocumentationPage() {
 				</Flex>
 
 				<Box mx="4vw" mb="280px">
-					{sections.map((section) => (
+					{DOCUMENTATION_SECTIONS.map((section) => (
 						<Box as="section" id={section.id} key={section.id} my={{ base: '10vw', md: '4vw' }}>
 							<Heading
 								fontWeight="semibold"
