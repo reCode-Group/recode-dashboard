@@ -29,7 +29,7 @@ const SupportTicketList = ({ title }) => {
 								<Text fontSize="sm" color={textColor} fontWeight="bold">
 									Помощник Андрей{' '}
 								</Text>
-								<Text fontSize="sm" color="gray.500" fontWeight="400">
+								<Text noOfLines={1} fontSize="sm" color="gray.500" fontWeight="400">
 									Добрый день! Сейчас подскажу...
 								</Text>
 							</Flex>
@@ -47,7 +47,7 @@ const SupportTicketList = ({ title }) => {
 								<Text fontSize="sm" color={textColor} fontWeight="bold">
 									Помощник Елена{' '}
 								</Text>
-								<Text fontSize="sm" color="gray.500" fontWeight="400">
+								<Text noOfLines={1} fontSize="sm" color="gray.500" fontWeight="400">
 									Отлично тогда могу закрыть тикет...
 								</Text>
 							</Flex>
@@ -65,7 +65,7 @@ const SupportTicketList = ({ title }) => {
 								<Text fontSize="sm" color={textColor} fontWeight="bold">
 									Помощник Максим{' '}
 								</Text>
-								<Text fontSize="sm" color="gray.500" fontWeight="400">
+								<Text noOfLines={1} fontSize="sm" color="gray.500" fontWeight="400">
 									Этот тикет закрыт.
 								</Text>
 							</Flex>
@@ -84,7 +84,7 @@ const SupportTicketList = ({ title }) => {
 								<Text fontSize="sm" color={textColor} fontWeight="bold">
 									Помощник Максим{' '}
 								</Text>
-								<Text fontSize="sm" color="gray.500" fontWeight="400">
+								<Text noOfLines={1} fontSize="sm" color="gray.500" fontWeight="400">
 									Этот тикет закрыт.
 								</Text>
 							</Flex>

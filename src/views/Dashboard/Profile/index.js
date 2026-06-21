@@ -1,19 +1,18 @@
 // Chakra imports
 import { Alert, AlertIcon, Button, Flex, Grid, Spinner, useColorModeValue, useToast } from '@chakra-ui/react';
-import avatar4 from 'assets/img/avatars/avatar4.png';
 import ProfileBgImage from 'assets/img/ProfileBackground.png';
 import ConversionHistory from 'components/Tables/ConversionHistory';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaCube } from 'react-icons/fa';
 import { IoDocumentsSharp } from 'react-icons/io5';
 import { useHistory, useLocation } from 'react-router-dom';
+import { getCurrentUser } from 'services/auth';
+import { getUserConversions } from 'services/conversions';
+import { getOrganizationDetails } from 'services/organization';
+import { mapConversion } from 'utils/conversions';
 import { invoicesData } from 'variables/general';
 import DocumentsFull from 'views/Dashboard/Billing/components/DocumentsFull';
 import SupportTicketList from 'views/Dashboard/Support/components/SupportTicketList';
-import { getUserConversions } from 'services/conversions';
-import { getOrganizationDetails } from 'services/organization';
-import { getCurrentUser } from 'services/auth';
-import { mapConversion } from 'utils/conversions';
 import Header from './components/Header';
 import PlatformSettings from './components/PlatformSettings';
 import ProfileInformation from './components/ProfileInformation';
@@ -27,6 +26,20 @@ function getFullName(user) {
 
 function getDisplayName(user) {
 	return getFullName(user) !== emptyValue ? getFullName(user) : user?.email || 'Профиль';
+}
+
+function getHeaderDisplayName(user) {
+	const surname = user?.surname?.trim();
+	const nameInitial = user?.name?.trim()?.[0];
+	const middleInitial = user?.lastname?.trim()?.[0];
+
+	if (!surname) {
+		return getDisplayName(user);
+	}
+
+	const initials = [nameInitial, middleInitial].filter(Boolean).map((letter) => `${letter}.`).join(' ');
+
+	return initials ? `${surname} ${initials}` : surname;
 }
 
 function getRoleLabel(role) {
@@ -142,18 +155,19 @@ function Profile() {
 		);
 	}
 
-	const displayName = getDisplayName(user);
+	const displayName = getHeaderDisplayName(user);
 	const fullName = getFullName(user);
 	const companyName = organization?.full_name || emptyValue;
 	const roleName = getRoleLabel(user?.organization_role);
 	const mobile = emptyValue;
+	const avatarImage = user?.avatar_url || user?.avatar || user?.photo_url || user?.photo || null;
 
 	return (
 		<Flex direction="column">
 			<Header
 				backgroundHeader={ProfileBgImage}
 				backgroundProfile={bgProfile}
-				avatarImage={avatar4}
+				avatarImage={avatarImage}
 				name={displayName}
 				email={user?.email || emptyValue}
 				tabs={tabs}
@@ -162,12 +176,12 @@ function Profile() {
 			/>
 
 			{activeTab === 'documents' ? (
-				<DocumentsFull title={'Отчеты'} data={invoicesData} />
+				<DocumentsFull title="Отчеты" data={invoicesData} />
 			) : (
 				<>
 					<Grid templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }} gap="22px">
 						<ProfileInformation
-							title={'Данные'}
+							title="Данные"
 							company={companyName}
 							role={roleName}
 							name={fullName}
@@ -175,11 +189,11 @@ function Profile() {
 							email={user?.email || emptyValue}
 						/>
 						<PlatformSettings
-							title={'Настройки платформы'}
-							subtitle1={'АККАУНТ'}
-							subtitle2={'ПЕРСОНАЛИЗАЦИЯ'}
+							title="Настройки платформы"
+							subtitle1="АККАУНТ"
+							subtitle2="ПЕРСОНАЛИЗАЦИЯ"
 						/>
-						<SupportTicketList title={'Открытые тикеты'} />
+						<SupportTicketList title="Открытые тикеты" />
 					</Grid>
 					<Grid
 						templateColumns={{ sm: '1fr' }}
@@ -188,7 +202,7 @@ function Profile() {
 						mt="24px"
 					>
 						<ConversionHistory
-							title={'Последние конвертации'}
+							title="Последние конвертации"
 							amount={conversions.length}
 							captions={['ID', 'Тип', 'Статус', 'Результат перевода', 'Затраченные токены', 'Дата']}
 							data={conversions}

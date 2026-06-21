@@ -23,6 +23,47 @@ import { FiUploadCloud, FiX } from 'react-icons/fi';
 const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
 const ALLOWED_AVATAR_TYPES = ['image/png', 'image/jpeg'];
 
+function getInitials(name) {
+	if (!name) {
+		return 'ПР';
+	}
+
+	const parts = name
+		.trim()
+		.split(/\s+/)
+		.filter(Boolean);
+
+	if (parts.length === 0) {
+		return 'ПР';
+	}
+
+	if (parts.length === 1) {
+		return parts[0].slice(0, 2).toUpperCase();
+	}
+
+	return `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase();
+}
+
+function AvatarFallback({ initials, size, radius, fontSize }) {
+	return (
+		<Flex
+			align='center'
+			justify='center'
+			bg='gray.800'
+			color='white'
+			w={size}
+			h={size}
+			borderRadius={radius}
+			fontWeight='800'
+			fontSize={fontSize}
+			letterSpacing='0.04em'
+			userSelect='none'
+		>
+			{initials}
+		</Flex>
+	);
+}
+
 const Header = ({
 	backgroundHeader,
 	backgroundProfile,
@@ -56,7 +97,7 @@ const Header = ({
 		return () => URL.revokeObjectURL(url);
 	}, [avatarFile]);
 
-	const avatarFallback = useMemo(() => name?.slice(0, 2) || 'PR', [name]);
+	const avatarFallback = useMemo(() => getInitials(name), [name]);
 	const avatarSrc = avatarPreviewUrl || avatarImage;
 
 	const handlePickAvatar = (event) => {
@@ -132,15 +173,18 @@ const Header = ({
 							textAlign={{ sm: 'center', md: 'start' }}
 						>
 							<Box position="relative" me={{ md: '22px' }}>
-								<Avatar
-									src={avatarSrc}
-									name={avatarFallback}
-									w="80px"
-									h="80px"
-									borderRadius="15px"
-									overflow="hidden"
-									imgProps={{ objectFit: 'cover' }}
-								/>
+								{avatarSrc ? (
+									<Avatar
+										src={avatarSrc}
+										w="80px"
+										h="80px"
+										borderRadius="15px"
+										overflow="hidden"
+										imgProps={{ objectFit: 'cover' }}
+									/>
+								) : (
+									<AvatarFallback initials={avatarFallback} size="80px" radius="15px" fontSize="2xl" />
+								)}
 								<Box
 									position="absolute"
 									right="-6px"
@@ -279,7 +323,11 @@ const Header = ({
 									alignItems='center'
 									gap='12px'
 								>
-									<Avatar src={avatarPreviewUrl} name={avatarFallback} w='56px' h='56px' borderRadius='12px' />
+									{avatarPreviewUrl ? (
+										<Avatar src={avatarPreviewUrl} w='56px' h='56px' borderRadius='12px' />
+									) : (
+										<AvatarFallback initials={avatarFallback} size='56px' radius='12px' fontSize='lg' />
+									)}
 									<Box>
 										<Text fontSize='12px' color='gray.500' fontWeight='600'>
 											Предпросмотр
