@@ -40,6 +40,7 @@ const MiniStatistics = ({
               fontSize='sm'
               color='gray.400'
               fontWeight='bold'
+              noOfLines={1}
               pb='.1rem'>
               {title}
             </StatLabel>
