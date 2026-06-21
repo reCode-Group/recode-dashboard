@@ -14,7 +14,7 @@ import AdminNavbarLinks from './AdminNavbarLinks';
 
 export default function AdminNavbar(props) {
 	const [scrolled, setScrolled] = useState(false);
-	const { variant, children, fixed, secondary, brandText, onOpen, ...rest } = props;
+	const { variant, children, fixed, secondary, brandText, onOpen, hasLeftInset, ...rest } = props;
 
 	// Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
 	let mainText = useColorModeValue('gray.700', 'gray.200');
@@ -27,6 +27,7 @@ export default function AdminNavbar(props) {
 	let navbarBorder = 'transparent';
 	let secondaryMargin = '0px';
 	let paddingX = '15px';
+	let leftInsetPadding = '0px';
 	const scrolledNavbarShadow = useColorModeValue('0px 7px 23px rgba(0, 0, 0, 0.05)', 'none');
 	const scrolledNavbarBg = useColorModeValue(
 		'linear-gradient(112.83deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.8) 110.84%)',
@@ -52,6 +53,9 @@ export default function AdminNavbar(props) {
 		secondaryText = 'white';
 		secondaryMargin = '22px';
 		paddingX = '30px';
+	}
+	if (hasLeftInset) {
+		leftInsetPadding = '24px';
 	}
 	const changeNavbar = () => {
 		if (window.scrollY > 1) {
@@ -98,6 +102,7 @@ export default function AdminNavbar(props) {
 					md: 'row',
 				}}
 				alignItems={{ sm: 'start', md: 'center' }}
+				ps={{ base: '0px', md: leftInsetPadding }}
 			>
 				<Box mb={{ sm: '8px', md: '0px' }} fontSize="xs">
 					<Breadcrumb>
@@ -152,5 +157,6 @@ AdminNavbar.propTypes = {
 	variant: PropTypes.string,
 	secondary: PropTypes.bool,
 	fixed: PropTypes.bool,
+	hasLeftInset: PropTypes.bool,
 	onOpen: PropTypes.func,
 };

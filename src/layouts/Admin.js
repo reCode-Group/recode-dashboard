@@ -95,6 +95,10 @@ export default function Dashboard(props) {
 		}
 		return activeNavbar;
 	};
+	const hasNavbarLeftInset = () => {
+		const currentPath = getCurrentPath();
+		return currentPath === '/admin/profile' || currentPath === '/admin/company';
+	};
 	const getRoutes = (routes) => {
 		return routes.map((prop, key) => {
 			if (prop.collapse) {
@@ -180,6 +184,7 @@ export default function Dashboard(props) {
 						logoText={'RECODE DASHBOARD'}
 						brandText={getActiveRoute(routes)}
 						secondary={getActiveNavbar(routes)}
+						hasLeftInset={hasNavbarLeftInset()}
 						fixed={fixed}
 						{...rest}
 					/>
