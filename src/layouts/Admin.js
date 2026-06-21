@@ -9,10 +9,11 @@ import '@fontsource/roboto/700.css';
 import AdminNavbar from 'components/Navbars/AdminNavbar.js';
 import Sidebar from 'components/Sidebar';
 import { useEffect, useState } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
 import routes from 'routes.js';
 import { getCurrentUser } from 'services/auth';
 import { clearAuthState, clearPendingProfileEmail, getPendingProfileEmail, hasAuthState } from 'services/session';
+import { getAdminRouteRedirect } from 'utils/adminAccess';
 // Custom Chakra theme
 import theme from 'theme/theme.js';
 import FixedPlugin from '../components/FixedPlugin/FixedPlugin';
@@ -22,10 +23,12 @@ import PanelContainer from '../components/Layout/PanelContainer';
 import PanelContent from '../components/Layout/PanelContent';
 export default function Dashboard(props) {
 	const { ...rest } = props;
+	const location = useLocation();
 	// states and functions
 	const [sidebarVariant, setSidebarVariant] = useState('transparent');
 	const [fixed, setFixed] = useState(false);
 	const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+	const [viewerContext, setViewerContext] = useState(null);
 	// functions for changing the states from components
 	const getRoute = () => {
 		return window.location.pathname !== '/admin/full-screen-maps';
@@ -135,7 +138,17 @@ export default function Dashboard(props) {
 			}
 
 			try {
-				await getCurrentUser();
+				const currentUser = await getCurrentUser();
+				const normalizedPath = getCurrentPath();
+				const redirectPath = getAdminRouteRedirect(normalizedPath, currentUser);
+
+				setViewerContext(currentUser);
+
+				if (redirectPath && redirectPath !== normalizedPath) {
+					props.history.replace(redirectPath);
+					return;
+				}
+
 				clearPendingProfileEmail();
 				if (isMounted) {
 					setIsCheckingAuth(false);
@@ -151,7 +164,7 @@ export default function Dashboard(props) {
 		return () => {
 			isMounted = false;
 		};
-	}, [props.history]);
+	}, [location.hash, location.pathname, props.history]);
 	// Chakra Color Mode
 	if (isCheckingAuth) {
 		return (
@@ -167,6 +180,7 @@ export default function Dashboard(props) {
 		<ChakraProvider theme={theme} resetCss={false}>
 			<Sidebar
 				routes={routes}
+				viewerContext={viewerContext}
 				logoText={'RECODE DASHBOARD'}
 				display="none"
 				sidebarVariant={sidebarVariant}
@@ -186,6 +200,7 @@ export default function Dashboard(props) {
 						secondary={getActiveNavbar(routes)}
 						hasLeftInset={hasNavbarLeftInset()}
 						fixed={fixed}
+						viewerContext={viewerContext}
 						{...rest}
 					/>
 				</Portal>

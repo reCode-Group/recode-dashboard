@@ -1,12 +1,12 @@
 // Chakra imports
-import { Alert, AlertIcon, Button, Flex, Grid, Spinner, useColorModeValue } from '@chakra-ui/react';
+import { Alert, AlertIcon, Button, Flex, Grid, Spinner, useColorModeValue, useToast } from '@chakra-ui/react';
 import avatar4 from 'assets/img/avatars/avatar4.png';
 import ProfileBgImage from 'assets/img/ProfileBackground.png';
 import ConversionHistory from 'components/Tables/ConversionHistory';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaCube } from 'react-icons/fa';
 import { IoDocumentsSharp } from 'react-icons/io5';
-import { useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { invoicesData } from 'variables/general';
 import DocumentsFull from 'views/Dashboard/Billing/components/DocumentsFull';
 import SupportTicketList from 'views/Dashboard/Support/components/SupportTicketList';
@@ -36,13 +36,19 @@ function getRoleLabel(role) {
 }
 
 function Profile() {
+	const history = useHistory();
 	const location = useLocation();
+	const toast = useToast();
 	const bgProfile = useColorModeValue(
 		'hsla(0,0%,100%,.8)',
 		'linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)'
 	);
 	const loadingColor = useColorModeValue('recode.300', 'recode.200');
 	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [location.search]);
+	const hasCompletedRegistration = useMemo(
+		() => new URLSearchParams(location.search).get('completed') === '1',
+		[location.search]
+	);
 	const [activeTab, setActiveTab] = useState(queryTab === 'documents' ? 'documents' : 'overview');
 	const [user, setUser] = useState(null);
 	const [organization, setOrganization] = useState(null);
@@ -55,6 +61,23 @@ function Profile() {
 			setActiveTab(queryTab);
 		}
 	}, [queryTab]);
+
+	useEffect(() => {
+		if (!hasCompletedRegistration) {
+			return;
+		}
+
+		toast({
+			title: 'Регистрация завершена',
+			description: 'Профиль успешно заполнен.',
+			status: 'success',
+			duration: 4000,
+			isClosable: true,
+			position: 'top-right',
+		});
+
+		history.replace('/admin/profile');
+	}, [hasCompletedRegistration, history, toast]);
 
 	const loadProfile = useCallback(async () => {
 		setIsLoading(true);

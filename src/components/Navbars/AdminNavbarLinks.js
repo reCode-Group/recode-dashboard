@@ -122,6 +122,7 @@ export default function HeaderLinks(props) {
         logoText={props.logoText}
         secondary={props.secondary}
         routes={routes}
+        viewerContext={props.viewerContext}
         // logo={logo}
         {...rest}
       />

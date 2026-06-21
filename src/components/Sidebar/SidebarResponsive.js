@@ -21,6 +21,7 @@ import { Separator } from "components/Separator/Separator";
 import { SidebarHelp } from "components/Sidebar/SidebarHelp";
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { getSidebarRouteTarget, isSidebarRouteActive, shouldHideSidebarRoute } from "utils/adminAccess";
 
 function SidebarResponsive(props) {
     // to check for active links and opened collapses
@@ -29,10 +30,6 @@ function SidebarResponsive(props) {
     const [state, setState] = React.useState({});
     const mainPanel = React.useRef();
     // verifies if routeName is the one active (in browser input)
-    const activeRoute = (routeName) => {
-      return location.pathname === routeName ? "active" : "";
-    };
-  
     const createLinks = (routes) => {
       // Chakra Color Mode
       const activeBg = useColorModeValue("white", "gray.700");
@@ -41,7 +38,7 @@ function SidebarResponsive(props) {
       const inactiveColor = useColorModeValue("gray.400", "gray.400");
   
       return routes.map((prop, key) => {
-        if (prop.redirect || prop.hiddenInSidebar) {
+        if (prop.redirect || prop.hiddenInSidebar || shouldHideSidebarRoute(prop, props.viewerContext)) {
           return null;
         }
         if (prop.category) {
@@ -68,9 +65,12 @@ function SidebarResponsive(props) {
             </div>
           );
         }
+        const routePath = prop.layout + prop.path;
+        const targetPath = getSidebarRouteTarget(prop, props.viewerContext);
+        const isActive = isSidebarRouteActive(prop, location.pathname);
         return (
-          <NavLink to={prop.layout + prop.path} key={prop.name}>
-            {activeRoute(prop.layout + prop.path) === "active" ? (
+          <NavLink to={targetPath} key={`${prop.name}-${targetPath}`}>
+            {isActive ? (
               <Button
                 boxSize="initial"
                 justifyContent="flex-start"

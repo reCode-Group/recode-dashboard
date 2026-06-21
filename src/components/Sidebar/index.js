@@ -13,7 +13,7 @@ function Sidebar(props) {
   const mainPanel = React.useRef();
   let variantChange = "0.2s linear";
 
-  const { logoText, routes, sidebarVariant } = props;
+  const { logoText, routes, sidebarVariant, viewerContext } = props;
 
   //  BRAND
   //  Chakra Color Mode
@@ -47,10 +47,12 @@ function Sidebar(props) {
           m={sidebarMargins}
           borderRadius={sidebarRadius}
         >
-          <SidebarContent routes={routes}
-        display="none"
-        sidebarVariant={sidebarVariant}
-        />
+          <SidebarContent
+            routes={routes}
+            viewerContext={viewerContext}
+            display="none"
+            sidebarVariant={sidebarVariant}
+          />
         </Box>
       </Box>
     </Box>

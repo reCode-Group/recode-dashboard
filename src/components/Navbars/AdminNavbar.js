@@ -145,6 +145,7 @@ export default function AdminNavbar(props) {
 						logoText={props.logoText}
 						secondary={props.secondary}
 						fixed={props.fixed}
+						viewerContext={props.viewerContext}
 					/>
 				</Box>
 			</Flex>

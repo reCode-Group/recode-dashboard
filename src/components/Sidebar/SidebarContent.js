@@ -15,10 +15,11 @@ import { Separator } from "components/Separator/Separator";
 import { SidebarHelp } from "components/Sidebar/SidebarHelp";
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { getSidebarRouteTarget, isSidebarRouteActive, shouldHideSidebarRoute } from "utils/adminAccess";
 // this function creates the links and collapses that appear in the sidebar (left menu)
 
 
-const SidebarContent = ({ logoText, routes }) => {
+const SidebarContent = ({ logoText, routes, viewerContext }) => {
   const logoColor = useColorModeValue("black", "white");
   // to check for active links and opened collapses
   let location = useLocation();
@@ -26,9 +27,6 @@ const SidebarContent = ({ logoText, routes }) => {
   const [state, setState] = React.useState({});
 
   // verifies if routeName is the one active (in browser input)
-  const activeRoute = (routeName) => {
-    return location.pathname === routeName ? "active" : "";
-  };
   const createLinks = (routes) => {
     // Chakra Color Mode
     const activeBg = useColorModeValue("white", "gray.700");
@@ -37,7 +35,7 @@ const SidebarContent = ({ logoText, routes }) => {
     const inactiveColor = useColorModeValue("gray.400", "gray.400");
 
     return routes.map((prop, key) => {
-      if (prop.redirect || prop.hiddenInSidebar) {
+      if (prop.redirect || prop.hiddenInSidebar || shouldHideSidebarRoute(prop, viewerContext)) {
         return null;
       }
       if (prop.category) {
@@ -64,9 +62,12 @@ const SidebarContent = ({ logoText, routes }) => {
           </div>
         );
       }
+      const routePath = prop.layout + prop.path;
+      const targetPath = getSidebarRouteTarget(prop, viewerContext);
+      const isActive = isSidebarRouteActive(prop, location.pathname);
       return (
-        <NavLink to={prop.layout + prop.path} key={prop.name}>
-          {activeRoute(prop.layout + prop.path) === "active" ? (
+        <NavLink to={targetPath} key={`${prop.name}-${targetPath}`}>
+          {isActive ? (
             <Button
               boxSize="initial"
               justifyContent="flex-start"

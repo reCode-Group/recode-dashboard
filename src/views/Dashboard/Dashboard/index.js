@@ -22,6 +22,7 @@ import { getUserSubscription } from 'services/subscription';
 import { mapConversion } from 'utils/conversions';
 import CreateSupportTicketModal from 'views/Dashboard/Support/components/CreateSupportTicketModal';
 import BuiltByDevelopers from './components/BuiltByDevelopers';
+import IncompleteRegistrationWarning from './components/IncompleteRegistrationWarning';
 import MiniStatistics from './components/MiniStatistics';
 import TokenOperationsFeed from './components/TokenOperationsFeed';
 import TokenUsageStatistics from './components/TokenUsageStatistics';
@@ -174,6 +175,7 @@ export default function Dashboard() {
 
 	const showEmployeesStats = isCompanyAdmin === true;
 	const isSupportStatsWide = isCompanyAdmin === false;
+	const showRegistrationWarning = viewerContext?.is_completed === false;
 	const tokenBalancePercentage = getTokenBalancePercentage(
 		subscriptionStats.tokensRemainValue,
 		subscriptionStats.packageTokensValue
@@ -181,7 +183,12 @@ export default function Dashboard() {
 
 	return (
 		<Flex flexDirection="column" pt={{ base: '120px', md: '75px' }}>
-			<SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing="24px">
+			{showRegistrationWarning ? (
+				<IncompleteRegistrationWarning
+					onCompleteRegistration={() => history.push('/admin/profile/complete')}
+				/>
+			) : (
+				<SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing="24px">
 				<MiniStatistics
 					title={'Тариф'}
 					amount={subscriptionStats.packageName}
@@ -211,7 +218,8 @@ export default function Dashboard() {
 					onIconAction={onOpen}
 					iconActionLabel='Open support ticket modal'
 				/>
-			</SimpleGrid>
+				</SimpleGrid>
+			)}
 			<Grid
 				templateColumns={{ md: '1fr', lg: '1.8fr 1.2fr' }}
 				templateRows={{ md: '1fr auto', lg: '1fr' }}

@@ -14,13 +14,8 @@ import {
 } from '@chakra-ui/react';
 import { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { completeRegistration } from 'services/auth';
-import {
-	clearPendingProfileEmail,
-	clearPendingProfileName,
-	getPendingProfileEmail,
-	getPendingProfileName,
-} from 'services/session';
+import { completeRegistration, getCurrentUser } from 'services/auth';
+import { clearPendingProfileName, getPendingProfileName } from 'services/session';
 
 const CYRILLIC_PATTERN = /^[А-Яа-яЁё-]+$/;
 const MAX_FIO_LENGTH = 32;
@@ -164,25 +159,26 @@ function ProfileComplete() {
 			return;
 		}
 
-		const email = getPendingProfileEmail();
-		if (!email) {
-			setServerError('Не удалось определить почту аккаунта. Войдите снова.');
-			return;
-		}
-
 		setIsSaving(true);
 		setServerError('');
 
 		try {
+			const currentUser = await getCurrentUser();
+			const email = currentUser?.email;
+
+			if (!email) {
+				setServerError('Не удалось определить почту аккаунта.');
+				return;
+			}
+
 			await completeRegistration({
 				email,
 				name: firstName.trim(),
 				surname: lastName.trim(),
 				lastname: middleName.trim(),
 			});
-			clearPendingProfileEmail();
 			clearPendingProfileName();
-			history.replace('/admin/dashboard');
+			history.replace('/admin/profile?completed=1');
 		} catch (error) {
 			setServerError(getFriendlyError(error));
 		} finally {
