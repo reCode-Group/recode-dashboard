@@ -94,6 +94,19 @@ export default function HeaderLinks(props) {
           borderRadius="inherit"
         />
       </InputGroup>
+      <NavLink to="/admin/profile">
+        <IconButton
+          aria-label="Профиль"
+          bg="transparent"
+          color={navbarIcon}
+          variant="ghost"
+          me={{ sm: "2px", md: "12px" }}
+          _hover={{ bg: "transparent" }}
+          _active={{ bg: "transparent" }}
+          _focus={{ boxShadow: "none" }}
+          icon={<ProfileIcon color={navbarIcon} w="22px" h="22px" me="0px" />}
+        />
+      </NavLink>
       <NavLink to="/auth/login-page" onClick={clearAuthState}>
         <Button
           ms="0px"
@@ -101,20 +114,6 @@ export default function HeaderLinks(props) {
           me={{ sm: "2px", md: "16px" }}
           color={navbarIcon}
           variant="transparent-with-icon"
-          rightIcon={
-            document.documentElement.dir ? (
-              ""
-            ) : (
-              <ProfileIcon color={navbarIcon} w="22px" h="22px" me="0px" />
-            )
-          }
-          leftIcon={
-            document.documentElement.dir ? (
-              <ProfileIcon color={navbarIcon} w="22px" h="22px" me="0px" />
-            ) : (
-              ""
-            )
-          }
         >
           <Text display={{ sm: "none", md: "flex" }}>Выйти</Text>
         </Button>

@@ -68,7 +68,7 @@ const WorkWithTheRockets = ({ title, description, backgroundImage }) => {
 								mx=".3rem"
 								cursor="pointer"
 								_hover={{ transform: 'translateX(20%)' }}
-								pt="4px"
+								pb="2px"
 							/>
 						</Button>
 					</Flex>
