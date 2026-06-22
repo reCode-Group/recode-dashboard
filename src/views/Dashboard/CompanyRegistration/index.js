@@ -93,9 +93,6 @@ function CompanyRegistration() {
 	const cardBorder = useColorModeValue('gray.200', 'whiteAlpha.300');
 	const sectionTitleColor = useColorModeValue('gray.700', 'white');
 	const labelColor = useColorModeValue('gray.700', 'gray.100');
-	const inputTextColor = useColorModeValue('black', 'white');
-	const inputBg = useColorModeValue('white', 'whiteAlpha.50');
-	const placeholderColor = useColorModeValue('gray.400', 'gray.400');
 	const mutedTextColor = useColorModeValue('gray.500', 'gray.300');
 	const searchCardBg = useColorModeValue('gray.50', 'whiteAlpha.50');
 	const searchAccentBg = useColorModeValue('white', 'whiteAlpha.100');
@@ -110,23 +107,6 @@ function CompanyRegistration() {
 	const ogrnLabel = isIp ? 'ОГРНИП' : 'ОГРН';
 	const ogrnPlaceholder = isIp ? '123456789012345' : '1027700132195';
 	const kppHelpText = 'Для ИП КПП не требуется.';
-
-	const inputStyles = {
-		borderRadius: '15px',
-		fontSize: 'sm',
-		size: 'lg',
-		color: inputTextColor,
-		borderColor: cardBorder,
-		bg: inputBg,
-		focusBorderColor: 'recode.300',
-		_focusVisible: {
-			borderColor: 'recode.300',
-			boxShadow: '0 0 0 1px var(--chakra-colors-recode-300)',
-		},
-		_placeholder: {
-			color: placeholderColor,
-		},
-	};
 
 	const handleEntityTypeChange = (nextType) => {
 		setEntityType(nextType);
@@ -461,7 +441,6 @@ function CompanyRegistration() {
 											}
 										}}
 										isDisabled={!dadataEnabled}
-										{...inputStyles}
 										bg={searchAccentBg}
 									/>
 									<InputRightElement width="102px" h="100%" pr="6px">
@@ -611,7 +590,6 @@ function CompanyRegistration() {
 										placeholder="ООО Ромашка"
 										value={form.fullName}
 										onChange={handleFieldChange('fullName')}
-										{...inputStyles}
 									/>
 									<FormErrorMessage>{errors.fullName}</FormErrorMessage>
 								</FormControl>
@@ -625,7 +603,6 @@ function CompanyRegistration() {
 									placeholder="ООО Ромашка"
 									value={form.shortName}
 									onChange={handleFieldChange('shortName')}
-									{...inputStyles}
 								/>
 								<FormErrorMessage>{errors.shortName}</FormErrorMessage>
 							</FormControl>
@@ -639,7 +616,6 @@ function CompanyRegistration() {
 									value={form.inn}
 									onChange={handleFieldChange('inn')}
 									maxLength={isIp ? 12 : 10}
-									{...inputStyles}
 								/>
 								<FormErrorMessage>{errors.inn}</FormErrorMessage>
 							</FormControl>
@@ -653,7 +629,6 @@ function CompanyRegistration() {
 									value={form.kpp}
 									onChange={handleFieldChange('kpp')}
 									maxLength={9}
-									{...inputStyles}
 								/>
 								{isIp ? (
 									<Text mt="8px" fontSize="12px" color={mutedTextColor}>
@@ -672,7 +647,6 @@ function CompanyRegistration() {
 									value={form.ogrn}
 									onChange={handleFieldChange('ogrn')}
 									maxLength={isIp ? 15 : 13}
-									{...inputStyles}
 								/>
 								<FormErrorMessage>{errors.ogrn}</FormErrorMessage>
 							</FormControl>
@@ -686,7 +660,6 @@ function CompanyRegistration() {
 									value={form.okpo}
 									onChange={handleFieldChange('okpo')}
 									maxLength={isIp ? 10 : 8}
-									{...inputStyles}
 								/>
 								<FormErrorMessage>{errors.okpo}</FormErrorMessage>
 							</FormControl>
@@ -711,7 +684,6 @@ function CompanyRegistration() {
 								placeholder="г. Москва, ул. Примерная, д. 1"
 								value={form.legalAddress}
 								onChange={handleFieldChange('legalAddress')}
-								{...inputStyles}
 							/>
 							<Text mt="8px" fontSize="12px" color={mutedTextColor}>
 								Юридический адрес нужен для заполнения карточки организации и проверки реквизитов
@@ -764,7 +736,6 @@ function CompanyRegistration() {
 										placeholder="Иванов Иван Иванович"
 										value={form.contactFio}
 										onChange={handleFieldChange('contactFio')}
-										{...inputStyles}
 									/>
 									<FormErrorMessage>{errors.contactFio}</FormErrorMessage>
 								</FormControl>
@@ -781,7 +752,6 @@ function CompanyRegistration() {
 									placeholder="Руководитель"
 									value={form.contactPosition}
 									onChange={handleFieldChange('contactPosition')}
-									{...inputStyles}
 								/>
 								<FormErrorMessage>{errors.contactPosition}</FormErrorMessage>
 							</FormControl>
@@ -797,7 +767,6 @@ function CompanyRegistration() {
 									placeholder="+7 (___) ___-__-__"
 									value={form.contactPhone}
 									onChange={handleFieldChange('contactPhone')}
-									{...inputStyles}
 								/>
 								<FormErrorMessage>{errors.contactPhone}</FormErrorMessage>
 							</FormControl>
@@ -813,7 +782,6 @@ function CompanyRegistration() {
 									placeholder="company@example.ru"
 									value={form.contactEmail}
 									onChange={handleFieldChange('contactEmail')}
-									{...inputStyles}
 								/>
 								<FormErrorMessage>{errors.contactEmail}</FormErrorMessage>
 							</FormControl>

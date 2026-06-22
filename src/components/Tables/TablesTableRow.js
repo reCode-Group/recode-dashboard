@@ -12,14 +12,14 @@ function TablesTableRow(props) {
 	return (
 		<Tr>
 			{!hiddenColumnsSet.has('user') && (
-				<Td minWidth={{ sm: '250px' }} pl="0px">
-					<Flex align="center" py=".8rem" minWidth="100%" flexWrap="nowrap">
-						<Avatar src={logo} name={name} w="50px" borderRadius="12px" me="18px" />
+				<Td minWidth={{ sm: '250px' }} pl="0px" py="10px">
+					<Flex align="center" py="2px" minWidth="100%" flexWrap="nowrap">
+						<Avatar src={logo} name={name} w="42px" h="42px" borderRadius="12px" me="14px" />
 						<Flex direction="column">
-							<Text fontSize="md" color={textColor} fontWeight="bold" minWidth="100%">
+							<Text fontSize="sm" color={textColor} fontWeight="bold" minWidth="100%">
 								{name}
 							</Text>
-							<Text fontSize="sm" color="gray.400" fontWeight="normal">
+							<Text fontSize="xs" color="gray.400" fontWeight="normal">
 								{email}
 							</Text>
 						</Flex>
@@ -28,12 +28,12 @@ function TablesTableRow(props) {
 			)}
 
 			{!hiddenColumnsSet.has('role') && (
-				<Td>
+				<Td py="10px">
 					<Flex direction="column">
-						<Text fontSize="md" color={textColor} fontWeight="bold">
+						<Text fontSize="sm" color={textColor} fontWeight="bold">
 							{domain}
 						</Text>
-						<Text fontSize="sm" color="gray.400" fontWeight="normal">
+						<Text fontSize="xs" color="gray.400" fontWeight="normal">
 							{subdomain}
 						</Text>
 					</Flex>
@@ -41,12 +41,12 @@ function TablesTableRow(props) {
 			)}
 
 			{!hiddenColumnsSet.has('status') && (
-				<Td>
+				<Td py="10px">
 					<Badge
 						bg={isActiveStatus ? 'green.400' : bgStatus}
 						color={isActiveStatus ? 'white' : colorStatus}
-						fontSize="16px"
-						p="3px 10px"
+						fontSize="13px"
+						p="2px 8px"
 						borderRadius="8px"
 					>
 						{status}
@@ -55,24 +55,24 @@ function TablesTableRow(props) {
 			)}
 
 			{!hiddenColumnsSet.has('tokens') && (
-				<Td>
-					<Text fontSize="md" color={textColor} fontWeight="bold" pb=".5rem">
+				<Td py="10px">
+					<Text fontSize="sm" color={textColor} fontWeight="bold">
 						{date}
 					</Text>
 				</Td>
 			)}
 
 			{!hiddenColumnsSet.has('actions') && (
-				<Td>
-					<Flex gap="12px">
+				<Td py="10px">
+					<Flex gap="10px">
 						<Button p="0px" bg="transparent" variant="no-hover" onClick={onEdit}>
-							<Text fontSize="md" color="recode.300" fontWeight="bold" cursor="pointer">
+							<Text fontSize="sm" color="recode.300" fontWeight="bold" cursor="pointer">
 								Токены
 							</Text>
 						</Button>
 						{onDeactivate ? (
 							<Button p="0px" bg="transparent" variant="no-hover" onClick={onDeactivate}>
-								<Text fontSize="md" color="red.400" fontWeight="bold" cursor="pointer">
+								<Text fontSize="sm" color="red.400" fontWeight="bold" cursor="pointer">
 									Отключить
 								</Text>
 							</Button>

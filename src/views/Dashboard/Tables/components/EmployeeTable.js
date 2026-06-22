@@ -84,10 +84,12 @@ function mapEmployee(employee) {
 function getErrorMessage(error) {
 	const message = error.message || '';
 	if (message.includes('Forbidden')) return 'Недостаточно прав для управления сотрудниками';
-	if (message.includes('employee email already exists')) return 'Сотрудник с таким email уже существует';
+	if (message.includes('employee email already exists'))
+		return 'Сотрудник с таким email уже существует';
 	if (message.includes('employee not found')) return 'Сотрудник не найден';
 	if (message.includes('already disabled')) return 'Сотрудник уже отключен';
-	if (message.includes('not enough organization tokens')) return 'Недостаточно токенов на счете организации';
+	if (message.includes('not enough organization tokens'))
+		return 'Недостаточно токенов на счете организации';
 	if (message.includes('Invalid input')) return 'Проверьте заполнение формы';
 	return message || 'Не удалось выполнить действие';
 }
@@ -322,13 +324,25 @@ const EmployeeTable = ({
 	const renderEmailModal = () => (
 		<Modal isOpen={isExistingModalOpen} onClose={closeExistingModal} isCentered size="xl">
 			<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
-			<ModalContent bg={glassBg} border="1px solid" borderColor="whiteAlpha.400" borderRadius="20px" overflow="hidden">
-				<ModalHeader px="32px" py="24px" borderBottom="1px solid" borderColor="blackAlpha.200" bg={sectionBg}>
+			<ModalContent
+				bg={glassBg}
+				border="1px solid"
+				borderColor="whiteAlpha.400"
+				borderRadius="20px"
+				overflow="hidden"
+			>
+				<ModalHeader
+					px="32px"
+					py="24px"
+					borderBottom="1px solid"
+					borderColor="blackAlpha.200"
+					bg={sectionBg}
+				>
 					<Text fontSize="24px" fontWeight="600" color={textColor} lineHeight="1.1">
 						Привязать существующего сотрудника
 					</Text>
 					<Text mt="6px" fontSize="14px" color={modalSubtitleColor}>
-						Введите email уже зарегистрированного пользователя.
+						Введите Email уже зарегистрированного пользователя.
 					</Text>
 				</ModalHeader>
 				<ModalBody px="32px" py="24px" bg={sectionBg}>
@@ -343,18 +357,33 @@ const EmployeeTable = ({
 							<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
 								Email
 							</FormLabel>
-							<Input type="email" value={existingEmail} onChange={(event) => setExistingEmail(event.target.value)} placeholder="name@company.ru" bg={modalInputBg} borderColor={modalInputBorderColor} borderRadius="12px" h="46px" />
+							<Input
+								type="email"
+								value={existingEmail}
+								onChange={(event) => setExistingEmail(event.target.value)}
+								placeholder="name@company.ru"
+								bg={modalInputBg}
+								borderColor={modalInputBorderColor}
+								borderRadius="12px"
+								h="46px"
+							/>
 							<FormErrorMessage>Укажите корректный email</FormErrorMessage>
 						</FormControl>
 					</Flex>
 				</ModalBody>
-				<ModalFooter px="32px" py="20px" borderTop="1px solid" borderColor="blackAlpha.200" bg={sectionBg}>
+				<ModalFooter
+					px="32px"
+					py="20px"
+					borderTop="1px solid"
+					borderColor="blackAlpha.200"
+					bg={sectionBg}
+				>
 					<Flex w="100%" justify="space-between" gap="12px">
 						<Button variant="ghost" onClick={closeExistingModal}>
 							Отмена
 						</Button>
 						<Button colorScheme="recode" onClick={handleAddExistingEmployee} isLoading={isSaving}>
-							Привязать
+							Отправить запрос
 						</Button>
 					</Flex>
 				</ModalFooter>
@@ -363,7 +392,13 @@ const EmployeeTable = ({
 	);
 
 	const tableContent = (
-		<Card h={fixedHeight} minH={fixedHeight} display="flex" flexDirection="column" overflow="hidden">
+		<Card
+			h={fixedHeight}
+			minH={fixedHeight}
+			display="flex"
+			flexDirection="column"
+			overflow="hidden"
+		>
 			<CardHeader p="6px 0px 22px 0px">
 				<Flex align="center" justify="space-between" gap="12px" width="100%">
 					<Text fontSize="xl" color={textColor} fontWeight="bold">
@@ -415,7 +450,15 @@ const EmployeeTable = ({
 							<Thead position="sticky" top="0" zIndex="1" bg={cardBg}>
 								<Tr my=".8rem" pl="0px" color="gray.400">
 									{visibleCaptions.map((caption, idx) => (
-										<Th color="gray.400" key={idx} ps={idx === 0 ? '0px' : null} position="sticky" top="0" zIndex="1" bg={cardBg}>
+										<Th
+											color="gray.400"
+											key={idx}
+											ps={idx === 0 ? '0px' : null}
+											position="sticky"
+											top="0"
+											zIndex="1"
+											bg={cardBg}
+										>
 											{caption}
 										</Th>
 									))}
@@ -443,7 +486,9 @@ const EmployeeTable = ({
 											date={row.date}
 											hiddenColumns={hiddenColumns}
 											onEdit={() => setTransferTarget(row)}
-											onDeactivate={row.rawStatus === 'disabled' ? null : () => handleDeactivate(row)}
+											onDeactivate={
+												row.rawStatus === 'disabled' ? null : () => handleDeactivate(row)
+											}
 										/>
 									))
 								)}
@@ -451,30 +496,30 @@ const EmployeeTable = ({
 						</Table>
 					)}
 				</Box>
-				<Flex mt="18px" gap="20px" wrap="wrap">
+				<Flex gap="20px" wrap="wrap">
 					<Button
 						leftIcon={<Icon as={FaPlus} boxSize="10px" />}
-						variant="ghost"
-						bg="transparent"
-						border="none"
+						variant="solid"
+						size="lg"
+						height="32px"
+						width="220px"
 						color="recode.300"
-						fontSize="xs"
+						fontSize="sm"
 						_hover={{ bg: 'transparent', color: 'recode.300' }}
 						_active={{ bg: 'transparent' }}
 						p="0px"
-						height="auto"
 						fontWeight="bold"
 						onClick={() => setIsCreateModalOpen(true)}
 					>
-						Создать сотрудника
+						СОЗДАТЬ СОТРУДНИКА
 					</Button>
 					<Button
 						variant="ghost"
 						bg="transparent"
 						border="none"
-						color="recode.300"
-						fontSize="xs"
-						_hover={{ bg: 'transparent', color: 'recode.300' }}
+						color="gray.600"
+						fontSize="sm"
+						_hover={{ bg: 'transparent', color: 'gray.500' }}
 						_active={{ bg: 'transparent' }}
 						p="0px"
 						height="auto"
@@ -488,13 +533,25 @@ const EmployeeTable = ({
 
 			<Modal isOpen={isCreateModalOpen} onClose={closeCreateModal} isCentered size="2xl">
 				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
-				<ModalContent bg={glassBg} border="1px solid" borderColor="whiteAlpha.400" borderRadius="20px" overflow="hidden">
-					<ModalHeader px="32px" py="24px" borderBottom="1px solid" borderColor="blackAlpha.200" bg={sectionBg}>
+				<ModalContent
+					bg={glassBg}
+					border="1px solid"
+					borderColor="whiteAlpha.400"
+					borderRadius="20px"
+					overflow="hidden"
+				>
+					<ModalHeader
+						px="32px"
+						py="24px"
+						borderBottom="1px solid"
+						borderColor="blackAlpha.200"
+						bg={sectionBg}
+					>
 						<Text fontSize="24px" fontWeight="600" color={textColor} lineHeight="1.1">
-							Создать сотрудника
+							Создание профиля сотрудника
 						</Text>
 						<Text mt="6px" fontSize="14px" color={modalSubtitleColor}>
-							Пароль будет сгенерирован на backend и отправлен сотруднику на email.
+							Пароль будет сгенерирован автоматически и отправлен на указанную почту сотрудника.
 						</Text>
 					</ModalHeader>
 					<ModalBody px="32px" py="24px" bg={sectionBg}>
@@ -509,26 +566,57 @@ const EmployeeTable = ({
 								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
 									Фамилия
 								</FormLabel>
-								<Input value={surname} onChange={(event) => setSurname(event.target.value)} placeholder="Иванов" bg={modalInputBg} borderColor={modalInputBorderColor} borderRadius="12px" h="46px" />
+								<Input
+									value={surname}
+									onChange={(event) => setSurname(event.target.value)}
+									placeholder="Иванов"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
+									borderRadius="12px"
+									h="46px"
+								/>
 								<FormErrorMessage>Укажите фамилию</FormErrorMessage>
 							</FormControl>
 							<FormControl isInvalid={Boolean(formError) && !firstName.trim()}>
 								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
 									Имя
 								</FormLabel>
-								<Input value={firstName} onChange={(event) => setFirstName(event.target.value)} placeholder="Иван" bg={modalInputBg} borderColor={modalInputBorderColor} borderRadius="12px" h="46px" />
+								<Input
+									value={firstName}
+									onChange={(event) => setFirstName(event.target.value)}
+									placeholder="Иван"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
+									borderRadius="12px"
+									h="46px"
+								/>
 								<FormErrorMessage>Укажите имя</FormErrorMessage>
 							</FormControl>
 							<FormControl isInvalid={Boolean(formError) && !email.trim()}>
 								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
 									Email
 								</FormLabel>
-								<Input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="name@company.ru" bg={modalInputBg} borderColor={modalInputBorderColor} borderRadius="12px" h="46px" />
+								<Input
+									type="email"
+									value={email}
+									onChange={(event) => setEmail(event.target.value)}
+									placeholder="name@company.ru"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
+									borderRadius="12px"
+									h="46px"
+								/>
 								<FormErrorMessage>Укажите email</FormErrorMessage>
 							</FormControl>
 						</Flex>
 					</ModalBody>
-					<ModalFooter px="32px" py="20px" borderTop="1px solid" borderColor="blackAlpha.200" bg={sectionBg}>
+					<ModalFooter
+						px="32px"
+						py="20px"
+						borderTop="1px solid"
+						borderColor="blackAlpha.200"
+						bg={sectionBg}
+					>
 						<Flex w="100%" justify="space-between" gap="12px">
 							<Button variant="ghost" onClick={closeCreateModal}>
 								Отмена
@@ -545,8 +633,20 @@ const EmployeeTable = ({
 
 			<Modal isOpen={Boolean(transferTarget)} onClose={closeTransferModal} isCentered size="xl">
 				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
-				<ModalContent bg={glassBg} border="1px solid" borderColor="whiteAlpha.400" borderRadius="20px" overflow="hidden">
-					<ModalHeader px="32px" py="24px" borderBottom="1px solid" borderColor="blackAlpha.200" bg={sectionBg}>
+				<ModalContent
+					bg={glassBg}
+					border="1px solid"
+					borderColor="whiteAlpha.400"
+					borderRadius="20px"
+					overflow="hidden"
+				>
+					<ModalHeader
+						px="32px"
+						py="24px"
+						borderBottom="1px solid"
+						borderColor="blackAlpha.200"
+						bg={sectionBg}
+					>
 						<Text fontSize="24px" fontWeight="600" color={textColor} lineHeight="1.1">
 							Перевести токены
 						</Text>
@@ -566,7 +666,14 @@ const EmployeeTable = ({
 								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
 									Токены: {formatTokenValue(tokens)}
 								</FormLabel>
-								<Slider value={tokens} onChange={(value) => setTokens(value)} min={0} max={organizationBalance} step={100} colorScheme="recode">
+								<Slider
+									value={tokens}
+									onChange={(value) => setTokens(value)}
+									min={0}
+									max={organizationBalance}
+									step={100}
+									colorScheme="recode"
+								>
 									<SliderTrack bg="blackAlpha.200">
 										<SliderFilledTrack />
 									</SliderTrack>
@@ -578,7 +685,13 @@ const EmployeeTable = ({
 							</FormControl>
 						</Flex>
 					</ModalBody>
-					<ModalFooter px="32px" py="20px" borderTop="1px solid" borderColor="blackAlpha.200" bg={sectionBg}>
+					<ModalFooter
+						px="32px"
+						py="20px"
+						borderTop="1px solid"
+						borderColor="blackAlpha.200"
+						bg={sectionBg}
+					>
 						<Flex w="100%" justify="space-between" gap="12px">
 							<Button variant="ghost" onClick={closeTransferModal}>
 								Отмена

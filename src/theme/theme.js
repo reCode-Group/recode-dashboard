@@ -5,6 +5,7 @@ import { buttonStyles } from './components/button';
 import { badgeStyles } from './components/badge';
 import { linkStyles } from './components/link';
 import { drawerStyles } from './components/drawer';
+import { inputStyles } from './components/input';
 import { CardComponent } from './additions/card/Card';
 import { CardBodyComponent } from './additions/card/CardBody';
 import { CardHeaderComponent } from './additions/card/CardHeader';
@@ -19,6 +20,7 @@ export default extendTheme(
 	badgeStyles, // Badge styles
 	linkStyles, // Link styles
 	drawerStyles, // Sidebar variant for Chakra's drawer
+	inputStyles, // Input styles
 	CardComponent, // Card component
 	CardBodyComponent, // Card Body component
 	CardHeaderComponent, // Card Header component

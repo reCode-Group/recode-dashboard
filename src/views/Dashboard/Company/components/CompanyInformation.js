@@ -90,21 +90,19 @@ const CompanyInformation = ({
 					<Separator mb="10px" />
 
 					<Flex direction="column" gap="14px" mb="16px">
-						<InfoRow label="Полное наименование" value={fullName} />
+						<InfoRow label="ПОЛНОЕ НАИМЕНОВАНИЕ" value={fullName} />
 						<InfoRow label="ИНН" value={inn} />
 						<InfoRow label="КПП" value={kpp} />
 						<InfoRow label="ОГРН" value={ogrn} />
-						<InfoRow label="Остаток токенов" value={formattedTokens} />
-						<InfoRow label="Сотрудников" value={formattedEmployees} />
 					</Flex>
 
 					<Separator mb="10px" />
 
 					<Flex direction="column" gap="14px">
-						<InfoRow label="Юридический адрес" value={legalAddress} />
-						<InfoRow label="Email компании" value={email} />
-						<InfoRow label="ФИО ответственного" value={responsibleFullName} />
-						<InfoRow label="Телефон" value={phone} />
+						<InfoRow label="ЮРИДИЧЕСКИЙ АДРЕС" value={legalAddress} />
+						<InfoRow label="EMAIL КОМПАНИИ" value={email} />
+						<InfoRow label="ФИО ОТВЕТСТВЕННОГО" value={responsibleFullName} />
+						<InfoRow label="ТЕЛЕФОН" value={phone} />
 					</Flex>
 				</Flex>
 			</CardBody>

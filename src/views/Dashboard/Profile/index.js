@@ -157,7 +157,7 @@ function Profile() {
 
 	const displayName = getHeaderDisplayName(user);
 	const fullName = getFullName(user);
-	const companyName = organization?.full_name || emptyValue;
+	const companyName = organization?.short_name || organization?.full_name || emptyValue;
 	const roleName = getRoleLabel(user?.organization_role);
 	const mobile = emptyValue;
 	const avatarImage = user?.avatar_url || user?.avatar || user?.photo_url || user?.photo || null;
