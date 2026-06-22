@@ -101,7 +101,7 @@ function SignUp() {
 			markAuthenticated();
 			setPendingProfileEmail(normalizedEmail);
 			setPendingProfileName(trimmedName);
-			history.replace('/admin/profile/complete');
+			history.replace('/lk/profile/complete');
 		} catch (requestError) {
 			setError(getFriendlyError(requestError));
 		} finally {

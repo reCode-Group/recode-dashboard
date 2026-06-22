@@ -31,7 +31,7 @@ export default function Dashboard(props) {
 	const [viewerContext, setViewerContext] = useState(null);
 	// functions for changing the states from components
 	const getRoute = () => {
-		return window.location.pathname !== '/admin/full-screen-maps';
+		return window.location.pathname !== '/lk/full-screen-maps';
 	};
 	const getCurrentPath = () => {
 		const rawPath = window.location.pathname || '';
@@ -53,7 +53,7 @@ export default function Dashboard(props) {
 		if (currentPath === (normalizedRoute || '/')) {
 			return true;
 		}
-		// Fallback for hash-based paths (e.g. /#/admin/profile)
+		// Fallback for hash-based paths (e.g. /#/lk/profile)
 		const hashPrefixedPath = `/#${currentPath}`;
 		const hashPrefixedNormalizedRoute = `/#${normalizedRoute}`;
 		return hashPrefixedPath === (hashPrefixedNormalizedRoute || '/#');
@@ -100,7 +100,7 @@ export default function Dashboard(props) {
 	};
 	const hasNavbarLeftInset = () => {
 		const currentPath = getCurrentPath();
-		return currentPath === '/admin/profile' || currentPath === '/admin/company';
+		return currentPath === '/lk/profile' || currentPath === '/lk/company';
 	};
 	const getRoutes = (routes) => {
 		return routes.map((prop, key) => {
@@ -110,7 +110,7 @@ export default function Dashboard(props) {
 			if (prop.category === 'account') {
 				return getRoutes(prop.views);
 			}
-			if (prop.layout === '/admin') {
+			if (prop.layout === '/lk') {
 				return <Route exact path={prop.layout + prop.path} component={prop.component} key={key} />;
 			} else {
 				return null;
@@ -123,7 +123,7 @@ export default function Dashboard(props) {
 
 		async function checkAuth() {
 			const currentPath = window.location.pathname;
-			const isProfileCompleteRoute = currentPath === '/admin/profile/complete';
+			const isProfileCompleteRoute = currentPath === '/lk/profile/complete';
 
 			if (!hasAuthState()) {
 				props.history.replace('/auth/login-page');
@@ -209,7 +209,18 @@ export default function Dashboard(props) {
 						<PanelContainer>
 							<Switch>
 								{getRoutes(routes)}
-								<Redirect from="/admin" to="/admin/dashboard" />
+								<Redirect exact from="/admin/profile/complete" to="/lk/profile/complete" />
+								<Redirect exact from="/admin/profile" to="/lk/profile" />
+								<Redirect exact from="/admin/company/reg" to="/lk/company/reg" />
+								<Redirect exact from="/admin/company" to="/lk/company" />
+								<Redirect exact from="/admin/employees" to="/lk/employees" />
+								<Redirect exact from="/admin/billing/pay" to="/lk/billing/pay" />
+								<Redirect exact from="/admin/billing" to="/lk/billing" />
+								<Redirect exact from="/admin/support" to="/lk/support" />
+								<Redirect exact from="/admin/tariff" to="/lk/tariff" />
+								<Redirect exact from="/admin/conversion-history" to="/lk/conversion-history" />
+								<Redirect exact from="/admin" to="/lk/dashboard" />
+								<Redirect from="/lk" to="/lk/dashboard" />
 							</Switch>
 						</PanelContainer>
 					</PanelContent>

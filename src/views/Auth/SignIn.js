@@ -56,7 +56,7 @@ function SignIn() {
     try {
       await login(normalizedEmail, password);
       markAuthenticated();
-      history.replace("/admin/dashboard");
+      history.replace("/lk/dashboard");
     } catch (requestError) {
       setError(getFriendlyError(requestError));
     } finally {

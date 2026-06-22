@@ -182,7 +182,7 @@ export default function Dashboard() {
 		<Flex flexDirection="column" pt={{ base: '120px', md: '75px' }}>
 			{showRegistrationWarning ? (
 				<IncompleteRegistrationWarning
-					onCompleteRegistration={() => history.push('/admin/profile/complete')}
+					onCompleteRegistration={() => history.push('/lk/profile/complete')}
 				/>
 			) : (
 				<SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing="24px">
@@ -203,7 +203,7 @@ export default function Dashboard() {
 						}
 						onInlineAction={
 							isSubscriptionLoaded && subscriptionStats.tokensRemainValue === 0
-								? () => history.push('/admin/billing')
+								? () => history.push('/lk/billing')
 								: undefined
 						}
 						inlineActionLabel="Перейти в финансы"
@@ -294,7 +294,7 @@ export default function Dashboard() {
 			<CreateSupportTicketModal
 				isOpen={isOpen}
 				onClose={onClose}
-				onNavigateToTickets={() => history.push('/admin/support')}
+				onNavigateToTickets={() => history.push('/lk/support')}
 				onTicketCreated={() => {}}
 			/>
 		</Flex>

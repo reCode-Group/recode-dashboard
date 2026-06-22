@@ -42,6 +42,7 @@ export function mapPartySuggestion(suggestion) {
 	const address = data.address || {};
 
 	return {
+		entityType: data.type === 'INDIVIDUAL' ? 'ip' : 'company',
 		fullName: names.full_with_opf || suggestion?.unrestricted_value || suggestion?.value || '',
 		shortName: names.short_with_opf || suggestion?.value || '',
 		inn: data.inn || '',

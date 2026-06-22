@@ -153,7 +153,7 @@ function OtherTariffs() {
 								bg="white"
 								_hover={{ bg: 'white', opacity: 0.9 }}
 								_active={{ bg: 'white' }}
-								onClick={() => history.push('/admin/billing/pay')}
+								onClick={() => history.push('/lk/billing/pay')}
 							>
 								ВЫБРАТЬ
 							</Button>

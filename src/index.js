@@ -3,15 +3,15 @@ import AuthLayout from 'layouts/Auth.js';
 import MainLayout from 'layouts/Main';
 import 'styles/tailwind.css';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 ReactDOM.render(
 	<BrowserRouter>
 		<Switch>
 			<Route path={`/auth`} component={AuthLayout} />
 			<Route path={`/admin`} component={AdminLayout} />
-			<Route path={`/main`} component={MainLayout} />
-			<Redirect from={`/`} to="/admin/dashboard" />
+			<Route path={`/lk`} component={AdminLayout} />
+			<Route path={`/`} component={MainLayout} />
 		</Switch>
 	</BrowserRouter>,
 	document.getElementById('root')

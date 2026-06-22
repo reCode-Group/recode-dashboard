@@ -280,7 +280,7 @@ export default function DocumentationPage() {
 						fontSize="sm"
 						fontWeight="medium"
 						_hover={{ bg: 'recode.400' }}
-						onClick={() => history.push('/main/macro-translator')}
+						onClick={() => history.push('/macro-translator')}
 					>
 						НАЧАТЬ РАБОТУ
 					</Button>

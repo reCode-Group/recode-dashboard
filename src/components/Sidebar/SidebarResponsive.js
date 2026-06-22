@@ -40,6 +40,7 @@ function SidebarResponsive(props) {
 		const inactiveBg = useColorModeValue('white', 'gray.700');
 		const activeColor = useColorModeValue('gray.700', 'white');
 		const inactiveColor = useColorModeValue('gray.400', 'gray.400');
+		const activeShadow = '0px 3.5px 5.5px rgba(0, 0, 0, 0.02)';
 
 		return routes.map((prop, key) => {
 			if (
@@ -96,6 +97,7 @@ function SidebarResponsive(props) {
 							}}
 							py="12px"
 							borderRadius="15px"
+							boxShadow={activeShadow}
 							_hover="none"
 							w="100%"
 							_active={{

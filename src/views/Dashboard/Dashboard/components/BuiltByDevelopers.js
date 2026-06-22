@@ -32,7 +32,7 @@ const BuiltByDevelopers = ({ title, name, description, image }) => {
 								variant="no-hover"
 								bg="transparent"
 								my={{ sm: '1.5rem', lg: '0px' }}
-								onClick={() => history.push('/main/documentation')}
+								onClick={() => history.push('/documentation')}
 							>
 								<Text
 									fontSize="sm"

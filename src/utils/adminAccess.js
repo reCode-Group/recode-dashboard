@@ -1,13 +1,13 @@
-export const PROFILE_COMPLETE_PATH = '/admin/profile/complete';
-export const DASHBOARD_PATH = '/admin/dashboard';
+export const PROFILE_COMPLETE_PATH = '/lk/profile/complete';
+export const DASHBOARD_PATH = '/lk/dashboard';
 
-const PROFILE_PATH = '/admin/profile';
-const BILLING_PATH = '/admin/billing';
-const BILLING_PAY_PATH = '/admin/billing/pay';
-const TARIFF_PATH = '/admin/tariff';
-const COMPANY_PATH = '/admin/company';
-const COMPANY_REG_PATH = '/admin/company/reg';
-const EMPLOYEES_PATH = '/admin/employees';
+const PROFILE_PATH = '/lk/profile';
+const BILLING_PATH = '/lk/billing';
+const BILLING_PAY_PATH = '/lk/billing/pay';
+const TARIFF_PATH = '/lk/tariff';
+const COMPANY_PATH = '/lk/company';
+const COMPANY_REG_PATH = '/lk/company/reg';
+const EMPLOYEES_PATH = '/lk/employees';
 
 const REGISTRATION_RESTRICTED_PATHS = new Set([
 	PROFILE_PATH,
@@ -63,6 +63,10 @@ export function isSidebarRouteActive(route, currentPath) {
 
 	if (fullPath === PROFILE_PATH) {
 		return currentPath === PROFILE_PATH || currentPath === PROFILE_COMPLETE_PATH;
+	}
+
+	if (fullPath === COMPANY_PATH) {
+		return currentPath === COMPANY_PATH || currentPath === COMPANY_REG_PATH;
 	}
 
 	return currentPath === fullPath;

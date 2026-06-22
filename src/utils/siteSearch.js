@@ -3,37 +3,37 @@ import { BLOG_ARTICLES } from 'views/Main/Blog/data';
 import { DOCUMENTATION_SECTIONS } from 'views/Main/Documentation/data';
 
 const ROUTE_DESCRIPTIONS = {
-	'/admin/dashboard': 'Главная страница личного кабинета, статистика и обзор платформы',
-	'/admin/profile': 'Профиль пользователя, документы и последние конвертации',
-	'/admin/company': 'Компания, настройки и история конвертаций организации',
-	'/admin/employees': 'Сотрудники компании и управление доступом',
-	'/admin/billing': 'Финансы, платежи, пополнение и способы оплаты',
-	'/admin/billing/pay': 'Оплата услуг и пополнение баланса',
-	'/admin/tariff': 'Тарифы и пакеты токенов',
-	'/admin/support': 'Техническая поддержка и тикеты',
-	'/admin/conversion-history': 'Полная история конвертаций',
-	'/main/landing': 'О проекте, возможности платформы и преимущества сервиса',
-	'/main/documentation': 'Документация, описание продукта и проектные материалы',
-	'/main/blog': 'Блог о VBA, автоматизации и миграции макросов',
-	'/main/contacts': 'Контакты и каналы связи',
-	'/main/privacy-policy': 'Политика конфиденциальности',
-	'/main/public-offer': 'Публичная оферта и условия использования',
-	'/main/macro-translator': 'Переводчик макросов VBA в JavaScript и Lua',
+	'/lk/dashboard': 'Главная страница личного кабинета, статистика и обзор платформы',
+	'/lk/profile': 'Профиль пользователя, документы и последние конвертации',
+	'/lk/company': 'Компания, настройки и история конвертаций организации',
+	'/lk/employees': 'Сотрудники компании и управление доступом',
+	'/lk/billing': 'Финансы, платежи, пополнение и способы оплаты',
+	'/lk/billing/pay': 'Оплата услуг и пополнение баланса',
+	'/lk/tariff': 'Тарифы и пакеты токенов',
+	'/lk/support': 'Техническая поддержка и тикеты',
+	'/lk/conversion-history': 'Полная история конвертаций',
+	'/': 'О проекте, возможности платформы и преимущества сервиса',
+	'/documentation': 'Документация, описание продукта и проектные материалы',
+	'/blog': 'Блог о VBA, автоматизации и миграции макросов',
+	'/contacts': 'Контакты и каналы связи',
+	'/privacy-policy': 'Политика конфиденциальности',
+	'/public-offer': 'Публичная оферта и условия использования',
+	'/macro-translator': 'Переводчик макросов VBA в JavaScript и Lua',
 };
 
 const ROUTE_KEYWORDS = {
-	'/admin/dashboard': ['главная', 'dashboard', 'статистика', 'обзор'],
-	'/admin/profile': ['аккаунт', 'профиль', 'документы'],
-	'/admin/company': ['организация', 'компания', 'настройки компании'],
-	'/admin/employees': ['команда', 'сотрудники', 'работники'],
-	'/admin/billing': ['финансы', 'оплата', 'платежи', 'пополнение', 'токены'],
-	'/admin/billing/pay': ['оплата', 'пополнить', 'баланс'],
-	'/admin/tariff': ['тариф', 'пакет', 'токены'],
-	'/admin/support': ['поддержка', 'тикеты', 'помощь'],
-	'/admin/conversion-history': ['история', 'конвертации', 'переводы'],
-	'/main/documentation': ['документация', 'ресурсы', 'pdf'],
-	'/main/blog': ['блог', 'статьи', 'vba'],
-	'/main/macro-translator': ['переводчик', 'макросы', 'vba', 'lua', 'js'],
+	'/lk/dashboard': ['главная', 'dashboard', 'статистика', 'обзор'],
+	'/lk/profile': ['аккаунт', 'профиль', 'документы'],
+	'/lk/company': ['организация', 'компания', 'настройки компании'],
+	'/lk/employees': ['команда', 'сотрудники', 'работники'],
+	'/lk/billing': ['финансы', 'оплата', 'платежи', 'пополнение', 'токены'],
+	'/lk/billing/pay': ['оплата', 'пополнить', 'баланс'],
+	'/lk/tariff': ['тариф', 'пакет', 'токены'],
+	'/lk/support': ['поддержка', 'тикеты', 'помощь'],
+	'/lk/conversion-history': ['история', 'конвертации', 'переводы'],
+	'/documentation': ['документация', 'ресурсы', 'pdf'],
+	'/blog': ['блог', 'статьи', 'vba'],
+	'/macro-translator': ['переводчик', 'макросы', 'vba', 'lua', 'js'],
 };
 
 function normalizeText(value) {
@@ -50,7 +50,7 @@ function flattenRoutes(items, result = []) {
 			return;
 		}
 
-		if (!item?.layout || !item?.path || !item?.name) {
+		if (typeof item?.layout !== 'string' || !item?.path || !item?.name) {
 			return;
 		}
 
@@ -64,7 +64,7 @@ function flattenRoutes(items, result = []) {
 			type: 'page',
 			title: item.name,
 			description: ROUTE_DESCRIPTIONS[fullPath] || item.name,
-			sectionLabel: fullPath.startsWith('/admin') ? 'Страница кабинета' : 'Страница сайта',
+			sectionLabel: fullPath.startsWith('/lk') ? 'Страница кабинета' : 'Страница сайта',
 			keywords: ROUTE_KEYWORDS[fullPath] || [],
 			route: fullPath,
 		});
@@ -101,7 +101,7 @@ function getBlogEntries() {
 		description: article.description || article.subtitle,
 		sectionLabel: 'Блог',
 		keywords: [article.subtitle, ...(article.content || []).slice(0, 2)],
-		route: `/main/blog/${article.slug}`,
+		route: `/blog/${article.slug}`,
 	}));
 }
 

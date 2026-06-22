@@ -15,8 +15,8 @@ import theme from 'theme/theme.js';
 export default function MainLayout(props) {
 	const { ...rest } = props;
 	const location = useLocation();
-	const isDocumentationRoute = location.pathname === '/main/documentation';
-	const isLandingRoute = location.pathname === '/main/landing';
+	const isDocumentationRoute = location.pathname === '/documentation';
+	const isLandingRoute = location.pathname === '/';
 	const contentMaxWidth = isDocumentationRoute || isLandingRoute ? '100%' : MAIN_CONTAINER_MAX_WIDTH;
 	const contentPaddingX = isDocumentationRoute || isLandingRoute ? '0px' : MAIN_CONTAINER_PADDING_X;
 	// ref for the wrapper div
@@ -74,7 +74,7 @@ export default function MainLayout(props) {
 			if (prop.category === 'account') {
 				return getRoutes(prop.views);
 			}
-			if (prop.layout === '/auth' || prop.layout === '/main') {
+			if (prop.layout === '/auth' || prop.layout === '' || prop.layout === '/main') {
 				return <Route exact path={prop.layout + prop.path} component={prop.component} key={key} />;
 			} else {
 				return null;
@@ -96,7 +96,14 @@ export default function MainLayout(props) {
 					<Box ref={wrapper} w="100%" maxW={contentMaxWidth} px={contentPaddingX} mx="auto">
 						<Switch>
 							{getRoutes(routes)}
-							<Redirect from="/main" to="/main/landing" />
+							<Redirect exact from="/main" to="/" />
+							<Redirect exact from="/main/landing" to="/" />
+							<Redirect exact from="/main/documentation" to="/documentation" />
+							<Redirect exact from="/main/blog" to="/blog" />
+							<Redirect exact from="/main/contacts" to="/contacts" />
+							<Redirect exact from="/main/privacy-policy" to="/privacy-policy" />
+							<Redirect exact from="/main/public-offer" to="/public-offer" />
+							<Redirect exact from="/main/macro-translator" to="/macro-translator" />
 							<Redirect from="/auth" to="/auth/login-page" />
 						</Switch>
 					</Box>

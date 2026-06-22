@@ -14,7 +14,7 @@ export default function FloatingNav({ items }) {
 			)}
 		>
 			<div className="flex items-center justify-between gap-4">
-				<NavLink to="/main/landing" className="shrink-0">
+				<NavLink to="/" className="shrink-0">
 					<img
 						src={require('assets/svg/recode-logo-colored.svg').default}
 						alt="reCode"
@@ -35,7 +35,7 @@ export default function FloatingNav({ items }) {
 				</div>
 
 				<NavLink
-					to="/admin/dashboard"
+					to="/lk/dashboard"
 					className="rounded-full bg-gradient-to-r from-[#313860] to-[#151928] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white md:px-6"
 				>
 					Личный кабинет

@@ -94,7 +94,7 @@ export default function Support() {
   }, [selectedTicket?.id]);
 
   const openTicket = (ticketId) => {
-    history.push(`/admin/support?ticket=${ticketId}`);
+    history.push(`/lk/support?ticket=${ticketId}`);
   };
 
   const handleSendReply = async () => {
@@ -269,9 +269,9 @@ export default function Support() {
         onClose={onClose}
         onTicketCreated={async (ticket) => {
           await loadTickets();
-          history.push(`/admin/support?ticket=${ticket.id}`);
+          history.push(`/lk/support?ticket=${ticket.id}`);
         }}
-        onNavigateToTickets={() => history.push("/admin/support")}
+        onNavigateToTickets={() => history.push("/lk/support")}
       />
     </Flex>
   );

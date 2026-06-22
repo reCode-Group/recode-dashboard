@@ -39,7 +39,7 @@ export default function Footer(props) {
         <ListItem>
           <Link
             as={RouterLink}
-            to="/main/privacy-policy"
+            to="/privacy-policy"
             color="gray.400"
             textDecoration="underline"
           >
@@ -49,7 +49,7 @@ export default function Footer(props) {
         <ListItem>
           <Link
             as={RouterLink}
-            to="/main/public-offer"
+            to="/public-offer"
             color="gray.400"
             textDecoration="underline"
           >
@@ -64,7 +64,7 @@ export default function Footer(props) {
         <ListItem>
            <Link
             as={RouterLink}
-            to="/main/contacts"
+            to="/contacts"
             color="gray.400"
             textDecoration="underline"
           >

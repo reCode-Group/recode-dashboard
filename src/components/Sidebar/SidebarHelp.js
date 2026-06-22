@@ -27,7 +27,7 @@ export function SidebarHelp(props) {
 			<Text fontSize="xs" color="white" mb="10px">
 				Можете задать вопрос в чате
 			</Text>
-			<Link w="100%" href="/admin/support">
+			<Link w="100%" href="/lk/support">
 				<Button
 					fontSize="xs"
 					fontWeight="semibold"

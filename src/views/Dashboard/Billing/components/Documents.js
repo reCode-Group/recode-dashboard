@@ -83,7 +83,7 @@ const Documents = ({ title, data, fixedHeight = '855px' }) => {
 						variant="outline"
 						fontSize="xs"
 						p="8px 32px"
-						onClick={() => history.push('/admin/profile?tab=documents')}
+						onClick={() => history.push('/lk/profile?tab=documents')}
 					>
 						{'Все отчеты'}
 					</Button>

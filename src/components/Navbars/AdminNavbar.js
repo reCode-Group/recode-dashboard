@@ -109,7 +109,7 @@ export default function AdminNavbar(props) {
 						<Box minW="0">
 							<Breadcrumb>
 								<BreadcrumbItem color={mainText}>
-									<BreadcrumbLink href="#" color={secondaryText}>
+									<BreadcrumbLink href="/lk/dashboard" color={secondaryText}>
 										Личный кабинет
 									</BreadcrumbLink>
 								</BreadcrumbItem>

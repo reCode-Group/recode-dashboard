@@ -178,7 +178,7 @@ function ProfileComplete() {
 				lastname: middleName.trim(),
 			});
 			clearPendingProfileName();
-			history.replace('/admin/profile?completed=1');
+			history.replace('/lk/profile?completed=1');
 		} catch (error) {
 			setServerError(getFriendlyError(error));
 		} finally {

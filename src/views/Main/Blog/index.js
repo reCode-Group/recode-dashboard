@@ -80,7 +80,7 @@ export default function BlogPage() {
 								borderColor="gray.300"
 								borderRadius="10px"
 								_hover={{ bg: 'gray.50' }}
-								onClick={() => history.push(`/main/blog/${article.slug}`)}
+								onClick={() => history.push(`/blog/${article.slug}`)}
 							>
 								Читать
 							</Button>

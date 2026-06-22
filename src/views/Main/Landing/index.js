@@ -86,7 +86,7 @@ export default function LandingPage() {
 	};
 
 	const handleStartWorkClick = () => {
-		history.push('/main/macro-translator');
+		history.push('/macro-translator');
 	};
 
 	const handleFeaturesClick = () => {
@@ -249,7 +249,7 @@ export default function LandingPage() {
 					</div>
 					<div className="h-[280px] rounded-[24px] bg-[#f8f9fa] p-8">
 						<div className="flex size-[54.778px] items-center justify-center rounded-[16px] border border-[#e2e8f0] bg-white">
-							<img src={forItIcon} alt="Р”Р»СЏ IT" className="size-7" />
+							<img src={forItIcon} alt="For IT" className="size-7" />
 						</div>
 						<h3 className="mt-4 text-[24px] font-semibold text-[#151928]">
 							Для разработчиков и IT-команд
@@ -420,7 +420,7 @@ export default function LandingPage() {
 							инструкции по их настройке и оплате тарифов
 						</p>
 						<NavLink
-							to="/main/contacts#support"
+							to="/contacts#support"
 							className="mt-8 flex h-[35px] w-[150px] items-center justify-center rounded-[12px] bg-white text-[10px] font-bold text-[#2d3748]"
 						>
 							НАПИСАТЬ
@@ -476,10 +476,10 @@ export default function LandingPage() {
 							<a href="#faq" className="block">
 								FAQ
 							</a>
-							<NavLink to="/main/contacts" className="block">
+							<NavLink to="/contacts" className="block">
 								Контакты
 							</NavLink>
-							<NavLink to="/main/blog" className="block">
+							<NavLink to="/blog" className="block">
 								Блог
 							</NavLink>
 							<a href="#about" className="block">
@@ -489,10 +489,10 @@ export default function LandingPage() {
 					</div>
 					<div>
 						<div className="space-y-2 text-[11px] text-white">
-							<NavLink to="/main/privacy-policy" className="block">
+							<NavLink to="/privacy-policy" className="block">
 								Политика конфиденциальности
 							</NavLink>
-							<NavLink to="/main/public-offer" className="block">
+							<NavLink to="/public-offer" className="block">
 								Публичная оферта
 							</NavLink>
 							<p>Рекомендательные технологии</p>

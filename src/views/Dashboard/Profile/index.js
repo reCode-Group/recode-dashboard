@@ -89,7 +89,7 @@ function Profile() {
 			position: 'top-right',
 		});
 
-		history.replace('/admin/profile');
+		history.replace('/lk/profile');
 	}, [hasCompletedRegistration, history, toast]);
 
 	const loadProfile = useCallback(async () => {

@@ -138,7 +138,7 @@ const EmployeeTable = ({
 			if (enforceOrganizationGuard) {
 				const user = await getCurrentUser();
 				if (!user.has_organization) {
-					history.replace('/admin/company/reg');
+					history.replace('/lk/company/reg');
 					return;
 				}
 			}
@@ -199,9 +199,9 @@ const EmployeeTable = ({
 		return !hiddenColumnsSet.has(columnKey);
 	});
 
-	const resolvedFullListPath = fullListPath.startsWith('/admin/')
+	const resolvedFullListPath = fullListPath.startsWith('/lk/')
 		? fullListPath
-		: `/admin${fullListPath.startsWith('/') ? fullListPath : `/${fullListPath}`}`;
+		: `/lk${fullListPath.startsWith('/') ? fullListPath : `/${fullListPath}`}`;
 	const handleFullListClick = onFullListClick ?? (() => history.push(resolvedFullListPath));
 
 	const resetCreateForm = () => {

@@ -40,7 +40,7 @@ export default function BlogArticlePage() {
 				gap="14px"
 			>
 				<Text color={mutedColor}>Статья не найдена</Text>
-				<Button onClick={() => history.push('/main/blog')} bg="recode.500" color="white">
+				<Button onClick={() => history.push('/blog')} bg="recode.500" color="white">
 					Вернуться в блог
 				</Button>
 			</Flex>
@@ -49,7 +49,7 @@ export default function BlogArticlePage() {
 
 	return (
 		<Flex direction="column" pt={{ base: '120px', md: '150px' }} pb={{ base: '56px', md: '72px' }}>
-			<Link as={RouterLink} to="/main/blog" color="recode.500" fontSize="sm" mb="14px">
+			<Link as={RouterLink} to="/blog" color="recode.500" fontSize="sm" mb="14px">
 				← Назад к блогу
 			</Link>
 
@@ -174,7 +174,7 @@ export default function BlogArticlePage() {
 								</Text>
 								<Button
 									as={RouterLink}
-									to={`/main/blog/${relatedArticle.slug}`}
+									to={`/blog/${relatedArticle.slug}`}
 									mt="auto"
 									pt="10px"
 									pb="10px"

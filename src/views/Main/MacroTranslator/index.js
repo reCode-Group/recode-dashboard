@@ -383,7 +383,7 @@ export default function MacroTranslatorPage() {
 										fontWeight="semibold"
 										borderRadius="8px"
 										rightIcon={<IoArrowForwardSharp />}
-										onClick={() => history.push('/admin/tariff')}
+										onClick={() => history.push('/lk/tariff')}
 										_hover={{ bg: 'gray.300' }}
 									>
 										ТАРИФЫ
@@ -509,7 +509,7 @@ export default function MacroTranslatorPage() {
 							fixedHeight="520px"
 							enablePagination={false}
 							showFullHistoryButton={true}
-							fullHistoryPath="/admin/conversion-history"
+							fullHistoryPath="/lk/conversion-history"
 							fullHistoryButtonLabel="Показать полную историю"
 						/>
 					</>

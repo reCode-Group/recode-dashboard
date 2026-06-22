@@ -71,7 +71,7 @@ function Company() {
 		try {
 			const currentUser = await getCurrentUser();
 			if (!currentUser.has_organization) {
-				history.replace('/admin/company/reg');
+				history.replace('/lk/company/reg');
 				return;
 			}
 
@@ -247,7 +247,7 @@ function Company() {
 							data={conversions}
 							enablePagination={true}
 							showFullHistoryButton={true}
-							fullHistoryPath="/admin/conversion-history?scope=organization"
+							fullHistoryPath="/lk/conversion-history?scope=organization"
 						/>
 					</Grid>
 				</GridItem>

@@ -329,7 +329,7 @@ export default function HeaderLinks(props) {
 				w="18px"
 				h="18px"
 			/>
-			<NavLink to="/admin/profile">
+			<NavLink to="/lk/profile">
 				<IconButton
 					display={showOnlyMobileMenu ? 'none' : { base: 'none', md: 'inline-flex' }}
 					aria-label="Профиль"

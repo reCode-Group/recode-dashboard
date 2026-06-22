@@ -12,7 +12,7 @@ import routes from 'routes.js';
 export default function AuthNavbar(props) {
 	const [open, setOpen] = React.useState(false);
 	const location = useLocation();
-	const isLandingPage = location.pathname === '/main/landing';
+	const isLandingPage = location.pathname === '/';
 	const [isTopOnLanding, setIsTopOnLanding] = React.useState(true);
 	const handleDrawerToggle = () => {
 		setOpen(!open);
@@ -93,7 +93,7 @@ export default function AuthNavbar(props) {
 	);
 	var linksAuth = (
 		<HStack display={{ sm: 'none', lg: 'flex' }}>
-			<NavLink to="/main/landing">
+			<NavLink to="/">
 				<Button
 					fontSize="sm"
 					fontWeight="medium"
@@ -107,7 +107,7 @@ export default function AuthNavbar(props) {
 					<Text>О ПРОЕКТЕ</Text>
 				</Button>
 			</NavLink>
-			<NavLink to="main/macro-translator">
+			<NavLink to="/macro-translator">
 				<Button
 					fontSize="sm"
 					fontWeight="medium"
@@ -133,7 +133,7 @@ export default function AuthNavbar(props) {
 					</Text>
 				</Button>
 			</NavLink>
-			<NavLink to="/main/documentation">
+			<NavLink to="/documentation">
 				<Button
 					fontSize="sm"
 					fontWeight="medium"
@@ -147,7 +147,7 @@ export default function AuthNavbar(props) {
 					<Text>РЕСУРСЫ</Text>
 				</Button>
 			</NavLink>
-			<NavLink to="/main/blog">
+			<NavLink to="/blog">
 				<Button
 					fontWeight="medium"
 					fontSize="sm"
@@ -160,7 +160,7 @@ export default function AuthNavbar(props) {
 					<Text>БЛОГ</Text>
 				</Button>
 			</NavLink>
-			<NavLink to="/main/contacts#support">
+			<NavLink to="/contacts#support">
 				<Button
 					fontSize="sm"
 					fontWeight="medium"
@@ -208,7 +208,7 @@ export default function AuthNavbar(props) {
 					/>
 				</Box>
 				{linksAuth}
-				<Link href="/admin/dashboard">
+				<Link href="/lk/dashboard">
 					<Button
 						bg={bgButton}
 						color={colorButton}
