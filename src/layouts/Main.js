@@ -89,7 +89,11 @@ export default function MainLayout(props) {
 			<Box ref={navRef} w="100%">
 				{!isDocumentationRoute && (
 					<Portal containerRef={navRef}>
-						<AuthNavbar secondary={getActiveNavbar(routes)} logoText="RECODE DASHBOARD" />
+						<AuthNavbar
+							secondary={getActiveNavbar(routes)}
+							logoText="RECODE DASHBOARD"
+							usePublicDrawer={true}
+						/>
 					</Portal>
 				)}
 				<Box w="100%">

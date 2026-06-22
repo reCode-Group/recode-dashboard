@@ -6,5 +6,6 @@
 - If shell rewrite is unavoidable, force UTF-8 output encoding and preserve existing line endings.
 - After every edit that touches Russian text, run a mojibake check in touched files (look for broken patterns like `Р`, `С`, `Ð`, `Ñ` inside words).
 - If mojibake is detected, stop and fix encoding before any further changes.
+- Do not replace readable Cyrillic text with Unicode escape sequences like `\u0438`; keep Russian text in normal Cyrillic unless the user explicitly asks otherwise.
 - Before final response, re-check all touched Cyrillic files for encoding integrity.
 - Do not run broad repo-wide encoding rewrites unless the user explicitly asks.

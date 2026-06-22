@@ -8,12 +8,16 @@ import {
 	FormLabel,
 	HStack,
 	Input,
+	InputGroup,
+	InputRightElement,
 	Link,
 	Text,
 	useColorModeValue,
 } from '@chakra-ui/react';
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import BgSignUp from 'assets/img/BgSignUp.png';
 import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
+import AuthNavbar from 'components/Navbars/AuthNavbar.js';
 import { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { login, register, sendVerificationCode, verifyCode } from 'services/auth';
@@ -50,6 +54,7 @@ function SignUp() {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [showPassword, setShowPassword] = useState(false);
 	const [code, setCode] = useState('');
 	const [step, setStep] = useState('account');
 	const [error, setError] = useState('');
@@ -111,6 +116,7 @@ function SignUp() {
 
 	return (
 		<Flex direction="column" alignSelf="center" justifySelf="center" overflow="hidden">
+			<AuthNavbar secondary={true} logoText="RECODE DASHBOARD" />
 			<Box
 				position="absolute"
 				minH={{ base: '70vh', md: '50vh' }}
@@ -245,17 +251,35 @@ function SignUp() {
 								<FormLabel ms="4px" fontSize="sm" fontWeight="normal">
 									Пароль
 								</FormLabel>
-								<Input
-									fontSize="sm"
-									borderRadius="15px"
-									type="password"
-									placeholder="Ваш пароль"
-									mb="24px"
-									size="lg"
-									value={password}
-									onChange={(event) => setPassword(event.target.value)}
-									isDisabled={isSubmitting}
-								/>
+								<InputGroup size="lg" mb="24px">
+									<Input
+										fontSize="sm"
+										borderRadius="15px"
+										type={showPassword ? 'text' : 'password'}
+										placeholder="Ваш пароль"
+										size="lg"
+										value={password}
+										onChange={(event) => setPassword(event.target.value)}
+										isDisabled={isSubmitting}
+										pr="3rem"
+									/>
+									<InputRightElement width="3rem" h="100%">
+										<Button
+											variant="ghost"
+											size="sm"
+											minW="auto"
+											h="auto"
+											p="0"
+											onClick={() => setShowPassword((value) => !value)}
+											isDisabled={isSubmitting}
+											aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+											_hover={{ bg: 'transparent' }}
+											_active={{ bg: 'transparent' }}
+										>
+											{showPassword ? <ViewOffIcon color="gray.400" /> : <ViewIcon color="gray.400" />}
+										</Button>
+									</InputRightElement>
+								</InputGroup>
 							</FormControl>
 						</>
 					) : (

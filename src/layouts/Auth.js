@@ -13,6 +13,7 @@ import theme from 'theme/theme.js';
 
 export default function Pages(props) {
 	const { ...rest } = props;
+	const isSignUpPage = window.location.href.indexOf('/auth/sign-up') !== -1;
 	// ref for the wrapper div
 	const wrapper = React.createRef();
 	React.useEffect(() => {
@@ -78,9 +79,15 @@ export default function Pages(props) {
 	return (
 		<ChakraProvider theme={theme} resetCss={false} w="100%">
 			<Box ref={navRef} w="100%">
-				<Portal containerRef={navRef}>
-					<AuthNavbar secondary={getActiveNavbar(routes)} logoText="RECODE DASHBOARD" />
-				</Portal>
+				{!isSignUpPage ? (
+					<Portal containerRef={navRef}>
+						<AuthNavbar
+							secondary={getActiveNavbar(routes)}
+							logoText="RECODE DASHBOARD"
+							usePublicDrawer={true}
+						/>
+					</Portal>
+				) : null}
 				<Box w="100%">
 					<Box ref={wrapper} w="100%">
 						<Switch>
