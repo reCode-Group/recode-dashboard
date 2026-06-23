@@ -267,11 +267,9 @@ export default function Support() {
       <CreateSupportTicketModal
         isOpen={isOpen}
         onClose={onClose}
-        onTicketCreated={async (ticket) => {
-          await loadTickets();
-          history.push(`/lk/support?ticket=${ticket.id}`);
+        onEmailSent={() => {
+          onClose();
         }}
-        onNavigateToTickets={() => history.push("/lk/support")}
       />
     </Flex>
   );

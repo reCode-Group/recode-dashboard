@@ -217,7 +217,7 @@ export default function Dashboard() {
 					) : null}
 					<MiniStatistics
 						title={'Техподдержка'}
-						amount={'Обращений нет'}
+						amount={'Можете задать вопрос'}
 						icon={<PlusIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
 						gridColumn={isSupportStatsWide ? { md: '1 / -1', xl: 'span 2' } : undefined}
 						enableIconAction={true}
@@ -294,8 +294,7 @@ export default function Dashboard() {
 			<CreateSupportTicketModal
 				isOpen={isOpen}
 				onClose={onClose}
-				onNavigateToTickets={() => history.push('/lk/support')}
-				onTicketCreated={() => {}}
+				onEmailSent={() => {}}
 			/>
 		</Flex>
 	);

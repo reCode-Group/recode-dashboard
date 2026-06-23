@@ -24,7 +24,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiPaperclip, FiUploadCloud, FiX } from "react-icons/fi";
-import { createSupportTicket, getAllowedAttachmentTypes } from "services/supportTickets";
+import { getAllowedAttachmentTypes, sendSupportEmail, SUPPORT_EMAIL } from "services/supportEmail";
 
 const MAX_FILES = 3;
 const allowedExtensions = ["png", "jpg", "jpeg", "pdf", "docx"];
@@ -44,8 +44,7 @@ function isFileAllowed(file, allowedMimes) {
 export default function CreateSupportTicketModal({
   isOpen,
   onClose,
-  onTicketCreated,
-  onNavigateToTickets,
+  onEmailSent,
 }) {
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
@@ -148,13 +147,13 @@ export default function CreateSupportTicketModal({
     setSubmitState("sending");
 
     try {
-      const ticket = await createSupportTicket({
+      const result = await sendSupportEmail({
         subject,
         description,
         files,
       });
       setSubmitState("success");
-      onTicketCreated?.(ticket);
+      onEmailSent?.(result);
     } catch (error) {
       setSubmitState("error");
       setRequestError(error.message || "Не удалось отправить обращение.");
@@ -180,7 +179,7 @@ export default function CreateSupportTicketModal({
                 Новое обращение в техподдержку
               </Text>
               <Text mt="6px" fontSize="14px" color={subtitleColor}>
-                Опишите проблему, и мы вернемся с ответом в тикете.
+                Укажите тему, описание и при необходимости приложите файлы. Мы получим письмо на {SUPPORT_EMAIL}.
               </Text>
             </Box>
             <IconButton
@@ -210,8 +209,8 @@ export default function CreateSupportTicketModal({
               <Alert status="success" borderRadius="12px" bg={successAlertBg} color={successAlertColor}>
                 <AlertIcon />
                 <Box>
-                  <Text fontWeight="600">Обращение отправлено</Text>
-                  <Text fontSize="sm">Тикет создан и уже доступен в истории.</Text>
+                  <Text fontWeight="600">Письмо отправлено</Text>
+                  <Text fontSize="sm">Сообщение доставлено в поддержку.</Text>
                 </Box>
               </Alert>
             ) : null}
@@ -354,9 +353,6 @@ export default function CreateSupportTicketModal({
             <Flex w="100%" justify="flex-end" gap="10px">
               <Button borderRadius="12px" onClick={onClose}>
                 Закрыть
-              </Button>
-              <Button colorScheme="blue" borderRadius="12px" onClick={onNavigateToTickets}>
-                Перейти к тикетам
               </Button>
             </Flex>
           ) : (
