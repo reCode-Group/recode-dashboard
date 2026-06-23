@@ -75,11 +75,17 @@ export default function AuthNavbar(props) {
 		'linear-gradient(112.83deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.4) 110.84%)',
 		'linear-gradient(112.83deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 110.84%)'
 	);
-	let navbarBorder = useColorModeValue('1.5px solid #FFFFFF', '1.5px solid rgba(255, 255, 255, 0.31)');
+	let navbarBorder = useColorModeValue(
+		'1.5px solid #FFFFFF',
+		'1.5px solid rgba(255, 255, 255, 0.31)'
+	);
 	let navbarShadow = useColorModeValue('0px 7px 23px rgba(0, 0, 0, 0.05)', 'none');
 	let navbarFilter = useColorModeValue('none', 'drop-shadow(0px 7px 23px rgba(0, 0, 0, 0.05))');
 	let navbarBackdrop = 'blur(18px)';
-	let bgButton = useColorModeValue('linear-gradient(81.62deg, #313860 2.25%, #151928 79.87%)', 'gray.800');
+	let bgButton = useColorModeValue(
+		'linear-gradient(81.62deg, #313860 2.25%, #151928 79.87%)',
+		'gray.800'
+	);
 	let navbarPosition = 'fixed';
 	let colorButton = 'white';
 
@@ -103,7 +109,7 @@ export default function AuthNavbar(props) {
 
 	const brand = (
 		<Link
-			href={`${process.env.PUBLIC_URL}/#/`}
+			href="/"
 			target="_blank"
 			display="flex"
 			lineHeight="100%"
@@ -226,7 +232,12 @@ export default function AuthNavbar(props) {
 					{usePublicDrawer ? (
 						publicDrawer
 					) : (
-						<SidebarResponsive logoText={logoText} secondary={secondary} routes={routes} {...rest} />
+						<SidebarResponsive
+							logoText={logoText}
+							secondary={secondary}
+							routes={routes}
+							{...rest}
+						/>
 					)}
 				</Box>
 				{linksAuth}

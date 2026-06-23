@@ -1,8 +1,9 @@
-import { Box, Flex, Image, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, Image, Text, Tooltip, useColorModeValue } from '@chakra-ui/react';
 import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { getCurrentUser } from 'services/auth';
 
 import mirLogo from 'assets/img/payment-methods/mir.png';
 import sbpLogo from 'assets/img/payment-methods/sbp.png';
@@ -89,6 +90,9 @@ const EXPLANATIONS = {
 	},
 };
 
+const TEMPORARILY_UNAVAILABLE_METHOD_IDS = new Set(['sbp', 'card']);
+const STATEMENT_METHOD_ID = 'statement';
+
 const PaymentMethod = ({
 	title = 'Способ оплаты',
 	titleFontSize = 'lg',
@@ -99,6 +103,7 @@ const PaymentMethod = ({
 	methods = DEFAULT_METHODS,
 }) => {
 	const [internalValue, setInternalValue] = useState(defaultValue);
+	const [currentUser, setCurrentUser] = useState(null);
 	const selectedMethod = value ?? internalValue;
 	const textColor = useColorModeValue('#2D3748', 'white');
 	const mutedColor = useColorModeValue('gray.500', 'gray.300');
@@ -108,12 +113,63 @@ const PaymentMethod = ({
 	const summaryColor = useColorModeValue('#38A169', 'green.300');
 	const bulletColor = useColorModeValue('#4A5568', 'gray.200');
 	const iconSurface = useColorModeValue('transparent', 'whiteAlpha.700');
+	const canUseStatementPayment =
+		currentUser?.has_organization === true &&
+		currentUser?.organization_role === 'director' &&
+		currentUser?.organization_status === 'active';
+	const availableMethods = useMemo(() => {
+		if (canUseStatementPayment) {
+			return methods;
+		}
 
-	const explanation = useMemo(() => EXPLANATIONS[selectedMethod] ?? EXPLANATIONS.statement, [
-		selectedMethod,
+		return methods.filter((method) => method.id !== STATEMENT_METHOD_ID);
+	}, [canUseStatementPayment, methods]);
+	const effectiveSelectedMethod =
+		!canUseStatementPayment && selectedMethod === STATEMENT_METHOD_ID ? 'tbank' : selectedMethod;
+
+	useEffect(() => {
+		let isMounted = true;
+
+		async function loadCurrentUser() {
+			try {
+				const user = await getCurrentUser();
+				if (!isMounted) return;
+				setCurrentUser(user);
+			} catch (error) {
+				if (!isMounted) return;
+				setCurrentUser(null);
+			}
+		}
+
+		loadCurrentUser();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
+	useEffect(() => {
+		if (canUseStatementPayment || selectedMethod !== STATEMENT_METHOD_ID) {
+			return;
+		}
+
+		if (value === undefined) {
+			setInternalValue('tbank');
+		}
+		if (onChange) {
+			onChange('tbank');
+		}
+	}, [canUseStatementPayment, onChange, selectedMethod, value]);
+
+	const explanation = useMemo(() => EXPLANATIONS[effectiveSelectedMethod] ?? EXPLANATIONS.statement, [
+		effectiveSelectedMethod,
 	]);
 
 	const handleSelect = (id) => {
+		if (TEMPORARILY_UNAVAILABLE_METHOD_IDS.has(id)) {
+			return;
+		}
+
 		if (value === undefined) {
 			setInternalValue(id);
 		}
@@ -131,9 +187,10 @@ const PaymentMethod = ({
 			</CardHeader>
 			<CardBody p="0" style={{ flexDirection: 'column' }}>
 				<Flex wrap="wrap" gap="8px">
-					{methods.map((method) => {
-						const isActive = selectedMethod === method.id;
-						return (
+					{availableMethods.map((method) => {
+						const isActive = effectiveSelectedMethod === method.id;
+						const isTemporarilyUnavailable = TEMPORARILY_UNAVAILABLE_METHOD_IDS.has(method.id);
+						const methodCard = (
 							<Flex
 								key={method.id}
 								align="center"
@@ -143,7 +200,8 @@ const PaymentMethod = ({
 								border="2px solid"
 								borderColor={isActive ? activeBorderColor : borderColor}
 								borderRadius="15px"
-								cursor="pointer"
+								cursor={isTemporarilyUnavailable ? 'not-allowed' : 'pointer'}
+								opacity={isTemporarilyUnavailable ? 0.55 : 1}
 								onClick={() => handleSelect(method.id)}
 							>
 								<Flex
@@ -168,6 +226,16 @@ const PaymentMethod = ({
 								</Text>
 							</Flex>
 						);
+
+						if (isTemporarilyUnavailable) {
+							return (
+								<Tooltip key={method.id} label="Временно не доступно" hasArrow>
+									<Box>{methodCard}</Box>
+								</Tooltip>
+							);
+						}
+
+						return methodCard;
 					})}
 				</Flex>
 

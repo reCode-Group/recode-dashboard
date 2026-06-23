@@ -5,3 +5,9 @@ export function getUserSubscription() {
 		method: 'GET',
 	});
 }
+
+export function getTokenPackages() {
+	return apiRequest('/api/token-packages', {
+		method: 'GET',
+	});
+}

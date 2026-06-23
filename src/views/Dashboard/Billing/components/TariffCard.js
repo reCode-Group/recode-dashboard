@@ -11,6 +11,8 @@ const TariffCard = ({
 	validUntil,
 	tokenBalance,
 	monthlyCost,
+	statusLabel = 'Активен',
+	statusColor = '#48BB78',
 }) => {
 	const validUntilData = validUntil ?? { name: '', data: '' };
 	const tokenBalanceData = tokenBalance ?? { name: '', code: '' };
@@ -41,9 +43,9 @@ const TariffCard = ({
 									height: '16px',
 								}}
 								m="10px"
-								bgColor="#48BB78"
+								bgColor={statusColor}
 							></Box>
-							Активен
+							{statusLabel}
 						</Flex>
 					</Flex>
 					<Spacer />

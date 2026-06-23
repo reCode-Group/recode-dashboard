@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiArrowRight, FiChevronDown, FiHelpCircle } from 'react-icons/fi';
 import { NavLink, useHistory } from 'react-router-dom';
 
@@ -21,6 +21,8 @@ import habrLogo from 'assets/svg/habr-logo.svg';
 import maxLogo from 'assets/svg/max-logo.svg';
 import footerLogo from 'assets/svg/recode-logo-white-text.svg';
 import vkLogo from 'assets/svg/vk-logo.svg';
+import { getTokenPackages } from 'services/subscription';
+import { normalizeTokenPackages } from 'utils/subscription';
 
 const faqRows = [
 	{
@@ -55,15 +57,17 @@ const faqRows = [
 	},
 ];
 
-const priceCards = [
+const defaultPriceCards = [
 	{
 		title: 'Базовый',
+		id: 1,
 		price: '20 000',
 		postfix: '₽ / мес.',
 		items: ['20 000 токенов', 'Базовая поддержка', 'Базовый'],
 	},
 	{
 		title: 'Экспертный',
+		id: 2,
 		price: '50 000',
 		postfix: '₽ / мес.',
 		items: ['50 000 токенов', 'Базовая поддержка', 'Базовый', 'Базовый'],
@@ -72,18 +76,89 @@ const priceCards = [
 	{
 		title: 'Для компаний',
 		price: 'Индивидуально',
+		id: 3,
 		postfix: '',
 		items: ['600 000 токенов', 'Базовая поддержка', 'Расширенная поддержка'],
 	},
 ];
 
+const priceCardDetailsById = {
+	1: {
+		items: ['20 000 токенов', 'Базовая поддержка', 'Базовый'],
+	},
+	2: {
+		items: ['50 000 токенов', 'Базовая поддержка', 'Базовый', 'Базовый'],
+		highlight: true,
+	},
+	3: {
+		items: ['600 000 токенов', 'Базовая поддержка', 'Расширенная поддержка'],
+	},
+};
+
+function formatLandingPrice(price) {
+	const amount = Number(price);
+	if (!Number.isFinite(amount) || amount <= 0) {
+		return 'Индивидуально';
+	}
+
+	return new Intl.NumberFormat('ru-RU').format(amount).replace(/,/g, ' ');
+}
+
+function buildPriceCardsFromApi(payload) {
+	const packages = normalizeTokenPackages(payload);
+	if (!packages.length) {
+		return defaultPriceCards;
+	}
+
+	return packages.map((item) => {
+		const packageId = Number(item?.id);
+		const details = priceCardDetailsById[packageId] || {};
+		const amount = Number(item?.price);
+
+		return {
+			id: packageId,
+			title: String(item?.name || 'Тариф'),
+			price: formatLandingPrice(item?.price),
+			postfix: Number.isFinite(amount) && amount > 0 ? '₽ / мес.' : '',
+			items: details.items || [],
+			highlight: Boolean(details.highlight),
+		};
+	});
+}
+
 export default function LandingPage() {
 	const [openFaqId, setOpenFaqId] = useState(faqRows[0].id);
+	const [priceCards, setPriceCards] = useState(defaultPriceCards);
 	const history = useHistory();
 
 	const toggleFaq = (id) => {
 		setOpenFaqId((current) => (current === id ? null : id));
 	};
+
+	useEffect(() => {
+		let isMounted = true;
+
+		const loadPriceCards = async () => {
+			try {
+				const payload = await getTokenPackages();
+				if (!isMounted) {
+					return;
+				}
+
+				setPriceCards(buildPriceCardsFromApi(payload));
+			} catch (error) {
+				if (isMounted) {
+					setPriceCards(defaultPriceCards);
+				}
+			}
+		};
+
+		loadPriceCards();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
 
 	const handleStartWorkClick = () => {
 		history.push('/macro-translator');
@@ -301,6 +376,11 @@ export default function LandingPage() {
 									: 'h-[357.015px] bg-[#edf2f7]'
 							}`}
 						>
+							{card.id === 2 ? (
+								<div className="mb-3 inline-flex rounded-full bg-[#f6ad55] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-white">
+									Хит
+								</div>
+							) : null}
 							<div
 								className={`rounded-[24px] p-5 ${
 									card.highlight ? 'bg-[rgba(255,255,255,0.05)]' : 'bg-white'

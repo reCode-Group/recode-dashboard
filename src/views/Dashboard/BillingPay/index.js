@@ -1,4 +1,6 @@
 import {
+	Alert,
+	AlertIcon,
 	Box,
 	Button,
 	Flex,
@@ -8,17 +10,14 @@ import {
 	GridItem,
 	Input,
 	Select,
+	Spinner,
 	Text,
 	useColorModeValue,
 } from '@chakra-ui/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { getTokenPackages } from 'services/subscription';
+import { formatPaymentAmount, normalizeTokenPackages } from 'utils/subscription';
 import PaymentMethod from 'views/Dashboard/Billing/components/PaymentMethod';
-
-const TARIFFS = [
-	{ id: 'basic', label: 'Базовый', monthlyPrice: 10000 },
-	{ id: 'standard', label: 'Стандарт', monthlyPrice: 20000 },
-	{ id: 'premium', label: 'Премиум', monthlyPrice: 50000 },
-];
 
 const PERIODS = [
 	{ id: '1', label: '1 месяц', value: 1 },
@@ -27,19 +26,14 @@ const PERIODS = [
 	{ id: '12', label: '12 месяцев', value: 12 },
 ];
 
-const formatAmount = (value) => {
-	const formatted = new Intl.NumberFormat('ru-RU', {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	}).format(value);
-	return formatted;
-};
-
 function BillingPay() {
-	const [tariffId, setTariffId] = useState('basic');
+	const [tariffs, setTariffs] = useState([]);
+	const [tariffId, setTariffId] = useState('');
 	const [periodId, setPeriodId] = useState('1');
 	const [inn, setInn] = useState('0239951661');
-	const [paymentMethodId, setPaymentMethodId] = useState('statement');
+	const [paymentMethodId, setPaymentMethodId] = useState('tbank');
+	const [isLoadingTariffs, setIsLoadingTariffs] = useState(true);
+	const [tariffsError, setTariffsError] = useState('');
 
 	const titleColor = useColorModeValue('gray.700', 'white');
 	const subtitleColor = useColorModeValue('gray.400', 'gray.300');
@@ -49,16 +43,56 @@ function BillingPay() {
 	const readonlyBg = useColorModeValue('gray.200', 'whiteAlpha.400');
 	const borderColor = useColorModeValue('gray.200', 'whiteAlpha.300');
 
-	const selectedTariff = useMemo(() => TARIFFS.find((item) => item.id === tariffId) || TARIFFS[0], [
+	useEffect(() => {
+		let isMounted = true;
+
+		async function loadTariffs() {
+			setIsLoadingTariffs(true);
+			setTariffsError('');
+
+			try {
+				const payload = await getTokenPackages();
+				if (!isMounted) return;
+
+				const tokenPackages = normalizeTokenPackages(payload);
+				setTariffs(tokenPackages);
+				setTariffId((currentTariffId) => {
+					if (tokenPackages.some((item) => String(item.id) === currentTariffId)) {
+						return currentTariffId;
+					}
+
+					return tokenPackages[0] ? String(tokenPackages[0].id) : '';
+				});
+			} catch (error) {
+				if (!isMounted) return;
+
+				setTariffs([]);
+				setTariffsError(error.message || 'Не удалось загрузить тарифы');
+			} finally {
+				if (!isMounted) return;
+				setIsLoadingTariffs(false);
+			}
+		}
+
+		loadTariffs();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
+	const selectedTariff = useMemo(() => tariffs.find((item) => String(item.id) === tariffId) || tariffs[0], [
+		tariffs,
 		tariffId,
 	]);
 	const selectedPeriod = useMemo(() => PERIODS.find((item) => item.id === periodId) || PERIODS[0], [
 		periodId,
 	]);
 	const isStatementMethod = paymentMethodId === 'statement';
+	const submitButtonLabel = isStatementMethod ? 'ВЫПИСАТЬ СЧЕТ' : 'ОПЛАТИТЬ';
 	const paymentAmount = useMemo(
-		() => formatAmount(selectedTariff.monthlyPrice * selectedPeriod.value),
-		[selectedPeriod.value, selectedTariff.monthlyPrice]
+		() => formatPaymentAmount((Number(selectedTariff?.price) || 0) * selectedPeriod.value),
+		[selectedPeriod.value, selectedTariff?.price]
 	);
 
 	const inputStyles = {
@@ -82,6 +116,13 @@ function BillingPay() {
 						</Text>
 
 						<Flex mt="22px" direction="column" gap="16px">
+							{tariffsError ? (
+								<Alert status="error" borderRadius="12px">
+									<AlertIcon />
+									{tariffsError}
+								</Alert>
+							) : null}
+
 							<FormControl>
 								<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
 									Тариф
@@ -90,11 +131,13 @@ function BillingPay() {
 									value={tariffId}
 									onChange={(event) => setTariffId(event.target.value)}
 									bg={inputBg}
+									placeholder={isLoadingTariffs ? 'Загрузка...' : 'Выберите тариф'}
+									isDisabled={isLoadingTariffs || tariffs.length === 0}
 									{...inputStyles}
 								>
-									{TARIFFS.map((tariff) => (
+									{tariffs.map((tariff) => (
 										<option key={tariff.id} value={tariff.id}>
-											{tariff.label}
+											{tariff.name}
 										</option>
 									))}
 								</Select>
@@ -151,8 +194,10 @@ function BillingPay() {
 								letterSpacing="0.02em"
 								_hover={{ bg: '#0A54BE' }}
 								_active={{ bg: '#0A54BE' }}
+								isDisabled={isLoadingTariffs || tariffs.length === 0}
+								leftIcon={isLoadingTariffs ? <Spinner size="sm" /> : undefined}
 							>
-								ВЫПИСАТЬ СЧЕТ
+								{submitButtonLabel}
 							</Button>
 						</Flex>
 					</Box>

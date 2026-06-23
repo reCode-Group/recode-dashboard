@@ -8,8 +8,11 @@ import OtherTariffs from './components/OtherTariffs';
 import PaymentMethod from './components/PaymentMethod';
 import TariffCard from './components/TariffCard';
 import Transactions from './components/Transactions';
+import useTariffData from './useTariffData';
 
 function Billing() {
+	const { currentTariff, otherTariffs, isLoading, error, reload } = useTariffData();
+
 	return (
 		<Flex direction="column" pt={{ base: '120px', md: '75px' }} mb="100px">
 			<Grid
@@ -39,24 +42,22 @@ function Billing() {
 						<GridItem area="tariff" minH="0">
 							<TariffCard
 								backgroundImage={BackgroundCard1}
-								title={'Ваш тариф'}
-								tariffName={'БАЗОВЫЙ'}
-								validUntil={{
-									name: 'ДЕЙСТВИТЕЛЕН ДО',
-									data: '25.11.2025',
-								}}
-								tokenBalance={{
-									name: 'ОСТАТОК ТОКЕНОВ',
-									code: '1 100 / 10 000',
-								}}
-								monthlyCost={{
-									name: 'СТОИМОСТЬ',
-									code: '20 000 ₽/мес.',
-								}}
+								title={currentTariff.title}
+								tariffName={currentTariff.tariffName}
+								validUntil={currentTariff.validUntil}
+								tokenBalance={currentTariff.tokenBalance}
+								monthlyCost={currentTariff.monthlyCost}
+								statusLabel={currentTariff.statusLabel}
+								statusColor={currentTariff.statusColor}
 							/>
 						</GridItem>
 						<GridItem area="others" minH="0">
-							<OtherTariffs />
+							<OtherTariffs
+								tariffs={otherTariffs}
+								isLoading={isLoading}
+								error={error}
+								onRetry={reload}
+							/>
 						</GridItem>
 						<GridItem area="transactions" minH="0" h={{ base: 'auto', xl: '100%' }}>
 							<Transactions

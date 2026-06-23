@@ -12,7 +12,6 @@ import { getOrganizationDetails } from 'services/organization';
 import { mapConversion } from 'utils/conversions';
 import { invoicesData } from 'variables/general';
 import DocumentsFull from 'views/Dashboard/Billing/components/DocumentsFull';
-import SupportTicketList from 'views/Dashboard/Support/components/SupportTicketList';
 import Header from './components/Header';
 import PlatformSettings from './components/PlatformSettings';
 import ProfileInformation from './components/ProfileInformation';
@@ -179,7 +178,7 @@ function Profile() {
 				<DocumentsFull title="Отчеты" data={invoicesData} />
 			) : (
 				<>
-					<Grid templateColumns={{ sm: '1fr', xl: 'repeat(3, 1fr)' }} gap="22px">
+					<Grid templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }} gap="22px">
 						<ProfileInformation
 							title="Данные"
 							company={companyName}
@@ -193,7 +192,6 @@ function Profile() {
 							subtitle1="АККАУНТ"
 							subtitle2="ПЕРСОНАЛИЗАЦИЯ"
 						/>
-						<SupportTicketList title="Открытые тикеты" />
 					</Grid>
 					<Grid
 						templateColumns={{ sm: '1fr' }}
