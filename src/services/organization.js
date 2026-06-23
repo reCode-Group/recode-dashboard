@@ -40,6 +40,13 @@ export function deactivateOrganizationEmployee(email) {
 	});
 }
 
+export function activateOrganizationEmployee(email) {
+	return apiRequest('/api/organization/employees/activate', {
+		method: 'POST',
+		body: JSON.stringify({ email }),
+	});
+}
+
 export function transferTokensToEmployee(organizationMemberID, amount) {
 	return apiRequest('/api/organization/employees/tokens/transfer', {
 		method: 'POST',

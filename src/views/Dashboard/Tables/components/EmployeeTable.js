@@ -38,6 +38,7 @@ import { FaPlus } from 'react-icons/fa';
 import { useHistory } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
 import {
+	activateOrganizationEmployee,
 	addExistingOrganizationEmployee,
 	createOrganizationEmployee,
 	deactivateOrganizationEmployee,
@@ -88,6 +89,7 @@ function getErrorMessage(error) {
 		return 'Сотрудник с таким email уже существует';
 	if (message.includes('employee not found')) return 'Сотрудник не найден';
 	if (message.includes('already disabled')) return 'Сотрудник уже отключен';
+	if (message.includes('already active')) return 'Сотрудник уже активирован';
 	if (message.includes('not enough organization tokens'))
 		return 'Недостаточно токенов на счете организации';
 	if (message.includes('Invalid input')) return 'Проверьте заполнение формы';
@@ -200,6 +202,10 @@ const EmployeeTable = ({
 		const columnKey = defaultColumnKeys[idx] ?? `column-${idx}`;
 		return !hiddenColumnsSet.has(columnKey);
 	});
+	const normalizedVisibleCaptions = visibleCaptions.map((caption, idx) => {
+		const visibleColumnKeys = defaultColumnKeys.filter((key) => !hiddenColumnsSet.has(key));
+		return visibleColumnKeys[idx] === 'actions' ? 'Управление' : caption;
+	});
 
 	const resolvedFullListPath = fullListPath.startsWith('/lk/')
 		? fullListPath
@@ -290,6 +296,19 @@ const EmployeeTable = ({
 		setError('');
 		try {
 			await deactivateOrganizationEmployee(row.email);
+			await loadEmployees();
+		} catch (requestError) {
+			setError(getErrorMessage(requestError));
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const handleActivate = async (row) => {
+		setIsSaving(true);
+		setError('');
+		try {
+			await activateOrganizationEmployee(row.email);
 			await loadEmployees();
 		} catch (requestError) {
 			setError(getErrorMessage(requestError));
@@ -449,7 +468,7 @@ const EmployeeTable = ({
 						<Table variant="simple" color={textColor} minW={{ base: '640px', md: '100%' }}>
 							<Thead position="sticky" top="0" zIndex="1" bg={cardBg}>
 								<Tr my=".8rem" pl="0px" color="gray.400">
-									{visibleCaptions.map((caption, idx) => (
+									{normalizedVisibleCaptions.map((caption, idx) => (
 										<Th
 											color="gray.400"
 											key={idx}
@@ -486,6 +505,9 @@ const EmployeeTable = ({
 											date={row.date}
 											hiddenColumns={hiddenColumns}
 											onEdit={() => setTransferTarget(row)}
+											onActivate={
+												row.rawStatus === 'disabled' ? () => handleActivate(row) : null
+											}
 											onDeactivate={
 												row.rawStatus === 'disabled' ? null : () => handleDeactivate(row)
 											}

@@ -1,7 +1,7 @@
 import { Avatar, Badge, Button, Flex, Td, Text, Tr, useColorModeValue } from '@chakra-ui/react';
 
 function TablesTableRow(props) {
-	const { logo, name, email, subdomain, domain, status, date, hiddenColumns = [], onEdit, onDeactivate } = props;
+	const { logo, name, email, subdomain, domain, status, date, hiddenColumns = [], onEdit, onDeactivate, onActivate } = props;
 	const textColor = useColorModeValue('gray.700', 'white');
 	const bgStatus = useColorModeValue('gray.400', '#1a202c');
 	const colorStatus = useColorModeValue('white', 'gray.400');
@@ -70,6 +70,13 @@ function TablesTableRow(props) {
 								Токены
 							</Text>
 						</Button>
+						{onActivate ? (
+							<Button p="0px" bg="transparent" variant="no-hover" onClick={onActivate}>
+								<Text fontSize="sm" color="green.400" fontWeight="bold" cursor="pointer">
+									Активировать
+								</Text>
+							</Button>
+						) : null}
 						{onDeactivate ? (
 							<Button p="0px" bg="transparent" variant="no-hover" onClick={onDeactivate}>
 								<Text fontSize="sm" color="red.400" fontWeight="bold" cursor="pointer">
