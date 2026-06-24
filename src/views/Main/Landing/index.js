@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FiArrowRight, FiChevronDown, FiHelpCircle } from 'react-icons/fi';
 import { NavLink, useHistory } from 'react-router-dom';
+import { resolveRouteTarget } from 'utils/navigation';
 
 import businessSiteCard from 'assets/img/landing/business-site-card.png';
 import bottomFondLogo from 'assets/img/landing/exact/bottom-fond.png';
@@ -59,39 +60,39 @@ const faqRows = [
 
 const defaultPriceCards = [
 	{
-		title: 'Базовый',
 		id: 1,
-		price: '20 000',
+		title: 'Базовый',
+		price: '1 000',
 		postfix: '₽ / мес.',
-		items: ['20 000 токенов', 'Базовая поддержка', 'Базовый'],
+		items: ['3 000 токенов', 'Базовая поддержка', 'Базовый'],
 	},
 	{
-		title: 'Экспертный',
 		id: 2,
-		price: '50 000',
+		title: 'Стандартный',
+		price: '3 000',
 		postfix: '₽ / мес.',
-		items: ['50 000 токенов', 'Базовая поддержка', 'Базовый', 'Базовый'],
+		items: ['10 000 токенов', 'Базовая поддержка', 'Базовый', 'Базовый'],
 		highlight: true,
 	},
 	{
-		title: 'Для компаний',
-		price: 'Индивидуально',
 		id: 3,
-		postfix: '',
-		items: ['600 000 токенов', 'Базовая поддержка', 'Расширенная поддержка'],
+		title: 'Премиум',
+		price: '25 000',
+		postfix: '₽ / мес.',
+		items: ['25 000 токенов', 'Базовая поддержка', 'Расширенная поддержка'],
 	},
 ];
 
 const priceCardDetailsById = {
 	1: {
-		items: ['20 000 токенов', 'Базовая поддержка', 'Базовый'],
+		items: ['3 000 токенов', 'Базовая поддержка', 'Базовый'],
 	},
 	2: {
-		items: ['50 000 токенов', 'Базовая поддержка', 'Базовый', 'Базовый'],
+		items: ['10 000 токенов', 'Базовая поддержка', 'Базовый', 'Базовый'],
 		highlight: true,
 	},
 	3: {
-		items: ['600 000 токенов', 'Базовая поддержка', 'Расширенная поддержка'],
+		items: ['25 000 токенов', 'Базовая поддержка', 'Расширенная поддержка'],
 	},
 };
 
@@ -169,6 +170,15 @@ export default function LandingPage() {
 		if (featuresSection) {
 			featuresSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 		}
+	};
+
+	const scrollToSection = (sectionId) => () => {
+		const section = document.getElementById(sectionId);
+		if (!section) {
+			return;
+		}
+
+		section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	};
 
 	return (
@@ -500,7 +510,7 @@ export default function LandingPage() {
 							инструкции по их настройке и оплате тарифов
 						</p>
 						<NavLink
-							to="/contacts#support"
+							to={resolveRouteTarget('/contacts#support')}
 							className="mt-8 flex h-[35px] w-[150px] items-center justify-center rounded-[12px] bg-white text-[10px] font-bold text-[#2d3748]"
 						>
 							НАПИСАТЬ
@@ -547,30 +557,49 @@ export default function LandingPage() {
 					</div>
 					<div className="text-[11px] text-white">
 						<div className="space-y-2">
-							<a href="#pricing" className="block">
+							<button
+								type="button"
+								onClick={scrollToSection('pricing')}
+								className="block bg-transparent text-left"
+							>
 								Тарифы
-							</a>
-							<a href="#features" className="block">
+							</button>
+							<button
+								type="button"
+								onClick={scrollToSection('features')}
+								className="block bg-transparent text-left"
+							>
 								Сервисы
-							</a>
-							<a href="#faq" className="block">
+							</button>
+							<button
+								type="button"
+								onClick={scrollToSection('faq')}
+								className="block bg-transparent text-left"
+							>
 								FAQ
-							</a>
+							</button>
 							<NavLink to="/contacts" className="block">
 								Контакты
 							</NavLink>
 							<NavLink to="/blog" className="block">
 								Блог
 							</NavLink>
-							<a href="#about" className="block">
+							<button
+								type="button"
+								onClick={scrollToSection('about')}
+								className="block bg-transparent text-left"
+							>
 								Регистрация
-							</a>
+							</button>
 						</div>
 					</div>
 					<div>
 						<div className="space-y-2 text-[11px] text-white">
 							<NavLink to="/privacy-policy" className="block">
 								Политика конфиденциальности
+							</NavLink>
+							<NavLink to="/public-offer" className="block">
+								Пользовательское соглашение
 							</NavLink>
 							<NavLink to="/public-offer" className="block">
 								Публичная оферта
