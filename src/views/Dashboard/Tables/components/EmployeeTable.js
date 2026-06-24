@@ -28,6 +28,7 @@ import {
 	Thead,
 	Tr,
 	useColorModeValue,
+	useToast,
 } from '@chakra-ui/react';
 import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
@@ -86,13 +87,13 @@ function getErrorMessage(error) {
 	const message = error.message || '';
 	if (message.includes('Forbidden')) return 'Недостаточно прав для управления сотрудниками';
 	if (message.includes('employee email already exists'))
-		return 'Сотрудник с таким email уже существует';
+		return 'Сотрудник с таким Email уже существует';
 	if (message.includes('employee not found')) return 'Сотрудник не найден';
 	if (message.includes('already disabled')) return 'Сотрудник уже отключен';
 	if (message.includes('already active')) return 'Сотрудник уже активирован';
 	if (message.includes('not enough organization tokens'))
 		return 'Недостаточно токенов на счете организации';
-	if (message.includes('Invalid input')) return 'Проверьте заполнение формы';
+	if (message.includes('Invalid input')) return 'Проверьте заполнение формы, есть ошибки';
 	return message || 'Не удалось выполнить действие';
 }
 
@@ -115,6 +116,7 @@ const EmployeeTable = ({
 	const modalSubtitleColor = useColorModeValue('gray.500', 'gray.300');
 	const modalInputBg = useColorModeValue('white', 'whiteAlpha.100');
 	const modalInputBorderColor = useColorModeValue('gray.200', 'whiteAlpha.300');
+	const toast = useToast();
 	const hiddenColumnsSet = new Set(hiddenColumns);
 	const scrollRef = useRef(null);
 
@@ -265,6 +267,13 @@ const EmployeeTable = ({
 			});
 			closeCreateModal();
 			await loadEmployees();
+			toast({
+				title: 'Сотрудник успешно добавлен',
+				status: 'success',
+				duration: 3000,
+				isClosable: true,
+				position: 'top-right',
+			});
 		} catch (requestError) {
 			setFormError(getErrorMessage(requestError));
 		} finally {
@@ -284,6 +293,13 @@ const EmployeeTable = ({
 			await addExistingOrganizationEmployee(existingEmail.trim());
 			closeExistingModal();
 			await loadEmployees();
+			toast({
+				title: 'Сотрудник успешно добавлен',
+				status: 'success',
+				duration: 3000,
+				isClosable: true,
+				position: 'top-right',
+			});
 		} catch (requestError) {
 			setFormError(getErrorMessage(requestError));
 		} finally {
@@ -505,9 +521,7 @@ const EmployeeTable = ({
 											date={row.date}
 											hiddenColumns={hiddenColumns}
 											onEdit={() => setTransferTarget(row)}
-											onActivate={
-												row.rawStatus === 'disabled' ? () => handleActivate(row) : null
-											}
+											onActivate={row.rawStatus === 'disabled' ? () => handleActivate(row) : null}
 											onDeactivate={
 												row.rawStatus === 'disabled' ? null : () => handleDeactivate(row)
 											}

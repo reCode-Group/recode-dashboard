@@ -186,7 +186,7 @@ const PaymentMethod = ({
 				</Text>
 			</CardHeader>
 			<CardBody p="0" style={{ flexDirection: 'column' }}>
-				<Flex wrap="wrap" gap="8px">
+				<Flex direction={{ base: 'column', md: 'row' }} wrap={{ base: 'nowrap', md: 'wrap' }} gap="8px">
 					{availableMethods.map((method) => {
 						const isActive = effectiveSelectedMethod === method.id;
 						const isTemporarilyUnavailable = TEMPORARILY_UNAVAILABLE_METHOD_IDS.has(method.id);
@@ -195,13 +195,16 @@ const PaymentMethod = ({
 								key={method.id}
 								align="center"
 								gap="8px"
-								h="50px"
+								h={{ base: 'auto', md: '50px' }}
+								minH="50px"
 								px="12px"
+								py={{ base: '10px', md: '0' }}
 								border="2px solid"
 								borderColor={isActive ? activeBorderColor : borderColor}
 								borderRadius="15px"
 								cursor={isTemporarilyUnavailable ? 'not-allowed' : 'pointer'}
 								opacity={isTemporarilyUnavailable ? 0.55 : 1}
+								w={{ base: '100%', md: 'auto' }}
 								onClick={() => handleSelect(method.id)}
 							>
 								<Flex
@@ -221,7 +224,7 @@ const PaymentMethod = ({
 										objectFit="contain"
 									/>
 								</Flex>
-								<Text color={mutedColor} whiteSpace="nowrap">
+								<Text color={mutedColor} whiteSpace={{ base: 'normal', md: 'nowrap' }} noOfLines={{ base: 1, md: undefined }}>
 									{method.title}
 								</Text>
 							</Flex>

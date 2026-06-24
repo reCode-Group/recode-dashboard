@@ -1,4 +1,13 @@
-import { Alert, AlertIcon, Button, Flex, Grid, Spinner, Text, useColorModeValue } from '@chakra-ui/react';
+import {
+	Alert,
+	AlertIcon,
+	Button,
+	Flex,
+	Grid,
+	Spinner,
+	Text,
+	useColorModeValue,
+} from '@chakra-ui/react';
 import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
@@ -45,7 +54,13 @@ function PeriodSwitcher({ value, onChange }) {
 	);
 }
 
-function OtherTariffs({ title = 'Другие тарифы', tariffs = [], isLoading = false, error = '', onRetry }) {
+function OtherTariffs({
+	title = 'Другие тарифы',
+	tariffs = [],
+	isLoading = false,
+	error = '',
+	onRetry,
+}) {
 	const [period, setPeriod] = useState('month');
 	const history = useHistory();
 	const titleColor = useColorModeValue('#2D3748', 'white');
@@ -74,7 +89,13 @@ function OtherTariffs({ title = 'Другие тарифы', tariffs = [], isLoa
 					<PeriodSwitcher value={period} onChange={setPeriod} />
 				</Flex>
 			</CardHeader>
-			<CardBody p="0" pt="0" h={{ base: 'auto', lg: '100%' }} display="flex" flexDirection="column">
+			<CardBody
+				p="0"
+				pt="12px"
+				h={{ base: 'auto', lg: '100%' }}
+				display="flex"
+				flexDirection="column"
+			>
 				{isLoading ? (
 					<Flex flex="1" minH="220px" align="center" justify="center">
 						<Spinner color="recode.300" />
@@ -97,7 +118,11 @@ function OtherTariffs({ title = 'Другие тарифы', tariffs = [], isLoa
 					</Flex>
 				) : (
 					<Grid
-						templateColumns={{ base: '1fr', md: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(3, minmax(0, 1fr))' }}
+						templateColumns={{
+							base: '1fr',
+							md: 'repeat(2, minmax(0, 1fr))',
+							xl: 'repeat(3, minmax(0, 1fr))',
+						}}
 						gap="12px"
 						w="100%"
 						h="100%"
@@ -106,8 +131,8 @@ function OtherTariffs({ title = 'Другие тарифы', tariffs = [], isLoa
 							<Flex
 								key={tariff.id}
 								direction="column"
-								border="1px solid"
-								borderColor={borderColor}
+								border="2px solid"
+								borderColor={Number(tariff.id) === 2 ? '#005DE0' : borderColor}
 								borderRadius="15px"
 								p="20px"
 								minH="178px"
@@ -115,7 +140,7 @@ function OtherTariffs({ title = 'Другие тарифы', tariffs = [], isLoa
 								flex="1"
 							>
 								<Flex justify="space-between" align="center" gap="4px" mb="12px">
-									<Text fontSize="18px" lineHeight="1.4" fontWeight="bold" color={titleColor}>
+									<Text fontSize="24px" lineHeight="1.4" fontWeight="bold" color={titleColor}>
 										{tariff.name}
 									</Text>
 									{Number(tariff.id) === 2 ? (

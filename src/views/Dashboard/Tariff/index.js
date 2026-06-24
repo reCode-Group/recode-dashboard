@@ -1,26 +1,27 @@
 import { Box, Flex, Grid, GridItem } from '@chakra-ui/react';
 import BackgroundCard1 from 'assets/img/BackgroundCard1.png';
-import useTariffData from 'views/Dashboard/Billing/useTariffData';
-import OtherTariffs from 'views/Dashboard/Billing/components/OtherTariffs';
 import PaymentMethod from 'views/Dashboard/Billing/components/PaymentMethod';
 import TariffCard from 'views/Dashboard/Billing/components/TariffCard';
+import useTariffData from 'views/Dashboard/Billing/useTariffData';
+import OtherTariffs from './components/OtherTariffs';
 
 function Tariff() {
 	const { currentTariff, otherTariffs, isLoading, error, reload } = useTariffData();
 
 	return (
 		<Flex direction="column" pt={{ base: '120px', md: '75px' }} minH="100vh">
-			<Box w={{ base: '100%', lg: '70%' }}>
+			<Box w="100%">
 				<Grid
-					templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
-					templateRows={{ base: 'auto auto auto', lg: 'auto auto' }}
+					templateColumns={{ base: '1fr', xl: 'minmax(0, 420px) minmax(0, 1fr)' }}
+					templateRows={{ base: 'auto auto auto', xl: 'auto auto' }}
 					templateAreas={{
 						base: `"tariff" "others" "payment"`,
-						lg: `"tariff others" "payment payment"`,
+						xl: `"tariff others" "payment payment"`,
 					}}
+					alignItems="stretch"
 					gap="24px"
 				>
-					<GridItem area="tariff">
+					<GridItem area="tariff" minW="0">
 						<TariffCard
 							backgroundImage={BackgroundCard1}
 							title={currentTariff.title}
@@ -32,15 +33,16 @@ function Tariff() {
 							statusColor={currentTariff.statusColor}
 						/>
 					</GridItem>
-					<GridItem area="others">
+					<GridItem area="others" minW="0">
 						<OtherTariffs
+							title="Тарифные пакеты"
 							tariffs={otherTariffs}
 							isLoading={isLoading}
 							error={error}
 							onRetry={reload}
 						/>
 					</GridItem>
-					<GridItem area="payment">
+					<GridItem area="payment" minW="0" w="100%">
 						<PaymentMethod title={'Способ оплаты'} />
 					</GridItem>
 				</Grid>

@@ -52,14 +52,22 @@ const CompanyInformation = ({
 	return (
 		<Card
 			p="16px"
+			h="100%"
 			backdropFilter="saturate(200%) blur(10.5px)"
 			boxShadow="0px 2px 5.5px rgba(0, 0, 0, 0.02)"
 			border="2px solid"
 			borderColor={borderProfileColor}
 			bg={glassBg}
 		>
-			<CardBody px="5px" display="flex">
-				<Flex direction="column" justifyContent="space-between" align="stretch" w="100%" h="100%">
+			<CardBody px="5px" display="flex" h="100%">
+				<Flex
+					direction="column"
+					justifyContent="space-between"
+					align="stretch"
+					w="100%"
+					h="100%"
+					py="8px"
+				>
 					<Flex align="center" mb="22px">
 						<Box position="relative" me="16px">
 							<Avatar

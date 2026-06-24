@@ -48,7 +48,9 @@ function getCompanyAddress(organization) {
 function Company() {
 	const history = useHistory();
 	const location = useLocation();
-	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [location.search]);
+	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [
+		location.search,
+	]);
 	const [activeTab, setActiveTab] = useState(
 		queryTab === 'employees' || queryTab === 'documents' ? queryTab : 'settings'
 	);
@@ -119,7 +121,11 @@ function Company() {
 
 	if (error) {
 		return (
-			<Flex direction="column" my={{ base: '120px', md: '75px' }} mx="1.5rem">
+			<Flex
+				direction="column"
+				my={{ base: '120px', md: '75px' }}
+				mx={{ base: '12px', md: '1.5rem' }}
+			>
 				<Alert status="error" borderRadius="12px">
 					<AlertIcon />
 					<Flex align="center" justify="space-between" gap="12px" w="100%">
@@ -138,7 +144,7 @@ function Company() {
 			<Box
 				bgImage={ProfileBgImage}
 				w="100%"
-				h="300px"
+				h={{ base: '95px', md: '300px' }}
 				borderRadius="25px"
 				bgPosition="50%"
 				bgRepeat="no-repeat"
@@ -147,13 +153,13 @@ function Company() {
 			<Grid
 				templateColumns={{ base: '1fr', xl: '493px minmax(0, 1fr)' }}
 				gap="22px"
-				alignItems="start"
+				alignItems="stretch"
 				mt={{ base: '24px', xl: '-64px' }}
-				mx="1.5rem"
-				w={{ base: 'calc(100% - 3rem)', xl: '95%' }}
+				mx={{ base: '12px', md: '1.5rem' }}
+				w={{ base: '100%', xl: '95%' }}
 				alignSelf="center"
 			>
-				<GridItem>
+				<GridItem display="flex" h="100%">
 					<CompanyInformation
 						title="Информация"
 						company={getCompanyName(organization)}
@@ -170,7 +176,7 @@ function Company() {
 					/>
 				</GridItem>
 
-				<GridItem>
+				<GridItem display="flex" flexDirection="column">
 					<Box
 						minH={{ xl: '113px' }}
 						p="16px"
@@ -183,7 +189,11 @@ function Company() {
 						display="flex"
 						alignItems="center"
 					>
-						<Flex direction={{ base: 'column', lg: 'row' }} gap={{ base: '8px', lg: '12px' }}>
+						<Flex
+							direction={{ base: 'column', lg: 'row' }}
+							gap={{ base: '8px', lg: '12px' }}
+							w={{ base: '100%', xl: 'none' }}
+						>
 							{tabs.map((tab) => {
 								const isActive = activeTab === tab.id;
 								return (
@@ -220,7 +230,7 @@ function Company() {
 						</Flex>
 					</Box>
 
-					<Grid mt="24px">
+					<Grid mt="24px" flex="1" minH="0">
 						{activeTab === 'documents' ? (
 							<Documents title="Документы компании" data={invoicesData} fixedHeight="403px" />
 						) : activeTab === 'employees' ? (

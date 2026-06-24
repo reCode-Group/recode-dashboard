@@ -158,7 +158,7 @@ const TokenOperationsFeed = ({ viewerContext }) => {
 	const subtitle =
 		viewerContext?.has_organization && viewerContext?.organization_role === 'director'
 			? 'Показаны 30 последних операций по доступным счетам компании'
-			: 'Показаны 30 последних операций по вашему счёту';
+			: 'Показаны 30 последних операций по личному счёту';
 
 	return (
 		<Card
