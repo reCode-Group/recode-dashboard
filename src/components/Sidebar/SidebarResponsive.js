@@ -37,7 +37,7 @@ function SidebarResponsive(props) {
 	const createLinks = (routes) => {
 		// Chakra Color Mode
 		const activeBg = useColorModeValue('white', 'gray.700');
-		const inactiveBg = useColorModeValue('white', 'gray.700');
+		const hoverBg = useColorModeValue('gray.100', 'whiteAlpha.100');
 		const activeColor = useColorModeValue('gray.700', 'white');
 		const inactiveColor = useColorModeValue('gray.400', 'gray.400');
 		const activeShadow = '0px 3.5px 5.5px rgba(0, 0, 0, 0.02)';
@@ -74,7 +74,6 @@ function SidebarResponsive(props) {
 					</div>
 				);
 			}
-			const routePath = prop.layout + prop.path;
 			const targetPath = getSidebarRouteTarget(prop, props.viewerContext);
 			const isActive = isSidebarRouteActive(prop, location.pathname);
 			return (
@@ -98,55 +97,39 @@ function SidebarResponsive(props) {
 					py="12px"
 					borderRadius="15px"
 					w="100%"
+					bg={isActive ? activeBg : 'transparent'}
+					boxShadow={isActive ? activeShadow : 'none'}
+					_hover={{
+						bg: isActive ? activeBg : hoverBg,
+					}}
 					_active={{
-						bg: 'inherit',
+						bg: isActive ? activeBg : hoverBg,
 						transform: 'none',
 						borderColor: 'transparent',
+						boxShadow: isActive ? activeShadow : 'none',
 					}}
 					_focus={{
 						boxShadow: 'none',
 					}}
 				>
-					{isActive ? (
-						<Flex
-							bg={activeBg}
-							boxShadow={activeShadow}
-							_hover="none"
-							w="100%"
-							borderRadius="15px"
-							align="center"
-						>
-							{typeof prop.icon === 'string' ? (
-								<Icon>{prop.icon}</Icon>
-							) : (
-								<IconBox bg="recode.300" color="white" h="30px" w="30px" me="12px">
-									{prop.icon}
-								</IconBox>
-							)}
-							<Text color={activeColor} my="auto" fontSize="sm">
-								{prop.name}
-							</Text>
-						</Flex>
-					) : (
-						<Flex
-							bg="transparent"
-							_hover="none"
-							w="100%"
-							borderRadius="15px"
-							align="center"
-						>
-							{typeof prop.icon === 'string' ? (
-								<Icon>{prop.icon}</Icon>
-							) : (
-								<IconBox bg={inactiveBg} color="recode.300" h="30px" w="30px" me="12px">
-									{prop.icon}
-								</IconBox>
-							)}
-							<Text color={inactiveColor} my="auto" fontSize="sm">
-								{prop.name}
-							</Text>
-						</Flex>
-					)}
+					<Flex bg="transparent" _hover="none" w="100%" borderRadius="15px" align="center">
+						{typeof prop.icon === 'string' ? (
+							<Icon>{prop.icon}</Icon>
+						) : (
+							<IconBox
+								bg={isActive ? 'recode.300' : 'transparent'}
+								color={isActive ? 'white' : 'recode.300'}
+								h="30px"
+								w="30px"
+								me="12px"
+							>
+								{prop.icon}
+							</IconBox>
+						)}
+						<Text color={isActive ? activeColor : inactiveColor} my="auto" fontSize="sm">
+							{prop.name}
+						</Text>
+					</Flex>
 				</Button>
 			);
 		});
