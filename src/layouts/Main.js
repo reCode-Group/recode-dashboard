@@ -8,8 +8,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import AuthNavbar from 'components/Navbars/AuthNavbar.js';
 import React from 'react';
-import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
-import routes from 'routes.js';
+import { Outlet, useLocation } from 'react-router-dom';
 import theme from 'theme/theme.js';
 
 export default function MainLayout(props) {
@@ -26,71 +25,16 @@ export default function MainLayout(props) {
 		// Specify how to clean up after this effect:
 		return function cleanup() {};
 	});
-	const getActiveRoute = (routes) => {
-		let activeRoute = 'reCode Dashboard';
-		for (let i = 0; i < routes.length; i++) {
-			if (routes[i].collapse) {
-				let collapseActiveRoute = getActiveRoute(routes[i].views);
-				if (collapseActiveRoute !== activeRoute) {
-					return collapseActiveRoute;
-				}
-			} else if (routes[i].category) {
-				let categoryActiveRoute = getActiveRoute(routes[i].views);
-				if (categoryActiveRoute !== activeRoute) {
-					return categoryActiveRoute;
-				}
-			} else {
-				if (window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1) {
-					return routes[i].name;
-				}
-			}
-		}
-		return activeRoute;
-	};
-	const getActiveNavbar = (routes) => {
-		let activeNavbar = false;
-		for (let i = 0; i < routes.length; i++) {
-			if (routes[i].category) {
-				let categoryActiveNavbar = getActiveNavbar(routes[i].views);
-				if (categoryActiveNavbar !== activeNavbar) {
-					return categoryActiveNavbar;
-				}
-			} else {
-				if (window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1) {
-					if (routes[i].secondaryNavbar) {
-						return routes[i].secondaryNavbar;
-					}
-				}
-			}
-		}
-		return activeNavbar;
-	};
-
-	const getRoutes = (routes) => {
-		return routes.map((prop, key) => {
-			if (prop.collapse) {
-				return getRoutes(prop.views);
-			}
-			if (prop.category === 'account') {
-				return getRoutes(prop.views);
-			}
-			if (prop.layout === '/auth' || prop.layout === '' || prop.layout === '/main') {
-				return <Route exact path={prop.layout + prop.path} component={prop.component} key={key} />;
-			} else {
-				return null;
-			}
-		});
-	};
 
 	const navRef = React.useRef();
 
 	return (
-		<ChakraProvider theme={theme} resetCss={false} w="100%">
+		<ChakraProvider theme={theme} resetCss={false}>
 			<Box ref={navRef} w="100%">
 				{!isDocumentationRoute && (
 					<Portal containerRef={navRef}>
 						<AuthNavbar
-							secondary={getActiveNavbar(routes)}
+							secondary={false}
 							logoText="RECODE DASHBOARD"
 							usePublicDrawer={true}
 						/>
@@ -98,18 +42,7 @@ export default function MainLayout(props) {
 				)}
 				<Box w="100%">
 					<Box ref={wrapper} w="100%" maxW={contentMaxWidth} px={contentPaddingX} mx="auto">
-						<Switch>
-							{getRoutes(routes)}
-							<Redirect exact from="/main" to="/" />
-							<Redirect exact from="/main/landing" to="/" />
-							<Redirect exact from="/main/documentation" to="/documentation" />
-							<Redirect exact from="/main/blog" to="/blog" />
-							<Redirect exact from="/main/contacts" to="/contacts" />
-							<Redirect exact from="/main/privacy-policy" to="/privacy-policy" />
-							<Redirect exact from="/main/public-offer" to="/public-offer" />
-							<Redirect exact from="/main/macro-translator" to="/macro-translator" />
-							<Redirect from="/auth" to="/auth/login-page" />
-						</Switch>
+						<Outlet />
 					</Box>
 				</Box>
 				{!isDocumentationRoute && !isLandingRoute && (

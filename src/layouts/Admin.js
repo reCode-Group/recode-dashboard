@@ -8,12 +8,11 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import AdminNavbar from 'components/Navbars/AdminNavbar.js';
 import Sidebar from 'components/Sidebar';
-import { useEffect, useState } from 'react';
-import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
+import { Suspense, useEffect, useState } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import routes from 'routes.js';
 import { getCurrentUser } from 'services/auth';
-import { clearAuthState, clearPendingProfileEmail, getPendingProfileEmail, hasAuthState } from 'services/session';
-import { getAdminRouteRedirect } from 'utils/adminAccess';
+import { clearPendingProfileEmail } from 'services/session';
 // Custom Chakra theme
 import theme from 'theme/theme.js';
 import FixedPlugin from '../components/FixedPlugin/FixedPlugin';
@@ -21,6 +20,15 @@ import FixedPlugin from '../components/FixedPlugin/FixedPlugin';
 import MainPanel from '../components/Layout/MainPanel';
 import PanelContainer from '../components/Layout/PanelContainer';
 import PanelContent from '../components/Layout/PanelContent';
+
+function RouteFallback() {
+	return (
+		<Box minH="50vh" display="flex" alignItems="center" justifyContent="center">
+			<Spinner color="recode.300" size="xl" />
+		</Box>
+	);
+}
+
 export default function Dashboard(props) {
 	const { ...rest } = props;
 	const location = useLocation();
@@ -102,69 +110,34 @@ export default function Dashboard(props) {
 		const currentPath = getCurrentPath();
 		return currentPath === '/lk/profile' || currentPath === '/lk/company';
 	};
-	const getRoutes = (routes) => {
-		return routes.map((prop, key) => {
-			if (prop.collapse) {
-				return getRoutes(prop.views);
-			}
-			if (prop.category === 'account') {
-				return getRoutes(prop.views);
-			}
-			if (prop.layout === '/lk') {
-				return <Route exact path={prop.layout + prop.path} component={prop.component} key={key} />;
-			} else {
-				return null;
-			}
-		});
-	};
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	useEffect(() => {
 		let isMounted = true;
 
-		async function checkAuth() {
-			const currentPath = window.location.pathname;
-			const isProfileCompleteRoute = currentPath === '/lk/profile/complete';
-
-			if (!hasAuthState()) {
-				props.history.replace('/auth/login-page');
-				return;
-			}
-
-			if (isProfileCompleteRoute && getPendingProfileEmail()) {
-				if (isMounted) {
-					setIsCheckingAuth(false);
-				}
-				return;
-			}
-
+		async function loadViewerContext() {
 			try {
 				const currentUser = await getCurrentUser();
-				const normalizedPath = getCurrentPath();
-				const redirectPath = getAdminRouteRedirect(normalizedPath, currentUser);
 
-				setViewerContext(currentUser);
-
-				if (redirectPath && redirectPath !== normalizedPath) {
-					props.history.replace(redirectPath);
+				if (!isMounted) {
 					return;
 				}
-
+				setViewerContext(currentUser);
 				clearPendingProfileEmail();
+				setIsCheckingAuth(false);
+			} catch (error) {
 				if (isMounted) {
+					setViewerContext(null);
 					setIsCheckingAuth(false);
 				}
-			} catch (error) {
-				clearAuthState();
-				props.history.replace('/auth/login-page');
 			}
 		}
 
-		checkAuth();
+		loadViewerContext();
 
 		return () => {
 			isMounted = false;
 		};
-	}, [location.hash, location.pathname, props.history]);
+	}, [location.hash, location.pathname]);
 	// Chakra Color Mode
 	if (isCheckingAuth) {
 		return (
@@ -207,21 +180,9 @@ export default function Dashboard(props) {
 				{getRoute() ? (
 					<PanelContent>
 						<PanelContainer>
-							<Switch>
-								{getRoutes(routes)}
-								<Redirect exact from="/admin/profile/complete" to="/lk/profile/complete" />
-								<Redirect exact from="/admin/profile" to="/lk/profile" />
-								<Redirect exact from="/admin/company/reg" to="/lk/company/reg" />
-								<Redirect exact from="/admin/company" to="/lk/company" />
-								<Redirect exact from="/admin/employees" to="/lk/employees" />
-								<Redirect exact from="/admin/billing/pay" to="/lk/billing/pay" />
-								<Redirect exact from="/admin/billing" to="/lk/billing" />
-								<Redirect exact from="/admin/support" to="/lk/support" />
-								<Redirect exact from="/admin/tariff" to="/lk/tariff" />
-								<Redirect exact from="/admin/conversion-history" to="/lk/conversion-history" />
-								<Redirect exact from="/admin" to="/lk/dashboard" />
-								<Redirect from="/lk" to="/lk/dashboard" />
-							</Switch>
+							<Suspense fallback={<RouteFallback />}>
+								<Outlet />
+							</Suspense>
 						</PanelContainer>
 					</PanelContent>
 				) : null}

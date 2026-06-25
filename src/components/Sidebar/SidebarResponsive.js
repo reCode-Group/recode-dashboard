@@ -20,7 +20,7 @@ import IconBox from 'components/Icons/IconBox';
 import { Separator } from 'components/Separator/Separator';
 import { SidebarHelp } from 'components/Sidebar/SidebarHelp';
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, NavLink, useLocation } from 'react-router-dom';
 import {
 	getSidebarRouteTarget,
 	isSidebarRouteActive,
@@ -78,94 +78,76 @@ function SidebarResponsive(props) {
 			const targetPath = getSidebarRouteTarget(prop, props.viewerContext);
 			const isActive = isSidebarRouteActive(prop, location.pathname);
 			return (
-				<NavLink to={targetPath} key={`${prop.name}-${targetPath}`}>
+				<Button
+					as={NavLink}
+					to={targetPath}
+					key={`${prop.name}-${targetPath}`}
+					boxSize="initial"
+					justifyContent="flex-start"
+					alignItems="center"
+					mb={{
+						xl: '12px',
+					}}
+					mx={{
+						xl: 'auto',
+					}}
+					ps={{
+						sm: '10px',
+						xl: '16px',
+					}}
+					py="12px"
+					borderRadius="15px"
+					w="100%"
+					_active={{
+						bg: 'inherit',
+						transform: 'none',
+						borderColor: 'transparent',
+					}}
+					_focus={{
+						boxShadow: 'none',
+					}}
+				>
 					{isActive ? (
-						<Button
-							boxSize="initial"
-							justifyContent="flex-start"
-							alignItems="center"
+						<Flex
 							bg={activeBg}
-							mb={{
-								xl: '12px',
-							}}
-							mx={{
-								xl: 'auto',
-							}}
-							ps={{
-								sm: '10px',
-								xl: '16px',
-							}}
-							py="12px"
-							borderRadius="15px"
 							boxShadow={activeShadow}
 							_hover="none"
 							w="100%"
-							_active={{
-								bg: 'inherit',
-								transform: 'none',
-								borderColor: 'transparent',
-							}}
-							_focus={{
-								boxShadow: 'none',
-							}}
-						>
-							<Flex>
-								{typeof prop.icon === 'string' ? (
-									<Icon>{prop.icon}</Icon>
-								) : (
-									<IconBox bg="recode.300" color="white" h="30px" w="30px" me="12px">
-										{prop.icon}
-									</IconBox>
-								)}
-								<Text color={activeColor} my="auto" fontSize="sm">
-									{prop.name}
-								</Text>
-							</Flex>
-						</Button>
-					) : (
-						<Button
-							boxSize="initial"
-							justifyContent="flex-start"
-							alignItems="center"
-							bg="transparent"
-							mb={{
-								xl: '12px',
-							}}
-							mx={{
-								xl: 'auto',
-							}}
-							py="12px"
-							ps={{
-								sm: '10px',
-								xl: '16px',
-							}}
 							borderRadius="15px"
+							align="center"
+						>
+							{typeof prop.icon === 'string' ? (
+								<Icon>{prop.icon}</Icon>
+							) : (
+								<IconBox bg="recode.300" color="white" h="30px" w="30px" me="12px">
+									{prop.icon}
+								</IconBox>
+							)}
+							<Text color={activeColor} my="auto" fontSize="sm">
+								{prop.name}
+							</Text>
+						</Flex>
+					) : (
+						<Flex
+							bg="transparent"
 							_hover="none"
 							w="100%"
-							_active={{
-								bg: 'inherit',
-								transform: 'none',
-								borderColor: 'transparent',
-							}}
-							_focus={{
-								boxShadow: 'none',
-							}}
+							borderRadius="15px"
+							align="center"
 						>
-							<Flex>
-								{typeof prop.icon === 'string' ? (
-									<Icon>{prop.icon}</Icon>
-								) : (
-									<IconBox bg={inactiveBg} color="recode.300" h="30px" w="30px" me="12px">
-										{prop.icon}
-									</IconBox>
-								)}
-								<Text color={inactiveColor} my="auto" fontSize="sm">
-									{prop.name}
-								</Text>
-							</Flex>
-						</Button>
+							{typeof prop.icon === 'string' ? (
+								<Icon>{prop.icon}</Icon>
+							) : (
+								<IconBox bg={inactiveBg} color="recode.300" h="30px" w="30px" me="12px">
+									{prop.icon}
+								</IconBox>
+							)}
+							<Text color={inactiveColor} my="auto" fontSize="sm">
+								{prop.name}
+							</Text>
+						</Flex>
 					)}
-				</NavLink>
+				</Button>
 			);
 		});
 	};
@@ -182,8 +164,8 @@ function SidebarResponsive(props) {
 	var brand = (
 		<Box pt={'35px'} mb="8px">
 			<Link
-				href={`${process.env.PUBLIC_URL}/#/`}
-				target="_blank"
+				as={RouterLink}
+				to="/"
 				display="flex"
 				lineHeight="100%"
 				mb="30px"

@@ -5,7 +5,7 @@ import ConversionHistory from 'components/Tables/ConversionHistory';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaCube } from 'react-icons/fa';
 import { IoDocumentsSharp } from 'react-icons/io5';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
 import { getUserConversions } from 'services/conversions';
 import { getOrganizationDetails } from 'services/organization';
@@ -48,7 +48,6 @@ function getRoleLabel(role) {
 }
 
 function Profile() {
-	const history = useHistory();
 	const location = useLocation();
 	const toast = useToast();
 	const bgProfile = useColorModeValue(
@@ -67,6 +66,7 @@ function Profile() {
 	const [conversions, setConversions] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState('');
+	const [redirectPath, setRedirectPath] = useState('');
 
 	useEffect(() => {
 		if (queryTab === 'documents' || queryTab === 'overview') {
@@ -88,8 +88,8 @@ function Profile() {
 			position: 'top-right',
 		});
 
-		history.replace('/lk/profile');
-	}, [hasCompletedRegistration, history, toast]);
+		setRedirectPath('/lk/profile');
+	}, [hasCompletedRegistration, toast]);
 
 	const loadProfile = useCallback(async () => {
 		setIsLoading(true);
@@ -152,6 +152,10 @@ function Profile() {
 				</Button>
 			</Flex>
 		);
+	}
+
+	if (redirectPath) {
+		return <Navigate to={redirectPath} replace />;
 	}
 
 	const displayName = getHeaderDisplayName(user);

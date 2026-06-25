@@ -1,0 +1,36 @@
+export const routePaths = {
+	home: () => '/',
+	auth: {
+		root: () => '/auth',
+		login: () => '/auth/login-page',
+		signUp: () => '/auth/sign-up',
+	},
+	dashboard: {
+		root: () => '/lk',
+		home: () => '/lk/dashboard',
+		profile: () => '/lk/profile',
+		profileComplete: () => '/lk/profile/complete',
+		company: () => '/lk/company',
+		companyRegistration: () => '/lk/company/reg',
+		employees: () => '/lk/employees',
+		billing: () => '/lk/billing',
+		billingPay: () => '/lk/billing/pay',
+		support: () => '/lk/support',
+		tariff: () => '/lk/tariff',
+		conversionHistory: () => '/lk/conversion-history',
+	},
+	public: {
+		documentation: () => '/documentation',
+		blog: () => '/blog',
+		blogArticle: (slug = ':slug') => `/blog/${slug}`,
+		contacts: () => '/contacts',
+		privacyPolicy: () => '/privacy-policy',
+		publicOffer: () => '/public-offer',
+		macroConstructor: () => '/macro-constructor',
+		macroTranslator: () => '/macro-translator',
+	},
+	legacy: {
+		main: () => '/main',
+		admin: () => '/admin',
+	},
+};

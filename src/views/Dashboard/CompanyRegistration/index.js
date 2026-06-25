@@ -28,7 +28,7 @@ import {
 	useColorModeValue,
 } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
 import { hasDadataApiKey, mapPartySuggestion, suggestParties } from 'services/dadata';
 import { createOrganization } from 'services/organization';
@@ -70,7 +70,7 @@ function getErrorMessage(error) {
 }
 
 function CompanyRegistration() {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const [currentUser, setCurrentUser] = useState(null);
 	const [entityType, setEntityType] = useState('company');
 	const [sameAsOwner, setSameAsOwner] = useState(false);
@@ -129,7 +129,7 @@ function CompanyRegistration() {
 					setCurrentUser(user);
 				}
 				if (user.has_organization) {
-					history.replace('/lk/company');
+					navigate('/lk/company', { replace: true });
 					return;
 				}
 			} finally {
@@ -144,7 +144,7 @@ function CompanyRegistration() {
 		return () => {
 			isMounted = false;
 		};
-	}, [history]);
+	}, [navigate]);
 
 	useEffect(() => {
 		const selectedTitle = selectedSuggestion
@@ -361,13 +361,13 @@ function CompanyRegistration() {
 				email: finalEmail || null,
 			});
 			setIsPreviewModalOpen(false);
-			history.replace('/lk/company');
+			navigate('/lk/company', { replace: true });
 		} catch (error) {
 			const message = getErrorMessage(error);
 			setSubmitError(message);
 			scrollToPageTop();
 			if (message === 'Компания уже привязана к аккаунту') {
-				history.replace('/lk/company');
+				navigate('/lk/company', { replace: true });
 			}
 		} finally {
 			setIsSubmitting(false);

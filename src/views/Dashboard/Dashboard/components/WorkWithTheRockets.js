@@ -3,12 +3,11 @@ import { Box, Button, Flex, Icon, Text, useColorModeValue } from '@chakra-ui/rea
 // Custom components
 import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
-import { useHistory } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 // react icons
 import { BsArrowRight } from 'react-icons/bs';
 
 const WorkWithTheRockets = ({ title, description, backgroundImage }) => {
-	const history = useHistory();
 	let mainText = useColorModeValue('gray.700', 'gray.700');
 	let secondaryText = useColorModeValue('gray.500', 'gray.500');
 
@@ -48,7 +47,7 @@ const WorkWithTheRockets = ({ title, description, backgroundImage }) => {
 						{description}
 					</Text>
 					<Flex align="center" mt="auto">
-						<Button p="0px" variant="no-hover" bg="transparent" onClick={() => history.push('/')}>
+						<Button as={RouterLink} to="/" p="0px" variant="no-hover" bg="transparent">
 							<Text
 								fontSize="sm"
 								fontWeight="bold"

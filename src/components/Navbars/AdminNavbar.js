@@ -9,7 +9,8 @@ import {
 	useColorModeValue,
 } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import AdminNavbarLinks from './AdminNavbarLinks';
 
 export default function AdminNavbar(props) {
@@ -64,7 +65,10 @@ export default function AdminNavbar(props) {
 			setScrolled(false);
 		}
 	};
-	window.addEventListener('scroll', changeNavbar);
+	useEffect(() => {
+		window.addEventListener('scroll', changeNavbar, { passive: true });
+		return () => window.removeEventListener('scroll', changeNavbar);
+	}, []);
 	return (
 		<Flex
 			position={navbarPosition}
@@ -109,21 +113,22 @@ export default function AdminNavbar(props) {
 						<Box minW="0">
 							<Breadcrumb>
 								<BreadcrumbItem color={mainText}>
-									<BreadcrumbLink href="/lk/dashboard" color={secondaryText}>
+									<BreadcrumbLink as={RouterLink} to="/lk/dashboard" color={secondaryText}>
 										Личный кабинет
 									</BreadcrumbLink>
 								</BreadcrumbItem>
 
 								<BreadcrumbItem color={mainText}>
-									<BreadcrumbLink href="#" color={mainText}>
+									<BreadcrumbLink as="span" color={mainText} cursor="default">
 										{brandText}
 									</BreadcrumbLink>
 								</BreadcrumbItem>
 							</Breadcrumb>
 							{/* Here we create navbar brand, based on route name */}
 							<Link
+								as={RouterLink}
+								to="/lk/dashboard"
 								color={mainText}
-								href="#"
 								bg="inherit"
 								borderRadius="inherit"
 								fontWeight="bold"

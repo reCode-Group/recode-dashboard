@@ -12,11 +12,10 @@ import {
 	useColorModeValue,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { Link as RouterLink, useHistory, useParams } from 'react-router-dom';
+import { Link as RouterLink, useParams } from 'react-router-dom';
 import { BLOG_ARTICLES, getBlogArticleBySlug } from '../data';
 
 export default function BlogArticlePage() {
-	const history = useHistory();
 	const { slug } = useParams();
 	const article = getBlogArticleBySlug(slug);
 	const titleColor = useColorModeValue('gray.700', 'white');
@@ -40,7 +39,7 @@ export default function BlogArticlePage() {
 				gap="14px"
 			>
 				<Text color={mutedColor}>Статья не найдена</Text>
-				<Button onClick={() => history.push('/blog')} bg="recode.500" color="white">
+				<Button as={RouterLink} to="/blog" bg="recode.500" color="white">
 					Вернуться в блог
 				</Button>
 			</Flex>
@@ -127,6 +126,8 @@ export default function BlogArticlePage() {
 							</Box>
 
 							<Button
+								as={RouterLink}
+								to="/macro-translator"
 								bg="white"
 								color="gray.700"
 								borderWidth="1px"

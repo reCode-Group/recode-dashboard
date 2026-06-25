@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FiArrowRight, FiChevronDown, FiHelpCircle } from 'react-icons/fi';
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { resolveRouteTarget } from 'utils/navigation';
 
 import businessSiteCard from 'assets/img/landing/business-site-card.png';
@@ -130,7 +130,7 @@ function buildPriceCardsFromApi(payload) {
 export default function LandingPage() {
 	const [openFaqId, setOpenFaqId] = useState(faqRows[0].id);
 	const [priceCards, setPriceCards] = useState(defaultPriceCards);
-	const history = useHistory();
+	const navigate = useNavigate();
 
 	const toggleFaq = (id) => {
 		setOpenFaqId((current) => (current === id ? null : id));
@@ -162,7 +162,7 @@ export default function LandingPage() {
 	}, []);
 
 	const handleStartWorkClick = () => {
-		history.push('/macro-translator');
+		navigate('/macro-translator');
 	};
 
 	const handleFeaturesClick = () => {
@@ -435,8 +435,8 @@ export default function LandingPage() {
 									card.highlight ? 'text-white' : 'text-[#151928]'
 								}`}
 							>
-								{card.items.map((item) => (
-									<li key={item} className="flex items-center gap-2">
+								{card.items.map((item, index) => (
+									<li key={`${card.id}-${item}-${index}`} className="flex items-center gap-2">
 										<span className="inline-flex size-4 items-center justify-center rounded-[5px] bg-[#cbd5e0] text-[10px] text-[#151928]">
 											✓
 										</span>

@@ -1,6 +1,7 @@
 import { cn } from 'lib/cn';
 import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
+import { isExternalUrl, resolveRouteTarget } from 'utils/navigation';
 
 export default function FloatingNav({ items }) {
 	return (
@@ -23,15 +24,27 @@ export default function FloatingNav({ items }) {
 				</NavLink>
 
 				<div className="hidden items-center gap-5 md:flex">
-					{items.map((item) => (
-						<a
-							key={item.label}
-							href={item.href}
-							className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-700 transition-colors hover:text-[#005de0]"
-						>
-							{item.label}
-						</a>
-					))}
+					{items.map((item) =>
+						isExternalUrl(item.href) ? (
+							<a
+								key={item.label}
+								href={item.href}
+								target="_blank"
+								rel="noreferrer"
+								className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-700 transition-colors hover:text-[#005de0]"
+							>
+								{item.label}
+							</a>
+						) : (
+							<NavLink
+								key={item.label}
+								to={resolveRouteTarget(item.href)}
+								className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-700 transition-colors hover:text-[#005de0]"
+							>
+								{item.label}
+							</NavLink>
+						)
+					)}
 				</div>
 
 				<NavLink

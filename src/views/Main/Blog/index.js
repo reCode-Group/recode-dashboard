@@ -8,11 +8,10 @@ import {
 	Text,
 	useColorModeValue,
 } from '@chakra-ui/react';
-import { useHistory } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { BLOG_ARTICLES } from './data';
 
 export default function BlogPage() {
-	const history = useHistory();
 	const cardBg = useColorModeValue('white', 'gray.700');
 	const cardBorder = useColorModeValue('gray.200', 'whiteAlpha.200');
 	const titleColor = useColorModeValue('gray.700', 'white');
@@ -70,6 +69,8 @@ export default function BlogPage() {
 								{article.description}
 							</Text>
 							<Button
+								as={RouterLink}
+								to={`/blog/${article.slug}`}
 								mt="auto"
 								pt="10px"
 								pb="10px"
@@ -80,7 +81,6 @@ export default function BlogPage() {
 								borderColor="gray.300"
 								borderRadius="10px"
 								_hover={{ bg: 'gray.50' }}
-								onClick={() => history.push(`/blog/${article.slug}`)}
 							>
 								Читать
 							</Button>

@@ -28,7 +28,7 @@ import ConversionHistory from 'components/Tables/ConversionHistory';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FiAlertCircle, FiCheck, FiCopy } from 'react-icons/fi';
 import { IoArrowForwardSharp } from 'react-icons/io5';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
 import { getUserConversions } from 'services/conversions';
 import { convertPaidMacro } from 'services/macroTranslator';
@@ -89,7 +89,7 @@ function getTariffLabel(subscriptionName) {
 }
 
 export default function MacroTranslatorPage() {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const [source, setSource] = useState('');
 	const [translated, setTranslated] = useState('');
 	const [targetLanguage, setTargetLanguage] = useState('JS');
@@ -207,7 +207,7 @@ export default function MacroTranslatorPage() {
 		}
 
 		if (!isAuthenticated) {
-			history.push('/auth/login-page');
+			navigate('/auth/login-page');
 			return;
 		}
 
@@ -227,7 +227,7 @@ export default function MacroTranslatorPage() {
 			await loadData();
 		} catch (error) {
 			if (isUnauthorizedError(error)) {
-				history.push('/auth/login-page');
+				navigate('/auth/login-page');
 				return;
 			}
 
@@ -383,7 +383,7 @@ export default function MacroTranslatorPage() {
 										fontWeight="semibold"
 										borderRadius="8px"
 										rightIcon={<IoArrowForwardSharp />}
-										onClick={() => history.push('/lk/tariff')}
+										onClick={() => navigate('/lk/tariff')}
 										_hover={{ bg: 'gray.300' }}
 									>
 										ТАРИФЫ

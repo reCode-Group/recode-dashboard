@@ -17,7 +17,7 @@ import CardBody from "components/Card/CardBody";
 import CardHeader from "components/Card/CardHeader";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiMessageCircle, FiPlus, FiSend } from "react-icons/fi";
-import { useHistory, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getSupportTickets, sendSupportReply } from "services/supportTickets";
 import CreateSupportTicketModal from "./components/CreateSupportTicketModal";
 
@@ -46,7 +46,7 @@ export default function Support() {
   const [reply, setReply] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const messagesScrollRef = useRef(null);
@@ -94,7 +94,7 @@ export default function Support() {
   }, [selectedTicket?.id]);
 
   const openTicket = (ticketId) => {
-    history.push(`/lk/support?ticket=${ticketId}`);
+    navigate(`/lk/support?ticket=${ticketId}`);
   };
 
   const handleSendReply = async () => {

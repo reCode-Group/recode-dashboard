@@ -8,7 +8,7 @@ import { EmployersIcon, TokensRemainIcon } from 'components/Icons/Icons';
 import { PlusIcon, WalletIcon } from 'components/Icons/Icons.js';
 import ConversionHistory from 'components/Tables/ConversionHistory';
 import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { getCurrentUser, getEmployeesCount } from 'services/auth';
 import { getUserConversions } from 'services/conversions';
 import { getUserSubscription } from 'services/subscription';
@@ -52,7 +52,6 @@ function getTokenBalancePercentage(tokensRemain, packageTokens) {
 
 export default function Dashboard() {
 	const iconBoxInside = useColorModeValue('white', 'white');
-	const history = useHistory();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [isCompanyAdmin, setIsCompanyAdmin] = useState(null);
 	const [viewerContext, setViewerContext] = useState(null);
@@ -65,6 +64,7 @@ export default function Dashboard() {
 		packageTokensValue: 0,
 	});
 	const [conversions, setConversions] = useState([]);
+	const [redirectPath, setRedirectPath] = useState('');
 
 	useEffect(() => {
 		let isMounted = true;
@@ -178,11 +178,15 @@ export default function Dashboard() {
 		subscriptionStats.packageTokensValue
 	);
 
+	if (redirectPath) {
+		return <Navigate to={redirectPath} replace />;
+	}
+
 	return (
 		<Flex flexDirection="column" pt={{ base: '120px', md: '75px' }}>
 			{showRegistrationWarning ? (
 				<IncompleteRegistrationWarning
-					onCompleteRegistration={() => history.push('/lk/profile/complete')}
+					onCompleteRegistration={() => setRedirectPath('/lk/profile/complete')}
 				/>
 			) : (
 				<SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing="24px">
@@ -203,7 +207,7 @@ export default function Dashboard() {
 						}
 						onInlineAction={
 							isSubscriptionLoaded && subscriptionStats.tokensRemainValue === 0
-								? () => history.push('/lk/billing')
+								? () => setRedirectPath('/lk/billing')
 								: undefined
 						}
 						inlineActionLabel="Перейти в финансы"

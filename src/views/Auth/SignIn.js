@@ -19,7 +19,7 @@ import {
 import signInImage from 'assets/img/signInImage.png';
 import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
 import { useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { login } from 'services/auth';
 import { markAuthenticated } from 'services/session';
 
@@ -38,7 +38,7 @@ function getFriendlyError(error) {
 }
 
 function SignIn() {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const titleColor = useColorModeValue('recode.300', 'recode.200');
 	const textColor = useColorModeValue('gray.400', 'white');
 	const bgIcons = useColorModeValue('gray.50', 'rgba(255, 255, 255, 0.1)');
@@ -64,7 +64,7 @@ function SignIn() {
 		try {
 			await login(normalizedEmail, password);
 			markAuthenticated();
-			history.replace('/lk/dashboard');
+			navigate('/lk/dashboard', { replace: true });
 		} catch (requestError) {
 			setError(getFriendlyError(requestError));
 		} finally {

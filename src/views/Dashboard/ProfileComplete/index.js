@@ -13,7 +13,7 @@ import {
 	useColorModeValue,
 } from '@chakra-ui/react';
 import { useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { completeRegistration, getCurrentUser } from 'services/auth';
 import { clearPendingProfileName, getPendingProfileName } from 'services/session';
 
@@ -96,13 +96,13 @@ function getFriendlyError(error) {
 }
 
 function ProfileComplete() {
-	const history = useHistory();
 	const [lastName, setLastName] = useState('');
 	const [firstName, setFirstName] = useState(getPendingProfileName());
 	const [middleName, setMiddleName] = useState('');
 	const [phone, setPhone] = useState('+7');
 	const [isSaving, setIsSaving] = useState(false);
 	const [serverError, setServerError] = useState('');
+	const [redirectPath, setRedirectPath] = useState('');
 
 	const titleColor = useColorModeValue('gray.700', 'white');
 	const subtitleColor = useColorModeValue('gray.400', 'gray.300');
@@ -178,13 +178,17 @@ function ProfileComplete() {
 				lastname: middleName.trim(),
 			});
 			clearPendingProfileName();
-			history.replace('/lk/profile?completed=1');
+			setRedirectPath('/lk/profile?completed=1');
 		} catch (error) {
 			setServerError(getFriendlyError(error));
 		} finally {
 			setIsSaving(false);
 		}
 	};
+
+	if (redirectPath) {
+		return <Navigate to={redirectPath} replace />;
+	}
 
 	return (
 		<Flex direction="column" pt={{ base: '120px', md: '75px' }} minH="100vh">

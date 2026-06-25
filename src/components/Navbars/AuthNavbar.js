@@ -22,7 +22,7 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive';
 import { MAIN_CONTAINER_MAX_WIDTH, MAIN_NAVBAR_WIDTH } from 'constants/layout';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, NavLink, useLocation } from 'react-router-dom';
 import routes from 'routes.js';
 
 const PUBLIC_NAV_ITEMS = [
@@ -30,7 +30,7 @@ const PUBLIC_NAV_ITEMS = [
 	{ to: '/macro-translator', label: 'ПЕРЕВОДЧИК', beta: true },
 	{ to: '/documentation', label: 'РЕСУРСЫ' },
 	{ to: '/blog', label: 'БЛОГ' },
-	{ to: '/contacts#support', label: 'ТЕХПОДДЕРЖКА' },
+	{ to: { pathname: '/contacts', hash: '#support' }, label: 'ТЕХПОДДЕРЖКА' },
 ];
 
 function NavItemLabel({ beta, betaColor, label }) {
@@ -109,8 +109,8 @@ export default function AuthNavbar(props) {
 
 	const brand = (
 		<Link
-			href="/"
-			target="_blank"
+			as={RouterLink}
+			to="/"
 			display="flex"
 			lineHeight="100%"
 			fontWeight="bold"
@@ -128,19 +128,23 @@ export default function AuthNavbar(props) {
 	const linksAuth = (
 		<HStack display={{ sm: 'none', lg: 'flex' }}>
 			{PUBLIC_NAV_ITEMS.map((item) => (
-				<NavLink to={item.to} key={item.to}>
-					<Button
-						fontSize="sm"
-						fontWeight="medium"
-						ms="0px"
-						px="0px"
-						me={{ sm: '2px', md: '16px' }}
-						color={navbarIcon}
-						variant="transparent-with-icon"
-					>
-						<NavItemLabel beta={item.beta} betaColor={betaColor} label={item.label} />
-					</Button>
-				</NavLink>
+				<Link
+					as={NavLink}
+					to={item.to}
+					key={typeof item.to === 'string' ? item.to : `${item.to.pathname}${item.to.hash || ''}`}
+					fontSize="14px"
+					fontWeight="500"
+					ms="0px"
+					px="0px"
+					me={{ sm: '2px', md: '16px' }}
+					color={navbarIcon}
+					display="inline-flex"
+					alignItems="center"
+					h="40px"
+					_hover={{ textDecoration: 'none', opacity: 0.85 }}
+				>
+					<NavItemLabel beta={item.beta} betaColor={betaColor} label={item.label} />
+				</Link>
 			))}
 		</HStack>
 	);
@@ -162,41 +166,43 @@ export default function AuthNavbar(props) {
 					<DrawerBody px="1rem" py="24px">
 						<Stack direction="column" spacing="6px" mt="36px">
 							{PUBLIC_NAV_ITEMS.map((item) => (
-								<NavLink to={item.to} key={`drawer-${item.to}`} onClick={onClose}>
-									<Button
-										boxSize="initial"
-										justifyContent="flex-start"
-										alignItems="center"
-										bg="transparent"
-										w="100%"
-										py="12px"
-										px="12px"
-										borderRadius="15px"
-										_hover={{ bg: 'gray.50' }}
-										_active={{ bg: 'gray.50', transform: 'none', borderColor: 'transparent' }}
-										_focus={{ boxShadow: 'none' }}
-									>
-										<Text color="gray.700" fontSize="sm" fontWeight="medium" textAlign="left">
-											<NavItemLabel beta={item.beta} betaColor="recode.300" label={item.label} />
-										</Text>
-									</Button>
-								</NavLink>
-							))}
-							<Link href="/lk/dashboard" onClick={onClose} _hover={{ textDecoration: 'none' }}>
-								<Button
-									bg="recode.300"
-									color="white"
-									fontSize="sm"
-									fontWeight="medium"
-									borderRadius="35px"
+								<Link
+									as={NavLink}
+									to={item.to}
+									key={`drawer-${typeof item.to === 'string' ? item.to : `${item.to.pathname}${item.to.hash || ''}`}`}
+									onClick={onClose}
+									display="flex"
+									justifyContent="flex-start"
+									alignItems="center"
 									w="100%"
-									h="44px"
-									mt="12px"
-									_hover={{ bg: 'recode.200' }}
-									_active={{ bg: 'recode.400' }}
+									py="12px"
+									px="12px"
+									borderRadius="15px"
+									_hover={{ bg: 'gray.50', textDecoration: 'none' }}
 								>
-									Личный кабинет
-								</Button>
+									<Text color="gray.700" fontSize="sm" fontWeight="medium" textAlign="left">
+										<NavItemLabel beta={item.beta} betaColor="recode.300" label={item.label} />
+									</Text>
+								</Link>
+							))}
+							<Link
+								as={RouterLink}
+								to="/lk/dashboard"
+								onClick={onClose}
+								display="flex"
+								alignItems="center"
+								justifyContent="center"
+								bg="recode.300"
+								color="white"
+								fontSize="sm"
+								fontWeight="medium"
+								borderRadius="35px"
+								w="100%"
+								h="44px"
+								mt="12px"
+								_hover={{ bg: 'recode.200', textDecoration: 'none' }}
+							>
+								Личный кабинет
 							</Link>
 						</Stack>
 					</DrawerBody>
@@ -241,22 +247,25 @@ export default function AuthNavbar(props) {
 					)}
 				</Box>
 				{linksAuth}
-				<Link href="/lk/dashboard">
-					<Button
-						bg={bgButton}
-						color={colorButton}
-						fontSize="xs"
-						fontWeight="medium"
-						variant="no-hover"
-						borderRadius="35px"
-						px="30px"
-						display={{
-							sm: 'none',
-							lg: 'flex',
-						}}
-					>
-						Личный кабинет
-					</Button>
+				<Link
+					as={RouterLink}
+					to="/lk/dashboard"
+					display={{
+						sm: 'none',
+						lg: 'flex',
+					}}
+					alignItems="center"
+					justifyContent="center"
+					bg={bgButton}
+					color={colorButton}
+					fontSize="xs"
+					fontWeight="medium"
+					borderRadius="35px"
+					px="30px"
+					h="40px"
+					_hover={{ textDecoration: 'none', opacity: 0.92 }}
+				>
+					Личный кабинет
 				</Link>
 			</Flex>
 		</Flex>

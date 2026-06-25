@@ -17,6 +17,7 @@ import {
 import { Separator } from 'components/Separator/Separator';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 
 export default function Configurator(props) {
 	const { secondary, isOpen, onClose, fixed, ...rest } = props;
@@ -126,7 +127,7 @@ export default function Configurator(props) {
 							<Separator />
 							<Box mt="24px">
 								<Box>
-									<Link href="/" w="100%" mb="16px">
+									<Link as={RouterLink} to="/" w="100%" mb="16px">
 										<Button
 											w="100%"
 											mb="16px"
@@ -139,7 +140,7 @@ export default function Configurator(props) {
 											Скачать исходники
 										</Button>
 									</Link>
-									<Link href="/" w="100%">
+									<Link as={RouterLink} to="/documentation" w="100%">
 										<Button
 											w="100%"
 											bg={secondaryButtonBg}

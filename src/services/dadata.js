@@ -2,11 +2,11 @@ const DADATA_PARTY_SUGGEST_URL =
 	'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/party';
 
 export function hasDadataApiKey() {
-	return Boolean(process.env.REACT_APP_DADATA_API_KEY);
+	return Boolean(import.meta.env.VITE_DADATA_API_KEY);
 }
 
 export async function suggestParties(query, count = 5) {
-	const token = process.env.REACT_APP_DADATA_API_KEY;
+	const token = import.meta.env.VITE_DADATA_API_KEY;
 	const trimmedQuery = query.trim();
 
 	if (!token || trimmedQuery.length < 2) {

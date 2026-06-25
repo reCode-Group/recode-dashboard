@@ -20,9 +20,10 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive';
 import PropTypes from 'prop-types';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FiArrowRight } from 'react-icons/fi';
-import { NavLink, useHistory, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import routes from 'routes.js';
 import { clearAuthState } from 'services/session';
+import { openExternalDocument } from 'utils/navigation';
 import { searchSite } from 'utils/siteSearch';
 
 export default function HeaderLinks(props) {
@@ -35,7 +36,7 @@ export default function HeaderLinks(props) {
 		showOnlyMobileMenu = false,
 		...rest
 	} = props;
-	const history = useHistory();
+	const navigate = useNavigate();
 	const location = useLocation();
 	const [searchQuery, setSearchQuery] = useState('');
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -105,12 +106,12 @@ export default function HeaderLinks(props) {
 		setActiveResultIndex(-1);
 
 		if (result.type === 'doc' && result.href) {
-			window.open(result.href, '_blank', 'noopener,noreferrer');
+			openExternalDocument(result.href);
 			return;
 		}
 
 		if (result.route) {
-			history.push(result.route);
+			navigate(result.route);
 		}
 	};
 
@@ -329,7 +330,7 @@ export default function HeaderLinks(props) {
 				w="18px"
 				h="18px"
 			/>
-			<NavLink to="/lk/profile">
+			<NavLink to="/lk/profile" end>
 				<IconButton
 					display={showOnlyMobileMenu ? 'none' : { base: 'none', md: 'inline-flex' }}
 					aria-label="Профиль"
@@ -343,7 +344,7 @@ export default function HeaderLinks(props) {
 					icon={<ProfileIcon color={navbarIcon} w="22px" h="22px" me="0px" />}
 				/>
 			</NavLink>
-			<NavLink to="/auth/login-page" onClick={clearAuthState}>
+			<NavLink to="/auth/login-page" onClick={clearAuthState} end>
 				<Button
 					display={{ base: 'none', md: 'inline-flex' }}
 					ms="0px"

@@ -12,7 +12,8 @@ import {
 import recodeLogoColored from 'assets/svg/recode-logo-colored.svg';
 import { useEffect, useMemo, useState } from 'react';
 import { FiChevronRight, FiFileText, FiSearch } from 'react-icons/fi';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { openExternalDocument } from 'utils/navigation';
 import { DOCUMENTATION_SECTIONS } from './data';
 
 function DocumentIcon() {
@@ -24,7 +25,7 @@ function SearchIcon() {
 }
 
 export default function DocumentationPage() {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const [activeSectionId, setActiveSectionId] = useState(DOCUMENTATION_SECTIONS[0].id);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -102,7 +103,7 @@ export default function DocumentationPage() {
 		scrollToSection(result.sectionId);
 		setSearchQuery(result.title);
 		setIsSearchFocused(false);
-		window.open(result.href, '_blank', 'noopener,noreferrer');
+		openExternalDocument(result.href);
 	};
 
 	return (
@@ -124,7 +125,7 @@ export default function DocumentationPage() {
 							p="0"
 							m="0"
 							cursor="pointer"
-							onClick={() => history.push('/')}
+							onClick={() => navigate('/')}
 						>
 							<Image src={recodeLogoColored} alt="reCode" w="8vw" minW="96px" mr="0.5rem" />
 						</Box>
@@ -280,7 +281,7 @@ export default function DocumentationPage() {
 						fontSize="sm"
 						fontWeight="medium"
 						_hover={{ bg: 'recode.400' }}
-						onClick={() => history.push('/macro-translator')}
+						onClick={() => navigate('/macro-translator')}
 					>
 						НАЧАТЬ РАБОТУ
 					</Button>

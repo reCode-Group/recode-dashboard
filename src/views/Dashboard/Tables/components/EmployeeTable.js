@@ -36,7 +36,7 @@ import CardHeader from 'components/Card/CardHeader.js';
 import TablesTableRow from 'components/Tables/TablesTableRow';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { useHistory } from 'react-router-dom';
+import { Link as RouterLink, Navigate } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
 import {
 	activateOrganizationEmployee,
@@ -108,7 +108,6 @@ const EmployeeTable = ({
 	fixedHeight = '550px',
 	enforceOrganizationGuard = true,
 }) => {
-	const history = useHistory();
 	const textColor = useColorModeValue('gray.700', 'white');
 	const cardBg = useColorModeValue('white', 'gray.700');
 	const glassBg = useColorModeValue('rgba(255, 255, 255, 0.92)', 'rgba(26, 32, 44, 0.9)');
@@ -135,6 +134,7 @@ const EmployeeTable = ({
 	const [existingEmail, setExistingEmail] = useState('');
 	const [tokens, setTokens] = useState(0);
 	const [formError, setFormError] = useState('');
+	const [redirectPath, setRedirectPath] = useState('');
 
 	const loadEmployees = useCallback(async () => {
 		setIsLoading(true);
@@ -144,7 +144,7 @@ const EmployeeTable = ({
 			if (enforceOrganizationGuard) {
 				const user = await getCurrentUser();
 				if (!user.has_organization) {
-					history.replace('/lk/company/reg');
+					setRedirectPath('/lk/company/reg');
 					return;
 				}
 			}
@@ -160,7 +160,7 @@ const EmployeeTable = ({
 		} finally {
 			setIsLoading(false);
 		}
-	}, [enforceOrganizationGuard, history]);
+	}, [enforceOrganizationGuard]);
 
 	useEffect(() => {
 		loadEmployees();
@@ -212,7 +212,10 @@ const EmployeeTable = ({
 	const resolvedFullListPath = fullListPath.startsWith('/lk/')
 		? fullListPath
 		: `/lk${fullListPath.startsWith('/') ? fullListPath : `/${fullListPath}`}`;
-	const handleFullListClick = onFullListClick ?? (() => history.push(resolvedFullListPath));
+
+	if (redirectPath) {
+		return <Navigate to={redirectPath} replace />;
+	}
 
 	const resetCreateForm = () => {
 		setFirstName('');
@@ -440,17 +443,32 @@ const EmployeeTable = ({
 						{title}
 					</Text>
 					{showFullListButton && (
-						<Button
-							colorScheme="recode"
-							borderColor="recode.300"
-							color="recode.300"
-							variant="outline"
-							fontSize="xs"
-							p="8px 30px"
-							onClick={handleFullListClick}
-						>
-							Весь список
-						</Button>
+						onFullListClick ? (
+							<Button
+								colorScheme="recode"
+								borderColor="recode.300"
+								color="recode.300"
+								variant="outline"
+								fontSize="xs"
+								p="8px 30px"
+								onClick={onFullListClick}
+							>
+								Весь список
+							</Button>
+						) : (
+							<Button
+								as={RouterLink}
+								to={resolvedFullListPath}
+								colorScheme="recode"
+								borderColor="recode.300"
+								color="recode.300"
+								variant="outline"
+								fontSize="xs"
+								p="8px 30px"
+							>
+								Весь список
+							</Button>
+						)
 					)}
 				</Flex>
 			</CardHeader>

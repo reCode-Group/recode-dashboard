@@ -19,7 +19,7 @@ import BgSignUp from 'assets/img/BgSignUp.png';
 import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
 import AuthNavbar from 'components/Navbars/AuthNavbar.js';
 import { useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { login, register, sendVerificationCode, verifyCode } from 'services/auth';
 import { markAuthenticated, setPendingProfileEmail, setPendingProfileName } from 'services/session';
 
@@ -44,7 +44,7 @@ function getFriendlyError(error) {
 }
 
 function SignUp() {
-	const history = useHistory();
+	const navigate = useNavigate();
 	const titleColor = useColorModeValue('recode.300', 'recode.200');
 	const textColor = useColorModeValue('gray.700', 'white');
 	const secondTextColor = useColorModeValue('gray.400', 'white');
@@ -106,7 +106,7 @@ function SignUp() {
 			markAuthenticated();
 			setPendingProfileEmail(normalizedEmail);
 			setPendingProfileName(trimmedName);
-			history.replace('/lk/profile/complete');
+			navigate('/lk/profile/complete', { replace: true });
 		} catch (requestError) {
 			setError(getFriendlyError(requestError));
 		} finally {

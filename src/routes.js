@@ -1,24 +1,4 @@
-﻿import Billing from 'views/Dashboard/Billing';
-import BillingPay from 'views/Dashboard/BillingPay';
-import CompanyRegistration from 'views/Dashboard/CompanyRegistration';
-import Company from 'views/Dashboard/Company';
-import ConversionHistoryPage from 'views/Dashboard/ConversionHistory';
-import Dashboard from 'views/Dashboard/Dashboard';
-import Profile from 'views/Dashboard/Profile';
-import ProfileComplete from 'views/Dashboard/ProfileComplete';
-import Support from 'views/Dashboard/Support';
-import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
-import Tariff from 'views/Dashboard/Tariff';
-import SignIn from 'views/Auth/SignIn';
-import SignUp from 'views/Auth/SignUp';
-import BlogPage from 'views/Main/Blog';
-import BlogArticlePage from 'views/Main/Blog/Article';
-import ContactsPage from 'views/Main/Contacts';
-import DocumentationPage from 'views/Main/Documentation';
-import LandingPage from 'views/Main/Landing';
-import PrivacyPolicyPage from 'views/Main/Legal/PrivacyPolicy';
-import PublicOfferPage from 'views/Main/Legal/PublicOffer';
-import MacroTranslatorPage from 'views/Main/MacroTranslator';
+import { lazy } from 'react';
 
 import {
 	CompanyIcon,
@@ -31,6 +11,29 @@ import {
 	RocketIcon,
 	SupportIcon,
 } from 'components/Icons/Icons';
+
+const Billing = lazy(() => import('views/Dashboard/Billing'));
+const BillingPay = lazy(() => import('views/Dashboard/BillingPay'));
+const CompanyRegistration = lazy(() => import('views/Dashboard/CompanyRegistration'));
+const Company = lazy(() => import('views/Dashboard/Company'));
+const ConversionHistoryPage = lazy(() => import('views/Dashboard/ConversionHistory'));
+const Dashboard = lazy(() => import('views/Dashboard/Dashboard'));
+const Profile = lazy(() => import('views/Dashboard/Profile'));
+const ProfileComplete = lazy(() => import('views/Dashboard/ProfileComplete'));
+const Support = lazy(() => import('views/Dashboard/Support'));
+const EmployeeTable = lazy(() => import('views/Dashboard/Tables/components/EmployeeTable'));
+const Tariff = lazy(() => import('views/Dashboard/Tariff'));
+const SignIn = lazy(() => import('views/Auth/SignIn'));
+const SignUp = lazy(() => import('views/Auth/SignUp'));
+const BlogPage = lazy(() => import('views/Main/Blog'));
+const BlogArticlePage = lazy(() => import('views/Main/Blog/Article'));
+const ContactsPage = lazy(() => import('views/Main/Contacts'));
+const DocumentationPage = lazy(() => import('views/Main/Documentation'));
+const MacroConstructorPage = lazy(() => import('features/macroConstructor/MacroConstructorPage'));
+const LandingPage = lazy(() => import('views/Main/Landing'));
+const PrivacyPolicyPage = lazy(() => import('views/Main/Legal/PrivacyPolicy'));
+const PublicOfferPage = lazy(() => import('views/Main/Legal/PublicOffer'));
+const MacroTranslatorPage = lazy(() => import('views/Main/MacroTranslator'));
 
 const dashRoutes = [
 	{
@@ -175,6 +178,13 @@ const dashRoutes = [
 				hiddenInSidebar: true,
 			},
 			{
+				path: '/macro-constructor',
+				name: 'Конструктор макросов',
+				component: MacroConstructorPage,
+				layout: '',
+				hiddenInSidebar: true,
+			},
+			{
 				path: '/macro-translator',
 				name: 'Перейти в переводчик',
 				icon: <ConverterIcon color="inherit" />,
@@ -193,6 +203,3 @@ const dashRoutes = [
 ];
 
 export default dashRoutes;
-
-
-

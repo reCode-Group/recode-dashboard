@@ -22,7 +22,7 @@ import {
 	useColorModeValue,
 } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 // Custom components
 import Card from 'components/Card/Card.js';
 import CardHeader from 'components/Card/CardHeader.js';
@@ -44,7 +44,6 @@ const ConversionHistory = ({
 	fullHistoryPath = '/lk/conversion-history',
 	fullHistoryButtonLabel = 'Показать всю историю',
 }) => {
-	const history = useHistory();
 	const textColor = useColorModeValue('gray.700', 'white');
 	const tableBorder = useColorModeValue('gray.200', 'whiteAlpha.200');
 	const inputBg = useColorModeValue('white', 'gray.700');
@@ -282,6 +281,8 @@ const ConversionHistory = ({
 							<Flex />
 						) : (
 							<Button
+								as={RouterLink}
+								to={fullHistoryPath}
 								variant="ghost"
 								bg="transparent"
 								color={textColor}
@@ -290,7 +291,6 @@ const ConversionHistory = ({
 								_hover={{ bg: 'transparent', textDecoration: 'underline' }}
 								_active={{ bg: 'transparent' }}
 								_focus={{ boxShadow: 'none' }}
-								onClick={() => history.push(fullHistoryPath)}
 							>
 								{fullHistoryButtonLabel}
 							</Button>
@@ -302,6 +302,8 @@ const ConversionHistory = ({
 
 						{showFullHistoryButton && (
 							<Button
+								as={RouterLink}
+								to={fullHistoryPath}
 								variant="ghost"
 								bg="transparent"
 								color={textColor}
@@ -310,7 +312,6 @@ const ConversionHistory = ({
 								_hover={{ bg: 'transparent', textDecoration: 'underline' }}
 								_active={{ bg: 'transparent' }}
 								_focus={{ boxShadow: 'none' }}
-								onClick={() => history.push(fullHistoryPath)}
 								ms={enablePagination ? '10px' : '0'}
 							>
 								{fullHistoryButtonLabel}

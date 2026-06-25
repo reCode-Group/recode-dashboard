@@ -17,10 +17,9 @@ import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
 import InvoicesRow from 'components/Tables/InvoicesRow';
 import { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 
 const Documents = ({ title, data, fixedHeight = '855px' }) => {
-	const history = useHistory();
 	const textColor = useColorModeValue('gray.700', 'white');
 	const cardBg = useColorModeValue('white', 'gray.700');
 	const scrollRef = useRef(null);
@@ -77,13 +76,14 @@ const Documents = ({ title, data, fixedHeight = '855px' }) => {
 						{title}
 					</Text>
 					<Button
+						as={RouterLink}
+						to="/lk/profile?tab=documents"
 						colorScheme="recode"
 						borderColor="recode.300"
 						color="recode.300"
 						variant="outline"
 						fontSize="xs"
 						p="8px 32px"
-						onClick={() => history.push('/lk/profile?tab=documents')}
 					>
 						{'Все отчеты'}
 					</Button>

@@ -16,7 +16,7 @@ import ConversionHistory from 'components/Tables/ConversionHistory';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaCog, FaUsers } from 'react-icons/fa';
 import { IoDocumentsSharp } from 'react-icons/io5';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
 import { getOrganizationConversions } from 'services/conversions';
 import { getOrganizationDetails } from 'services/organization';
@@ -46,7 +46,6 @@ function getCompanyAddress(organization) {
 }
 
 function Company() {
-	const history = useHistory();
 	const location = useLocation();
 	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [
 		location.search,
@@ -58,6 +57,7 @@ function Company() {
 	const [conversions, setConversions] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState('');
+	const [redirectPath, setRedirectPath] = useState('');
 
 	const textColor = useColorModeValue('gray.700', 'white');
 	const borderProfileColor = useColorModeValue('white', 'rgba(255, 255, 255, 0.31)');
@@ -73,7 +73,7 @@ function Company() {
 		try {
 			const currentUser = await getCurrentUser();
 			if (!currentUser.has_organization) {
-				history.replace('/lk/company/reg');
+				setRedirectPath('/lk/company/reg');
 				return;
 			}
 
@@ -93,7 +93,7 @@ function Company() {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [history]);
+	}, []);
 
 	useEffect(() => {
 		loadCompany();
@@ -137,6 +137,10 @@ function Company() {
 				</Alert>
 			</Flex>
 		);
+	}
+
+	if (redirectPath) {
+		return <Navigate to={redirectPath} replace />;
 	}
 
 	return (
