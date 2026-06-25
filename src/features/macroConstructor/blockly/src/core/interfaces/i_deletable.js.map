@@ -1,0 +1,1 @@
+{"version":3,"file":"i_deletable.js","sourceRoot":"","sources":["../../../../core/interfaces/i_deletable.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAsBH,yDAAyD;AACzD,MAAM,UAAU,WAAW,CAAC,GAAQ;IAClC,OAAO,CACL,GAAG,CAAC,aAAa,CAAC,KAAK,SAAS;QAChC,GAAG,CAAC,SAAS,CAAC,KAAK,SAAS;QAC5B,GAAG,CAAC,gBAAgB,CAAC,KAAK,SAAS,CACpC,CAAC;AACJ,CAAC"}

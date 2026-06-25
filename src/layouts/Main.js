@@ -16,8 +16,10 @@ export default function MainLayout(props) {
 	const location = useLocation();
 	const isDocumentationRoute = location.pathname === '/documentation';
 	const isLandingRoute = location.pathname === '/';
-	const contentMaxWidth = isDocumentationRoute || isLandingRoute ? '100%' : MAIN_CONTAINER_MAX_WIDTH;
-	const contentPaddingX = isDocumentationRoute || isLandingRoute ? '0px' : MAIN_CONTAINER_PADDING_X;
+	const isMacroConstructorRoute = location.pathname === '/macro-constructor';
+	const isFullBleedRoute = isDocumentationRoute || isLandingRoute || isMacroConstructorRoute;
+	const contentMaxWidth = isFullBleedRoute ? '100%' : MAIN_CONTAINER_MAX_WIDTH;
+	const contentPaddingX = isFullBleedRoute ? '0px' : MAIN_CONTAINER_PADDING_X;
 	// ref for the wrapper div
 	const wrapper = React.createRef();
 	React.useEffect(() => {
@@ -31,7 +33,7 @@ export default function MainLayout(props) {
 	return (
 		<ChakraProvider theme={theme} resetCss={false}>
 			<Box ref={navRef} w="100%">
-				{!isDocumentationRoute && (
+				{!isDocumentationRoute && !isMacroConstructorRoute && (
 					<Portal containerRef={navRef}>
 						<AuthNavbar
 							secondary={false}
@@ -45,7 +47,7 @@ export default function MainLayout(props) {
 						<Outlet />
 					</Box>
 				</Box>
-				{!isDocumentationRoute && !isLandingRoute && (
+				{!isDocumentationRoute && !isLandingRoute && !isMacroConstructorRoute && (
 					<Box px={MAIN_CONTAINER_PADDING_X} mx="auto" width="100%" maxW={MAIN_CONTAINER_MAX_WIDTH}>
 						<Footer />
 					</Box>

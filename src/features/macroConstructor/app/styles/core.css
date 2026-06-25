@@ -1,0 +1,168 @@
+#blocklyDiv {
+  height: 100%;
+  width: 100%;
+}
+#importExport {
+  font-family: monospace;
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 40px;
+  aspect-ratio: 1;
+  display: grid;
+  grid: 50%/50%;
+  color: #005de0;
+  --_g: no-repeat linear-gradient(currentColor 0 0);
+  background: var(--_g), var(--_g), var(--_g);
+  background-size: 50.1% 50.1%;
+  animation:
+    l6-0 1.5s infinite steps(1) alternate,
+    l6-0-0 3s infinite steps(1);
+}
+.loader::before {
+  content: '';
+  background: currentColor;
+  transform: perspective(150px) rotateY(0deg) rotateX(0deg);
+  transform-origin: bottom right;
+  animation: l6-1 1.5s infinite linear alternate;
+}
+@keyframes l6-0 {
+  0% {
+    background-position:
+      0 100%,
+      100% 100%,
+      100% 0;
+  }
+  33% {
+    background-position:
+      100% 100%,
+      100% 100%,
+      100% 0;
+  }
+  66% {
+    background-position:
+      100% 0,
+      100% 0,
+      100% 0;
+  }
+}
+@keyframes l6-0-0 {
+  0% {
+    transform: scaleX(1) rotate(0deg);
+  }
+  50% {
+    transform: scaleX(-1) rotate(-90deg);
+  }
+}
+@keyframes l6-1 {
+  16.5% {
+    transform: perspective(150px) rotateX(-90deg) rotateY(0deg) rotateX(0deg);
+    filter: brightness(1.2);
+  }
+  33% {
+    transform: perspective(150px) rotateX(-180deg) rotateY(0deg) rotateX(0deg);
+  }
+  66% {
+    transform: perspective(150px) rotateX(-180deg) rotateY(-180deg)
+      rotateX(0deg);
+  }
+  100% {
+    transform: perspective(150px) rotateX(-180deg) rotateY(-180deg)
+      rotateX(-180deg);
+    filter: brightness(1.2);
+  }
+}
+
+.loader-overlay {
+  position: absolute;
+  align-items: center;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  transition: 0.5s ease-in-out;
+  z-index: 1000;
+}
+
+.loader-container {
+  text-align: center;
+  padding: 40px;
+  width: 100%;
+  height: 80%;
+}
+
+.loader-container .logo {
+  margin-bottom: 4rem;
+}
+
+.loader {
+  margin: 0 auto;
+}
+
+.loading-text {
+  font-size: 1.8rem;
+  color: #333;
+  margin-top: 20px;
+  font-weight: 500;
+}
+
+.subtext {
+  font-size: 14px;
+  color: #666;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.loader-overlay.hide {
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* Простая заглушка для мобильных устройств */
+@media (max-width: 976px) {
+  .layout,
+  .header,
+  .top-nav,
+  .footer {
+    display: none !important;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #005de0;
+    background-image: url(../media/fon1.svg);
+    background-size: cover;
+    background-position: center;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding: 20px;
+  }
+
+  body::after {
+    content: 'Конструктор макросов недоступен на мобильных устройствах и планшетах.\A\AПожалуйста, используйте компьютер для работы.';
+    white-space: pre-wrap;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    color: #333;
+    padding: 30px;
+    border-radius: 15px;
+    width: 75%;
+    z-index: 10000;
+    font-size: 18px;
+    line-height: 1.5;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+}

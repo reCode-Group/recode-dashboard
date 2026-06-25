@@ -1,0 +1,1 @@
+{"version":3,"file":"i_focusable_node.js","sourceRoot":"","sources":["../../../../core/interfaces/i_focusable_node.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AA8FH;;;;;;GAMG;AACH,MAAM,UAAU,eAAe,CAAC,MAAkB;IAChD,OAAO,CACL,MAAM;QACN,qBAAqB,IAAI,MAAM;QAC/B,kBAAkB,IAAI,MAAM;QAC5B,aAAa,IAAI,MAAM;QACvB,YAAY,IAAI,MAAM;QACtB,cAAc,IAAI,MAAM,CACzB,CAAC;AACJ,CAAC"}
