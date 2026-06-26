@@ -192,6 +192,13 @@ const dashRoutes = [
 				layout: '',
 			},
 			{
+				path: '/macro-constructor',
+				name: 'Конструктор макросов',
+				icon: <ConverterIcon color="inherit" />,
+				component: MacroConstructorPage,
+				layout: '',
+			},
+			{
 				path: '/conversion-history',
 				name: 'История конвертаций',
 				icon: <HistoryIcon color="inherit" />,

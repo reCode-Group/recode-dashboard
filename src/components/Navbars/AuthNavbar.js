@@ -2,6 +2,7 @@ import { HamburgerIcon } from '@chakra-ui/icons';
 import {
 	Box,
 	Button,
+	Collapse,
 	Drawer,
 	DrawerBody,
 	DrawerCloseButton,
@@ -11,6 +12,10 @@ import {
 	HStack,
 	Image,
 	Link,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuList,
 	Stack,
 	Text,
 	useColorModeValue,
@@ -22,7 +27,7 @@ import SidebarResponsive from 'components/Sidebar/SidebarResponsive';
 import { MAIN_CONTAINER_MAX_WIDTH, MAIN_NAVBAR_WIDTH } from 'constants/layout';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Link as RouterLink, NavLink, useLocation } from 'react-router-dom';
+import { NavLink, Link as RouterLink, useLocation } from 'react-router-dom';
 import routes from 'routes.js';
 
 const PUBLIC_NAV_ITEMS = [
@@ -31,6 +36,12 @@ const PUBLIC_NAV_ITEMS = [
 	{ to: '/documentation', label: 'РЕСУРСЫ' },
 	{ to: '/blog', label: 'БЛОГ' },
 	{ to: { pathname: '/contacts', hash: '#support' }, label: 'ТЕХПОДДЕРЖКА' },
+];
+
+const RESOURCE_NAV_ITEMS = [
+	{ to: '/documentation', label: 'Документация' },
+	{ to: '/macro-constructor', label: 'Конструктор макросов' },
+	{ to: '/privacy-policy', label: 'Юридические документы' },
 ];
 
 function NavItemLabel({ beta, betaColor, label }) {
@@ -50,6 +61,7 @@ export default function AuthNavbar(props) {
 	const location = useLocation();
 	const isLandingPage = location.pathname === '/';
 	const [isTopOnLanding, setIsTopOnLanding] = React.useState(true);
+	const [isResourcesOpen, setIsResourcesOpen] = React.useState(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const drawerButtonRef = React.useRef();
 	const { logoText, secondary, usePublicDrawer, ...rest } = props;
@@ -127,7 +139,7 @@ export default function AuthNavbar(props) {
 
 	const linksAuth = (
 		<HStack display={{ sm: 'none', lg: 'flex' }}>
-			{PUBLIC_NAV_ITEMS.map((item) => (
+			{PUBLIC_NAV_ITEMS.filter((item) => item.to !== '/documentation').map((item) => (
 				<Link
 					as={NavLink}
 					to={item.to}
@@ -146,6 +158,38 @@ export default function AuthNavbar(props) {
 					<NavItemLabel beta={item.beta} betaColor={betaColor} label={item.label} />
 				</Link>
 			))}
+			<Menu>
+				<MenuButton
+					as={Button}
+					variant="ghost"
+					fontSize="14px"
+					fontWeight="500"
+					ms="0px"
+					px="0px"
+					me={{ sm: '2px', md: '16px' }}
+					color={navbarIcon}
+					display="inline-flex"
+					alignItems="center"
+					h="40px"
+					_hover={{ bg: 'transparent', opacity: 0.85 }}
+					_active={{ bg: 'transparent' }}
+					_focus={{ boxShadow: 'none' }}
+				>
+					<Text>
+						РЕСУРСЫ
+						<Text as="span" fontSize="10px" ml={2}>
+							▼
+						</Text>
+					</Text>
+				</MenuButton>
+				<MenuList borderRadius="16px" py="8px" minW="240px">
+					{RESOURCE_NAV_ITEMS.map((item) => (
+						<MenuItem as={RouterLink} to={item.to} key={item.to} fontSize="14px" fontWeight="500">
+							{item.label}
+						</MenuItem>
+					))}
+				</MenuList>
+			</Menu>
 		</HStack>
 	);
 
@@ -165,11 +209,15 @@ export default function AuthNavbar(props) {
 					<DrawerCloseButton _focus={{ boxShadow: 'none' }} _hover={{ boxShadow: 'none' }} />
 					<DrawerBody px="1rem" py="24px">
 						<Stack direction="column" spacing="6px" mt="36px">
-							{PUBLIC_NAV_ITEMS.map((item) => (
+							{PUBLIC_NAV_ITEMS.filter((item) => item.to !== '/documentation').map((item) => (
 								<Link
 									as={NavLink}
 									to={item.to}
-									key={`drawer-${typeof item.to === 'string' ? item.to : `${item.to.pathname}${item.to.hash || ''}`}`}
+									key={`drawer-${
+										typeof item.to === 'string'
+											? item.to
+											: `${item.to.pathname}${item.to.hash || ''}`
+									}`}
 									onClick={onClose}
 									display="flex"
 									justifyContent="flex-start"
@@ -185,6 +233,51 @@ export default function AuthNavbar(props) {
 									</Text>
 								</Link>
 							))}
+							<Button
+								onClick={() => setIsResourcesOpen((prev) => !prev)}
+								display="flex"
+								justifyContent="space-between"
+								alignItems="center"
+								w="100%"
+								py="12px"
+								px="12px"
+								borderRadius="15px"
+								bg="transparent"
+								_hover={{ bg: 'gray.50' }}
+								_active={{ bg: 'gray.50' }}
+								_focus={{ boxShadow: 'none' }}
+							>
+								<Text color="gray.700" fontSize="sm" fontWeight="medium" textAlign="left">
+									РЕСУРСЫ
+								</Text>
+								<Text color="gray.700" fontSize="10px">
+									{isResourcesOpen ? '▲' : '▼'}
+								</Text>
+							</Button>
+							<Collapse in={isResourcesOpen} animateOpacity>
+								<Stack spacing="4px" ps="12px">
+									{RESOURCE_NAV_ITEMS.map((item) => (
+										<Link
+											as={NavLink}
+											to={item.to}
+											key={`drawer-resource-${item.to}`}
+											onClick={onClose}
+											display="flex"
+											justifyContent="flex-start"
+											alignItems="center"
+											w="100%"
+											py="10px"
+											px="12px"
+											borderRadius="12px"
+											_hover={{ bg: 'gray.50', textDecoration: 'none' }}
+										>
+											<Text color="gray.700" fontSize="sm" fontWeight="medium" textAlign="left">
+												{item.label}
+											</Text>
+										</Link>
+									))}
+								</Stack>
+							</Collapse>
 							<Link
 								as={RouterLink}
 								to="/lk/dashboard"
