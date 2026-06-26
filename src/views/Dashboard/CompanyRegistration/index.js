@@ -41,6 +41,7 @@ const initialForm = {
 	ogrn: '',
 	okpo: '',
 	legalAddress: '',
+	orgEmail: '',
 	contactFio: '',
 	contactPosition: '',
 	contactPhone: '',
@@ -189,14 +190,16 @@ function CompanyRegistration() {
 		};
 	}, [dadataEnabled, searchQuery, selectedSuggestion]);
 
-	const finalEmail = sameAsOwner
-		? currentUser?.email || form.contactEmail.trim() || ''
-		: form.contactEmail.trim();
+	const finalOrganizationEmail = form.orgEmail.trim();
 	const finalResponsibleName = sameAsOwner ? currentUser?.name || form.contactFio : form.contactFio;
 	const finalResponsiblePosition = sameAsOwner ? 'Владелец текущего профиля' : form.contactPosition;
 	const finalResponsiblePhone = sameAsOwner
 		? currentUser?.phone || form.contactPhone
 		: form.contactPhone;
+	const finalResponsibleEmail = sameAsOwner
+		? currentUser?.email || form.contactEmail.trim() || ''
+		: form.contactEmail.trim();
+	const finalEmail = finalResponsibleEmail;
 
 	const errors = useMemo(() => {
 		const nextErrors = {};
@@ -242,13 +245,17 @@ function CompanyRegistration() {
 		if (!finalResponsiblePhone?.trim()) {
 			nextErrors.contactPhone = 'Укажите контактный телефон';
 		}
-		if (!finalEmail.trim()) {
+		if (!finalResponsibleEmail.trim()) {
 			nextErrors.contactEmail = 'Укажите корпоративную почту';
+		}
+		if (nextErrors.contactEmail) {
+			nextErrors.contactEmail = 'Enter responsible email';
+			nextErrors.contactEmail = 'Укажите email ответственного';
 		}
 		return nextErrors;
 	}, [
 		currentUser,
-		finalEmail,
+		finalResponsibleEmail,
 		finalResponsibleName,
 		finalResponsiblePhone,
 		finalResponsiblePosition,
@@ -271,6 +278,24 @@ function CompanyRegistration() {
 		['Должность', finalResponsiblePosition],
 		['Контактный телефон', finalResponsiblePhone],
 		['Корпоративная почта', finalEmail],
+	];
+
+	void previewRows;
+
+	const previewDataRows = [
+		['Тип', isIp ? 'Индивидуальный предприниматель' : 'Юридическое лицо'],
+		['Полное наименование', form.fullName],
+		['Сокращенное наименование', form.shortName],
+		[innLabel, form.inn],
+		...(isIp ? [] : [['КПП', form.kpp]]),
+		[ogrnLabel, form.ogrn],
+		['ОКПО', form.okpo],
+		['Юридический адрес', form.legalAddress],
+		['Email организации', finalOrganizationEmail],
+		['ФИО ответственного лица', finalResponsibleName],
+		['Должность', finalResponsiblePosition],
+		['Контактный телефон', finalResponsiblePhone],
+		['Email ответственного', finalResponsibleEmail],
 	];
 
 	const handleFieldChange = (field) => (event) => {
@@ -358,12 +383,17 @@ function CompanyRegistration() {
 				post_address: form.legalAddress.trim() || null,
 				address: form.legalAddress.trim() || null,
 				short_name: form.shortName.trim() || null,
-				email: finalEmail || null,
+				email: finalOrganizationEmail || null,
+				responsible_full_name: finalResponsibleName?.trim() || null,
+				responsible_email: finalResponsibleEmail || null,
+				responsible_phone: finalResponsiblePhone?.trim() || null,
+				responsible_position: finalResponsiblePosition?.trim() || null,
 			});
 			setIsPreviewModalOpen(false);
 			navigate('/lk/company', { replace: true });
 		} catch (error) {
 			const message = getErrorMessage(error);
+			setIsPreviewModalOpen(false);
 			setSubmitError(message);
 			scrollToPageTop();
 			if (message === 'Компания уже привязана к аккаунту') {
@@ -687,9 +717,22 @@ function CompanyRegistration() {
 							/>
 							<Text mt="8px" fontSize="12px" color={mutedTextColor}>
 								Юридический адрес нужен для заполнения карточки организации и проверки реквизитов
-								при подключении к платежному аккаунту.
+								при подключении к платежному аккаунту
 							</Text>
 							<FormErrorMessage>{errors.legalAddress}</FormErrorMessage>
+						</FormControl>
+						<FormControl mt="16px">
+							<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
+								Email организации
+							</FormLabel>
+							<Input
+								placeholder="org@example.ru"
+								value={form.orgEmail}
+								onChange={handleFieldChange('orgEmail')}
+							/>
+							<Text mt="8px" fontSize="12px" color={mutedTextColor}>
+								Необязательное поле
+							</Text>
 						</FormControl>
 					</Box>
 
@@ -779,7 +822,7 @@ function CompanyRegistration() {
 									Корпоративная почта
 								</FormLabel>
 								<Input
-									placeholder="company@example.ru"
+									placeholder="responsible@example.ru"
 									value={form.contactEmail}
 									onChange={handleFieldChange('contactEmail')}
 								/>
@@ -833,7 +876,7 @@ function CompanyRegistration() {
 					<ModalHeader color={sectionTitleColor}>Проверьте данные компании</ModalHeader>
 					<ModalBody>
 						<Flex direction="column" gap="10px">
-							{previewRows.map(([label, value]) => (
+							{previewDataRows.map(([label, value]) => (
 								<Flex
 									key={label}
 									justify="space-between"
