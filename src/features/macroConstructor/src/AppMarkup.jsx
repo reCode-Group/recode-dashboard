@@ -5,12 +5,12 @@ import { Modals } from './components/Modals.jsx';
 import { NotificationsHost } from './components/NotificationsHost.jsx';
 import { Sidebar } from './components/Sidebar.jsx';
 
-export function AppMarkup({ handlers, isReady, viewerContext }) {
+export function AppMarkup({ handlers, isReady, viewerContext, organization }) {
   return (
     <div>
       <LoaderOverlay visible={!isReady} />
       <div style={{ visibility: isReady ? 'visible' : 'hidden' }}>
-        <Header handlers={handlers} viewerContext={viewerContext} />
+        <Header handlers={handlers} viewerContext={viewerContext} organization={organization} />
         <main className="layout">
           <aside className="toolbar glass" style={{ display: 'none' }}>
             <div className="tool vba">

@@ -1,10 +1,9 @@
-import * as Blockly from '../blockly/src/core/blockly.js';
-import { blocks } from '../blockly/src/blocks/blocks.js';
-import { defineBlocks } from '../blockly/src/core/common.js';
-import { luaGenerator } from '../blockly/src/generators/lua.js';
-import { javascriptGenerator } from '../blockly/src/generators/javascript.js';
-import { pythonGenerator } from '../blockly/src/generators/python.js';
-import {blocklyMediaUrl} from './assets.js';
+import {loadScript} from '../app/scripts/load.mjs';
+import * as Blockly from '../blockly/blockly.loader.mjs';
+import '../blockly/blocks.loader.mjs';
+import {luaGenerator} from '../blockly/lua.loader.mjs';
+import {javascriptGenerator} from '../blockly/javascript.loader.mjs';
+import {pythonGenerator} from '../blockly/python.loader.mjs';
 import {downloadScreenshot} from './screenshot.js';
 
 function setToolboxIcon(index, iconName) {
@@ -13,7 +12,7 @@ function setToolboxIcon(index, iconName) {
 }
 
 export async function initBlocklyApp() {
-  defineBlocks(blocks);
+  await loadScript('./blockly/msg/ru.js');
 
   let workspace = null;
 
@@ -270,7 +269,7 @@ export async function initBlocklyApp() {
       maxBlocks: Infinity,
       maxInstances: {'test_basic_limit_instances': 3},
       maxTrashcanContents: 256,
-      media: blocklyMediaUrl,
+      media: './app/media/',
       oneBasedIndex: true,
       readOnly: false,
       rtl,

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getCurrentUser } from 'services/auth';
+import { getOrganizationDetails } from 'services/organization';
 import { AppMarkup } from './AppMarkup.jsx';
 import {
   closeCodeFullModal,
@@ -20,6 +21,7 @@ import { initBlocklyApp } from './blocklyApp.js';
 export default function App() {
   const [isAppReady, setIsAppReady] = useState(false);
   const [viewerContext, setViewerContext] = useState(null);
+  const [organization, setOrganization] = useState(null);
 
   const handlers = useMemo(
     () => ({
@@ -54,9 +56,22 @@ export default function App() {
           if (isMounted) {
             setViewerContext(currentUser);
           }
+          if (currentUser?.has_organization) {
+            try {
+              const organizationDetails = await getOrganizationDetails();
+              if (isMounted) {
+                setOrganization(organizationDetails);
+              }
+            } catch {
+              if (isMounted) {
+                setOrganization(null);
+              }
+            }
+          }
         } catch {
           if (isMounted) {
             setViewerContext(null);
+            setOrganization(null);
           }
         }
 
@@ -99,5 +114,5 @@ export default function App() {
     };
   }, []);
 
-  return <AppMarkup handlers={handlers} isReady={isAppReady} viewerContext={viewerContext} />;
+  return <AppMarkup handlers={handlers} isReady={isAppReady} viewerContext={viewerContext} organization={organization} />;
 }

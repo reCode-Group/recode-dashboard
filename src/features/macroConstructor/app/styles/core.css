@@ -93,7 +93,14 @@
 }
 
 .loader-container .logo {
+  display: flex;
+  justify-content: center;
   margin-bottom: 4rem;
+}
+
+.loader-container .logo img {
+  display: block;
+  margin: 0 auto;
 }
 
 .loader {
