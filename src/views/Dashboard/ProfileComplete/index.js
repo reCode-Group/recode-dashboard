@@ -176,6 +176,7 @@ function ProfileComplete() {
 				name: firstName.trim(),
 				surname: lastName.trim(),
 				lastname: middleName.trim(),
+				phone: phone.trim(),
 			});
 			clearPendingProfileName();
 			setRedirectPath('/lk/profile?completed=1');
