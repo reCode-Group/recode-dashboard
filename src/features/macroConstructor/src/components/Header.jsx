@@ -69,7 +69,7 @@ export function Header({handlers, viewerContext, organization}) {
     <div className="header-left">
       <div className="header-logo">
         <a href="/">
-          <img src="./app/media/constructor.svg" alt="Рекод Конструктор макросов" />
+          <img src="/app/media/constructor.svg" alt="Рекод Конструктор макросов" />
         </a>
       </div>
       <div className="divider" />

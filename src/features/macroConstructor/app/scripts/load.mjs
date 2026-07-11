@@ -34,7 +34,7 @@ if (typeof window !== 'object') {
  * The formulation given here will work so long as top-level page is loaded from
  * somewhere in tests/.
  */
-export const ROOT = window.location.href.replace(/\/tests\/.*$/, '/');
+export const ROOT = `${window.location.origin}/blockly/`;
 
 /**
  * Decide whether to use compressed mode or not.
@@ -60,7 +60,7 @@ function compressed() {
 }
 
 /** @type {boolean} Load in compressed mode. */
-export const COMPRESSED = compressed();
+export const COMPRESSED = false;
 
 /**
  * Load a chunk, either by importing its ESM entrypoint or loading the
@@ -96,7 +96,7 @@ export async function loadChunk(modulePath, scriptPath, scriptExports) {
     await loadScript(`${ROOT}${scriptPath}`);
     return get(scriptExports);
   } else {
-    const exports = await import(`../../${modulePath}`);
+    const exports = await import(/* @vite-ignore */ `${ROOT}${modulePath}`);
     if (!scriptExports.includes('.')) globalThis[scriptExports] = exports;
     return exports;
   }
