@@ -34,7 +34,7 @@ if (typeof window !== 'object') {
  * The formulation given here will work so long as top-level page is loaded from
  * somewhere in tests/.
  */
-export const ROOT = `${window.location.origin}/blockly/`;
+export const ROOT = `${window.location.origin}/`;
 
 /**
  * Decide whether to use compressed mode or not.
