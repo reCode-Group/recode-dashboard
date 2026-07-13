@@ -12,7 +12,7 @@ function setToolboxIcon(index, iconName) {
 }
 
 export async function initBlocklyApp() {
-  await loadScript('./blockly/msg/ru.js');
+  await loadScript('/blockly/msg/ru.js');
 
   let workspace = null;
 
@@ -269,7 +269,7 @@ export async function initBlocklyApp() {
       maxBlocks: Infinity,
       maxInstances: {'test_basic_limit_instances': 3},
       maxTrashcanContents: 256,
-      media: './app/media/',
+      media: '/app/media/',
       oneBasedIndex: true,
       readOnly: false,
       rtl,
