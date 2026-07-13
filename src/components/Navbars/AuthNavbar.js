@@ -25,24 +25,37 @@ import recode_logo_colored from 'assets/svg/recode-logo-colored.svg';
 import recode_logo_white from 'assets/svg/recode-logo-white.svg';
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive';
 import { MAIN_CONTAINER_MAX_WIDTH, MAIN_NAVBAR_WIDTH } from 'constants/layout';
+import { PUBLIC_SITE_URLS } from 'constants/publicSite';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { NavLink, Link as RouterLink, useLocation } from 'react-router-dom';
 import routes from 'routes.js';
 
 const PUBLIC_NAV_ITEMS = [
-	{ to: '/', label: 'О ПРОЕКТЕ' },
-	{ to: '/macro-translator', label: 'ПЕРЕВОДЧИК', beta: true },
+	{ to: PUBLIC_SITE_URLS.home, label: 'О ПРОЕКТЕ' },
+	{ to: '/translator', label: 'ПЕРЕВОДЧИК', beta: true },
 	{ to: '/documentation', label: 'РЕСУРСЫ' },
-	{ to: '/blog', label: 'БЛОГ' },
-	{ to: { pathname: '/contacts', hash: '#support' }, label: 'ТЕХПОДДЕРЖКА' },
+	{ to: PUBLIC_SITE_URLS.blog, label: 'БЛОГ' },
+	{ to: PUBLIC_SITE_URLS.contactsSupport, label: 'ТЕХПОДДЕРЖКА' },
 ];
 
 const RESOURCE_NAV_ITEMS = [
 	{ to: '/documentation', label: 'Документация' },
-	{ to: '/macro-constructor', label: 'Конструктор макросов' },
-	{ to: '/privacy-policy', label: 'Юридические документы' },
+	{ to: '/constructor', label: 'Конструктор макросов' },
+	{ to: PUBLIC_SITE_URLS.legal, label: 'Юридические документы' },
 ];
+
+const PUBLIC_NAV_ITEMS_BEFORE_RESOURCES = PUBLIC_NAV_ITEMS.filter(
+	(item) => item.to === PUBLIC_SITE_URLS.home || item.to === '/translator'
+);
+const PUBLIC_NAV_ITEMS_AFTER_RESOURCES = PUBLIC_NAV_ITEMS.filter(
+	(item) =>
+		item.to !== PUBLIC_SITE_URLS.home && item.to !== '/translator' && item.to !== '/documentation'
+);
+
+function isExternalTarget(target) {
+	return typeof target === 'string' && target.startsWith('http');
+}
 
 function NavItemLabel({ beta, betaColor, label }) {
 	return (
@@ -57,6 +70,38 @@ function NavItemLabel({ beta, betaColor, label }) {
 	);
 }
 
+function PublicNavLink({ item, children, onClick, ...rest }) {
+	if (isExternalTarget(item.to)) {
+		return (
+			<Link href={item.to} onClick={onClick} {...rest}>
+				{children}
+			</Link>
+		);
+	}
+
+	return (
+		<Link as={NavLink} to={item.to} onClick={onClick} {...rest}>
+			{children}
+		</Link>
+	);
+}
+
+function PublicMenuItem({ item }) {
+	if (isExternalTarget(item.to)) {
+		return (
+			<MenuItem as="a" href={item.to} fontSize="14px" fontWeight="500">
+				{item.label}
+			</MenuItem>
+		);
+	}
+
+	return (
+		<MenuItem as={RouterLink} to={item.to} fontSize="14px" fontWeight="500">
+			{item.label}
+		</MenuItem>
+	);
+}
+
 export default function AuthNavbar(props) {
 	const location = useLocation();
 	const isLandingPage = location.pathname === '/';
@@ -64,7 +109,7 @@ export default function AuthNavbar(props) {
 	const [isResourcesOpen, setIsResourcesOpen] = React.useState(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const drawerButtonRef = React.useRef();
-	const { logoText, secondary, usePublicDrawer, ...rest } = props;
+	const { logoText, secondary, useDarkModeLogo, usePublicDrawer, ...rest } = props;
 
 	React.useEffect(() => {
 		if (secondary || !isLandingPage) {
@@ -100,6 +145,9 @@ export default function AuthNavbar(props) {
 	);
 	let navbarPosition = 'fixed';
 	let colorButton = 'white';
+	const colorModeLogo = useColorModeValue(recode_logo_colored, recode_logo_white);
+	const navbarLogo =
+		secondary === true ? recode_logo_white : useDarkModeLogo ? colorModeLogo : recode_logo_colored;
 
 	if (secondary === true) {
 		navbarIcon = 'white';
@@ -121,34 +169,27 @@ export default function AuthNavbar(props) {
 
 	const brand = (
 		<Link
-			as={RouterLink}
-			to="/"
+			href={PUBLIC_SITE_URLS.home}
 			display="flex"
 			lineHeight="100%"
 			fontWeight="bold"
 			justifyContent="center"
 			alignItems="center"
 		>
-			<Image
-				src={secondary === true ? recode_logo_white : recode_logo_colored}
-				alt="reCode Platform Logo"
-				width={{ base: 108, sm: 118, md: 125 }}
-			/>
+			<Image src={navbarLogo} alt="reCode Platform Logo" width={{ base: 108, sm: 118, md: 125 }} />
 		</Link>
 	);
 
 	const linksAuth = (
-		<HStack display={{ sm: 'none', lg: 'flex' }}>
-			{PUBLIC_NAV_ITEMS.filter((item) => item.to !== '/documentation').map((item) => (
-				<Link
-					as={NavLink}
-					to={item.to}
-					key={typeof item.to === 'string' ? item.to : `${item.to.pathname}${item.to.hash || ''}`}
+		<HStack display={{ sm: 'none', lg: 'flex' }} spacing={{ lg: '24px', xl: '32px' }}>
+			{PUBLIC_NAV_ITEMS_BEFORE_RESOURCES.map((item) => (
+				<PublicNavLink
+					item={item}
+					key={item.to}
 					fontSize="14px"
 					fontWeight="500"
 					ms="0px"
 					px="0px"
-					me={{ sm: '2px', md: '16px' }}
 					color={navbarIcon}
 					display="inline-flex"
 					alignItems="center"
@@ -156,7 +197,7 @@ export default function AuthNavbar(props) {
 					_hover={{ textDecoration: 'none', opacity: 0.85 }}
 				>
 					<NavItemLabel beta={item.beta} betaColor={betaColor} label={item.label} />
-				</Link>
+				</PublicNavLink>
 			))}
 			<Menu>
 				<MenuButton
@@ -166,7 +207,6 @@ export default function AuthNavbar(props) {
 					fontWeight="500"
 					ms="0px"
 					px="0px"
-					me={{ sm: '2px', md: '16px' }}
 					color={navbarIcon}
 					display="inline-flex"
 					alignItems="center"
@@ -184,12 +224,27 @@ export default function AuthNavbar(props) {
 				</MenuButton>
 				<MenuList borderRadius="16px" py="8px" minW="240px">
 					{RESOURCE_NAV_ITEMS.map((item) => (
-						<MenuItem as={RouterLink} to={item.to} key={item.to} fontSize="14px" fontWeight="500">
-							{item.label}
-						</MenuItem>
+						<PublicMenuItem item={item} key={item.to} />
 					))}
 				</MenuList>
 			</Menu>
+			{PUBLIC_NAV_ITEMS_AFTER_RESOURCES.map((item) => (
+				<PublicNavLink
+					item={item}
+					key={item.to}
+					fontSize="14px"
+					fontWeight="500"
+					ms="0px"
+					px="0px"
+					color={navbarIcon}
+					display="inline-flex"
+					alignItems="center"
+					h="40px"
+					_hover={{ textDecoration: 'none', opacity: 0.85 }}
+				>
+					<NavItemLabel beta={item.beta} betaColor={betaColor} label={item.label} />
+				</PublicNavLink>
+			))}
 		</HStack>
 	);
 
@@ -209,15 +264,10 @@ export default function AuthNavbar(props) {
 					<DrawerCloseButton _focus={{ boxShadow: 'none' }} _hover={{ boxShadow: 'none' }} />
 					<DrawerBody px="1rem" py="24px">
 						<Stack direction="column" spacing="6px" mt="36px">
-							{PUBLIC_NAV_ITEMS.filter((item) => item.to !== '/documentation').map((item) => (
-								<Link
-									as={NavLink}
-									to={item.to}
-									key={`drawer-${
-										typeof item.to === 'string'
-											? item.to
-											: `${item.to.pathname}${item.to.hash || ''}`
-									}`}
+							{PUBLIC_NAV_ITEMS_BEFORE_RESOURCES.map((item) => (
+								<PublicNavLink
+									item={item}
+									key={`drawer-${item.to}`}
 									onClick={onClose}
 									display="flex"
 									justifyContent="flex-start"
@@ -231,7 +281,7 @@ export default function AuthNavbar(props) {
 									<Text color="gray.700" fontSize="sm" fontWeight="medium" textAlign="left">
 										<NavItemLabel beta={item.beta} betaColor="recode.300" label={item.label} />
 									</Text>
-								</Link>
+								</PublicNavLink>
 							))}
 							<Button
 								onClick={() => setIsResourcesOpen((prev) => !prev)}
@@ -257,9 +307,8 @@ export default function AuthNavbar(props) {
 							<Collapse in={isResourcesOpen} animateOpacity>
 								<Stack spacing="4px" ps="12px">
 									{RESOURCE_NAV_ITEMS.map((item) => (
-										<Link
-											as={NavLink}
-											to={item.to}
+										<PublicNavLink
+											item={item}
 											key={`drawer-resource-${item.to}`}
 											onClick={onClose}
 											display="flex"
@@ -274,10 +323,29 @@ export default function AuthNavbar(props) {
 											<Text color="gray.700" fontSize="sm" fontWeight="medium" textAlign="left">
 												{item.label}
 											</Text>
-										</Link>
+										</PublicNavLink>
 									))}
 								</Stack>
 							</Collapse>
+							{PUBLIC_NAV_ITEMS_AFTER_RESOURCES.map((item) => (
+								<PublicNavLink
+									item={item}
+									key={`drawer-${item.to}`}
+									onClick={onClose}
+									display="flex"
+									justifyContent="flex-start"
+									alignItems="center"
+									w="100%"
+									py="12px"
+									px="12px"
+									borderRadius="15px"
+									_hover={{ bg: 'gray.50', textDecoration: 'none' }}
+								>
+									<Text color="gray.700" fontSize="sm" fontWeight="medium" textAlign="left">
+										<NavItemLabel beta={item.beta} betaColor="recode.300" label={item.label} />
+									</Text>
+								</PublicNavLink>
+							))}
 							<Link
 								as={RouterLink}
 								to="/lk/dashboard"
@@ -368,5 +436,6 @@ export default function AuthNavbar(props) {
 AuthNavbar.propTypes = {
 	color: PropTypes.oneOf(['primary', 'info', 'success', 'warning', 'danger']),
 	brandText: PropTypes.string,
+	useDarkModeLogo: PropTypes.bool,
 	usePublicDrawer: PropTypes.bool,
 };

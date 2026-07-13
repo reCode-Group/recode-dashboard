@@ -15,9 +15,8 @@ export default function MainLayout(props) {
 	const { ...rest } = props;
 	const location = useLocation();
 	const isDocumentationRoute = location.pathname === '/documentation';
-	const isLandingRoute = location.pathname === '/';
-	const isMacroConstructorRoute = location.pathname === '/macro-constructor';
-	const isFullBleedRoute = isDocumentationRoute || isLandingRoute || isMacroConstructorRoute;
+	const isMacroConstructorRoute = location.pathname === '/constructor';
+	const isFullBleedRoute = isDocumentationRoute || isMacroConstructorRoute;
 	const contentMaxWidth = isFullBleedRoute ? '100%' : MAIN_CONTAINER_MAX_WIDTH;
 	const contentPaddingX = isFullBleedRoute ? '0px' : MAIN_CONTAINER_PADDING_X;
 	// ref for the wrapper div
@@ -38,6 +37,7 @@ export default function MainLayout(props) {
 						<AuthNavbar
 							secondary={false}
 							logoText="RECODE DASHBOARD"
+							useDarkModeLogo={true}
 							usePublicDrawer={true}
 						/>
 					</Portal>
@@ -47,7 +47,7 @@ export default function MainLayout(props) {
 						<Outlet />
 					</Box>
 				</Box>
-				{!isDocumentationRoute && !isLandingRoute && !isMacroConstructorRoute && (
+				{!isDocumentationRoute && !isMacroConstructorRoute && (
 					<Box px={MAIN_CONTAINER_PADDING_X} mx="auto" width="100%" maxW={MAIN_CONTAINER_MAX_WIDTH}>
 						<Footer />
 					</Box>

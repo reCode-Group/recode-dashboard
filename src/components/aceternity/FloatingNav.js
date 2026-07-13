@@ -1,5 +1,6 @@
 import { cn } from 'lib/cn';
 import { motion } from 'framer-motion';
+import { PUBLIC_SITE_URLS } from 'constants/publicSite';
 import { NavLink } from 'react-router-dom';
 import { isExternalUrl, resolveRouteTarget } from 'utils/navigation';
 
@@ -15,13 +16,13 @@ export default function FloatingNav({ items }) {
 			)}
 		>
 			<div className="flex items-center justify-between gap-4">
-				<NavLink to="/" className="shrink-0">
+				<a href={PUBLIC_SITE_URLS.home} className="shrink-0">
 					<img
 						src={require('assets/svg/recode-logo-colored.svg').default}
 						alt="reCode"
 						className="h-8 w-auto md:h-9"
 					/>
-				</NavLink>
+				</a>
 
 				<div className="hidden items-center gap-5 md:flex">
 					{items.map((item) =>

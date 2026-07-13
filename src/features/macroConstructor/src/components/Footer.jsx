@@ -1,4 +1,4 @@
-import { Link as RouterLink } from 'react-router-dom';
+import { PUBLIC_SITE_URLS } from 'constants/publicSite';
 
 export function Footer() {
   return (
@@ -8,14 +8,14 @@ export function Footer() {
         © ООО «Рекод Решения», {new Date().getFullYear()}
       </div>
       <div className="version">
-        <span style={{color: '#22c55e'}}>▧</span> Версия 1.0.2-stable
+        <span style={{color: '#22c55e'}}>●</span> Версия 1.0.2-stable
       </div>
     </div>
     <div className="footer-right">
-      <RouterLink to="/privacy-policy">Политика конфиденциальности</RouterLink>
-      <RouterLink to="/public-offer">Условия использования</RouterLink>
-      <RouterLink to="/blog">Блог</RouterLink>
-      <RouterLink to="/contacts">Контакты</RouterLink>
+      <a href={PUBLIC_SITE_URLS.legal}>Политика конфиденциальности</a>
+      <a href={PUBLIC_SITE_URLS.legal}>Условия использования</a>
+      <a href={PUBLIC_SITE_URLS.blog}>Блог</a>
+      <a href={PUBLIC_SITE_URLS.contacts}>Контакты</a>
     </div>
   </footer>
   );

@@ -1,9 +1,8 @@
 /*eslint-disable*/
 import { Flex, Link, List, ListItem, Text } from '@chakra-ui/react';
-import { Link as RouterLink } from 'react-router-dom';
+import { PUBLIC_SITE_URLS } from 'constants/publicSite';
 
 export default function Footer(props) {
-	// const linkRecode = useColorModeValue("recode.400", "red.200");=
 	return (
 		<Flex
 			flexDirection={{
@@ -37,22 +36,22 @@ export default function Footer(props) {
 				columnGap="20px"
 			>
 				<ListItem>
-					<Link as={RouterLink} to="/privacy-policy" color="gray.400" textDecoration="underline">
+					<Link href={PUBLIC_SITE_URLS.legal} color="gray.400" textDecoration="underline">
 						Политика конфиденциальности
 					</Link>
 				</ListItem>
 				<ListItem>
-					<Link color="gray.400" href="https://recode-group/blog" textDecoration="underline">
+					<Link color="gray.400" href={PUBLIC_SITE_URLS.legal} textDecoration="underline">
 						Пользовательское соглашение
 					</Link>
 				</ListItem>
 				<ListItem>
-					<Link as={RouterLink} to="/public-offer" color="gray.400" textDecoration="underline">
+					<Link href={PUBLIC_SITE_URLS.legal} color="gray.400" textDecoration="underline">
 						Публичная оферта
 					</Link>
 				</ListItem>
 				<ListItem>
-					<Link as={RouterLink} to="/contacts" color="gray.400" textDecoration="underline">
+					<Link href={PUBLIC_SITE_URLS.contacts} color="gray.400" textDecoration="underline">
 						Контакты
 					</Link>
 				</ListItem>

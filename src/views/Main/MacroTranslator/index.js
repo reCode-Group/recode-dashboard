@@ -31,7 +31,7 @@ import { IoArrowForwardSharp } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
 import { getUserConversions } from 'services/conversions';
-import { convertPaidMacro } from 'services/macroTranslator';
+import { convertFreeMacro, convertPaidMacro } from 'services/macroTranslator';
 import { getUserSubscription } from 'services/subscription';
 import { mapConversion } from 'utils/conversions';
 
@@ -51,6 +51,13 @@ const TOKEN_SOURCE = {
 	PERSONAL: 'personal',
 	EMPLOYEE: 'employee',
 };
+
+const TRANSLATION_MODE = {
+	FREE: 'free',
+	PAID: 'paid',
+};
+
+const FREE_TRANSLATIONS_PER_DAY = 4;
 
 const conversionDateFormat = {
 	day: '2-digit',
@@ -100,6 +107,7 @@ export default function MacroTranslatorPage() {
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [user, setUser] = useState(null);
 	const [subscriptionName, setSubscriptionName] = useState('Нет тарифа');
+	const [translationMode, setTranslationMode] = useState(TRANSLATION_MODE.FREE);
 	const [selectedTokenSource, setSelectedTokenSource] = useState(TOKEN_SOURCE.PERSONAL);
 	const [historyItems, setHistoryItems] = useState([]);
 	const [errorMessage, setErrorMessage] = useState('');
@@ -124,6 +132,7 @@ export default function MacroTranslatorPage() {
 	const employeeTokens = Number(user?.organization_tokens_remain) || 0;
 	const activeTokenBalance =
 		selectedTokenSource === TOKEN_SOURCE.EMPLOYEE ? employeeTokens : personalTokens;
+	const isFreeTranslation = translationMode === TRANSLATION_MODE.FREE;
 
 	const loadData = useCallback(async () => {
 		setIsPageLoading(true);
@@ -216,12 +225,17 @@ export default function MacroTranslatorPage() {
 		setCopied(false);
 
 		try {
-			const result = await convertPaidMacro({
+			const requestPayload = {
 				origin_code: source.trim(),
 				origin_language: 'VBA',
 				target_language: targetLanguage,
-				as_employee: selectedTokenSource === TOKEN_SOURCE.EMPLOYEE,
-			});
+			};
+			const result = isFreeTranslation
+				? await convertFreeMacro(requestPayload)
+				: await convertPaidMacro({
+						...requestPayload,
+						as_employee: selectedTokenSource === TOKEN_SOURCE.EMPLOYEE,
+				  });
 
 			setTranslated(result?.target_code || '');
 			await loadData();
@@ -284,6 +298,36 @@ export default function MacroTranslatorPage() {
 					<>
 						<Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="20px">
 							<Box>
+								<Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap="12px" mb="12px">
+									<Box>
+										<Text fontSize="xs" fontWeight="600" color={mutedColor} mb="6px">
+											ИСХОДНЫЙ ЯЗЫК
+										</Text>
+										<Select value="VBA" isDisabled bg={inputBg} borderColor={tableBorder} borderRadius="15px">
+											<option value="VBA">VBA</option>
+										</Select>
+									</Box>
+									<Box>
+										<Text fontSize="xs" fontWeight="600" color={mutedColor} mb="6px">
+											ЯЗЫК ПЕРЕВОДА
+										</Text>
+										<Select
+											value={targetLanguage}
+											onChange={(event) => setTargetLanguage(event.target.value)}
+											bg={inputBg}
+											borderColor={tableBorder}
+											borderRadius="15px"
+											color={selectPlaceholderColor}
+										>
+											{LANGUAGE_OPTIONS.map((option) => (
+												<option key={option.value} value={option.value}>
+													{option.label}
+												</option>
+											))}
+										</Select>
+									</Box>
+								</Grid>
+
 								<Text fontSize="sm" color={textColor} mb="8px">
 									Исходный макрос
 								</Text>
@@ -314,36 +358,6 @@ export default function MacroTranslatorPage() {
 										{charCounter}
 									</Text>
 								</Box>
-
-								<Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap="12px" mt="12px">
-									<Box>
-										<Text fontSize="xs" fontWeight="600" color={mutedColor} mb="6px">
-											ИСХОДНЫЙ ЯЗЫК
-										</Text>
-										<Select value="VBA" isDisabled bg={inputBg} borderColor={tableBorder} borderRadius="15px">
-											<option value="VBA">VBA</option>
-										</Select>
-									</Box>
-									<Box>
-										<Text fontSize="xs" fontWeight="600" color={mutedColor} mb="6px">
-											ЯЗЫК ПЕРЕВОДА
-										</Text>
-										<Select
-											value={targetLanguage}
-											onChange={(event) => setTargetLanguage(event.target.value)}
-											bg={inputBg}
-											borderColor={tableBorder}
-											borderRadius="15px"
-											color={selectPlaceholderColor}
-										>
-											{LANGUAGE_OPTIONS.map((option) => (
-												<option key={option.value} value={option.value}>
-													{option.label}
-												</option>
-											))}
-										</Select>
-									</Box>
-								</Grid>
 
 								<Flex
 									borderWidth="1px"
@@ -425,6 +439,55 @@ export default function MacroTranslatorPage() {
 							</Box>
 
 							<Box>
+								<Flex
+									px="16px"
+									py="12px"
+									mb="12px"
+									borderRadius="15px"
+									borderWidth="1px"
+									borderColor={tableBorder}
+									bg={toggleBg}
+									justify="space-between"
+									align="center"
+									gap="16px"
+								>
+									<Box>
+										<Text fontSize="xs" fontWeight="600" color={mutedColor} mb="2px">
+											РЕЖИМ ПЕРЕВОДА
+										</Text>
+										<Text fontSize="12px" color={mutedColor} mt="2px">
+											{isFreeTranslation
+												? `Бесплатно, до ${FREE_TRANSLATIONS_PER_DAY} переводов в день`
+												: 'Перевод с оплатой токенами'}
+										</Text>
+									</Box>
+									<HStack spacing="8px" flexShrink={0}>
+										<Text
+											fontSize="xs"
+											fontWeight="600"
+											color={isFreeTranslation ? textColor : mutedColor}
+										>
+											Бесплатно
+										</Text>
+										<Switch
+											colorScheme="green"
+											isChecked={!isFreeTranslation}
+											onChange={(event) =>
+												setTranslationMode(
+													event.target.checked ? TRANSLATION_MODE.PAID : TRANSLATION_MODE.FREE
+												)
+											}
+										/>
+										<Text
+											fontSize="xs"
+											fontWeight="600"
+											color={!isFreeTranslation ? textColor : mutedColor}
+										>
+											За токены
+										</Text>
+									</HStack>
+								</Flex>
+
 								<Text fontSize="sm" color={textColor} mb="8px">
 									Переведенный макрос
 								</Text>

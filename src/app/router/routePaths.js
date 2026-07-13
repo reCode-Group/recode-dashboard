@@ -1,5 +1,5 @@
 export const routePaths = {
-	home: () => '/',
+	home: () => '/lk/dashboard',
 	auth: {
 		root: () => '/auth',
 		login: () => '/auth/login-page',
@@ -21,13 +21,8 @@ export const routePaths = {
 	},
 	public: {
 		documentation: () => '/documentation',
-		blog: () => '/blog',
-		blogArticle: (slug = ':slug') => `/blog/${slug}`,
-		contacts: () => '/contacts',
-		privacyPolicy: () => '/privacy-policy',
-		publicOffer: () => '/public-offer',
-		macroConstructor: () => '/macro-constructor',
-		macroTranslator: () => '/macro-translator',
+		macroConstructor: () => '/constructor',
+		macroTranslator: () => '/translator',
 	},
 	legacy: {
 		main: () => '/main',

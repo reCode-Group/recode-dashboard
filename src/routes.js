@@ -25,14 +25,8 @@ const EmployeeTable = lazy(() => import('views/Dashboard/Tables/components/Emplo
 const Tariff = lazy(() => import('views/Dashboard/Tariff'));
 const SignIn = lazy(() => import('views/Auth/SignIn'));
 const SignUp = lazy(() => import('views/Auth/SignUp'));
-const BlogPage = lazy(() => import('views/Main/Blog'));
-const BlogArticlePage = lazy(() => import('views/Main/Blog/Article'));
-const ContactsPage = lazy(() => import('views/Main/Contacts'));
 const DocumentationPage = lazy(() => import('views/Main/Documentation'));
 const MacroConstructorPage = lazy(() => import('features/macroConstructor/MacroConstructorPage'));
-const LandingPage = lazy(() => import('views/Main/Landing'));
-const PrivacyPolicyPage = lazy(() => import('views/Main/Legal/PrivacyPolicy'));
-const PublicOfferPage = lazy(() => import('views/Main/Legal/PublicOffer'));
 const MacroTranslatorPage = lazy(() => import('views/Main/MacroTranslator'));
 
 const dashRoutes = [
@@ -129,13 +123,6 @@ const dashRoutes = [
 				layout: '/lk',
 			},
 			{
-				path: '/',
-				name: 'Лендинг',
-				component: LandingPage,
-				layout: '',
-				hiddenInSidebar: true,
-			},
-			{
 				path: '/documentation',
 				name: 'Документация',
 				component: DocumentationPage,
@@ -143,56 +130,21 @@ const dashRoutes = [
 				hiddenInSidebar: true,
 			},
 			{
-				path: '/blog',
-				name: 'Блог',
-				component: BlogPage,
-				layout: '',
-				hiddenInSidebar: true,
-			},
-			{
-				path: '/blog/:slug',
-				name: 'Статья',
-				component: BlogArticlePage,
-				layout: '',
-				hiddenInSidebar: true,
-			},
-			{
-				path: '/contacts',
-				name: 'Контакты',
-				component: ContactsPage,
-				layout: '',
-				hiddenInSidebar: true,
-			},
-			{
-				path: '/privacy-policy',
-				name: 'Политика конфиденциальности',
-				component: PrivacyPolicyPage,
-				layout: '',
-				hiddenInSidebar: true,
-			},
-			{
-				path: '/public-offer',
-				name: 'Публичная оферта',
-				component: PublicOfferPage,
-				layout: '',
-				hiddenInSidebar: true,
-			},
-			{
-				path: '/macro-constructor',
+				path: '/constructor',
 				name: 'Конструктор макросов',
 				component: MacroConstructorPage,
 				layout: '',
 				hiddenInSidebar: true,
 			},
 			{
-				path: '/macro-translator',
+				path: '/translator',
 				name: 'Перейти в переводчик',
 				icon: <ConverterIcon color="inherit" />,
 				component: MacroTranslatorPage,
 				layout: '',
 			},
 			{
-				path: '/macro-constructor',
+				path: '/constructor',
 				name: 'Конструктор макросов',
 				icon: <ConverterIcon color="inherit" />,
 				component: MacroConstructorPage,

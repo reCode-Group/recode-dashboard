@@ -281,7 +281,7 @@ export default function DocumentationPage() {
 						fontSize="sm"
 						fontWeight="medium"
 						_hover={{ bg: 'recode.400' }}
-						onClick={() => navigate('/macro-translator')}
+						onClick={() => navigate('/translator')}
 					>
 						НАЧАТЬ РАБОТУ
 					</Button>

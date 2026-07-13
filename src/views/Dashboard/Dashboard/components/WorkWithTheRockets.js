@@ -3,7 +3,7 @@ import { Box, Button, Flex, Icon, Text, useColorModeValue } from '@chakra-ui/rea
 // Custom components
 import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
-import { Link as RouterLink } from 'react-router-dom';
+import { PUBLIC_SITE_URLS } from 'constants/publicSite';
 // react icons
 import { BsArrowRight } from 'react-icons/bs';
 
@@ -47,7 +47,7 @@ const WorkWithTheRockets = ({ title, description, backgroundImage }) => {
 						{description}
 					</Text>
 					<Flex align="center" mt="auto">
-						<Button as={RouterLink} to="/" p="0px" variant="no-hover" bg="transparent">
+						<Button as="a" href={PUBLIC_SITE_URLS.home} p="0px" variant="no-hover" bg="transparent">
 							<Text
 								fontSize="sm"
 								fontWeight="bold"

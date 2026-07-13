@@ -6,7 +6,6 @@ import AdminLayout from 'layouts/Admin';
 import MainLayout from 'layouts/Main';
 import { authRoutes } from './routes/authRoutes';
 import { dashboardRoutes } from './routes/dashboardRoutes';
-import { legacyRedirectRoutes } from './routes/legacyRedirectRoutes';
 import { mainRoutes } from './routes/mainRoutes';
 import { routePaths } from './routePaths';
 import { RequireAuth } from './ui/RequireAuth';
@@ -15,7 +14,7 @@ import { RequireGuest } from './ui/RequireGuest';
 const appRouter = createBrowserRouter([
 	{
 		element: <MainLayout />,
-		children: [...mainRoutes, ...legacyRedirectRoutes.filter((route) => route.path.startsWith('/main'))],
+		children: mainRoutes,
 	},
 	{
 		element: <RequireGuest />,
@@ -31,10 +30,7 @@ const appRouter = createBrowserRouter([
 		children: [
 			{
 				element: <AdminLayout />,
-				children: [
-					...dashboardRoutes,
-					...legacyRedirectRoutes.filter((route) => route.path.startsWith('/admin')),
-				],
+				children: dashboardRoutes,
 			},
 		],
 	},

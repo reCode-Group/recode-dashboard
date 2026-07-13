@@ -1,3 +1,5 @@
+import { buildApiUrl } from './apiClient';
+
 export const SUPPORT_EMAIL = 'help@recode-group.ru';
 
 export function getAllowedAttachmentTypes() {
@@ -17,7 +19,7 @@ export async function sendSupportEmail({ subject, description, files = [] }) {
 		formData.append('attachments', file);
 	});
 
-	const response = await fetch('/api/support/email', {
+	const response = await fetch(buildApiUrl('/api/support/email'), {
 		method: 'POST',
 		credentials: 'include',
 		body: formData,

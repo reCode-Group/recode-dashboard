@@ -1,5 +1,4 @@
 import routes from 'routes';
-import { BLOG_ARTICLES } from 'views/Main/Blog/data';
 import { DOCUMENTATION_SECTIONS } from 'views/Main/Documentation/data';
 
 const ROUTE_DESCRIPTIONS = {
@@ -12,13 +11,8 @@ const ROUTE_DESCRIPTIONS = {
 	'/lk/tariff': 'Тарифы и пакеты токенов',
 	'/lk/support': 'Техническая поддержка и тикеты',
 	'/lk/conversion-history': 'Полная история конвертаций',
-	'/': 'О проекте, возможности платформы и преимущества сервиса',
 	'/documentation': 'Документация, описание продукта и проектные материалы',
-	'/blog': 'Блог о VBA, автоматизации и миграции макросов',
-	'/contacts': 'Контакты и каналы связи',
-	'/privacy-policy': 'Политика конфиденциальности',
-	'/public-offer': 'Публичная оферта и условия использования',
-	'/macro-translator': 'Переводчик макросов VBA в JavaScript и Lua',
+	'/translator': 'Переводчик макросов VBA в JavaScript и Lua',
 };
 
 const ROUTE_KEYWORDS = {
@@ -32,8 +26,7 @@ const ROUTE_KEYWORDS = {
 	'/lk/support': ['поддержка', 'тикеты', 'помощь'],
 	'/lk/conversion-history': ['история', 'конвертации', 'переводы'],
 	'/documentation': ['документация', 'ресурсы', 'pdf'],
-	'/blog': ['блог', 'статьи', 'vba'],
-	'/macro-translator': ['переводчик', 'макросы', 'vba', 'lua', 'js'],
+	'/translator': ['переводчик', 'макросы', 'vba', 'lua', 'js'],
 };
 
 function normalizeText(value) {
@@ -93,23 +86,13 @@ function getDocumentationEntries() {
 	);
 }
 
-function getBlogEntries() {
-	return BLOG_ARTICLES.map((article) => ({
-		id: `blog:${article.slug}`,
-		type: 'blog',
-		title: article.title,
-		description: article.description || article.subtitle,
-		sectionLabel: 'Блог',
-		keywords: [article.subtitle, ...(article.content || []).slice(0, 2)],
-		route: `/blog/${article.slug}`,
-	}));
-}
-
 function buildSearchText(entry) {
-	return normalizeText([entry.title, entry.description, entry.sectionLabel, ...(entry.keywords || [])].join(' '));
+	return normalizeText(
+		[entry.title, entry.description, entry.sectionLabel, ...(entry.keywords || [])].join(' ')
+	);
 }
 
-const SEARCH_INDEX = [...getRouteEntries(), ...getDocumentationEntries(), ...getBlogEntries()].map((entry) => ({
+const SEARCH_INDEX = [...getRouteEntries(), ...getDocumentationEntries()].map((entry) => ({
 	...entry,
 	searchText: buildSearchText(entry),
 }));
@@ -136,11 +119,10 @@ export function searchSite(query, limit = 8) {
 		return [];
 	}
 
-	return SEARCH_INDEX
-		.map((entry) => ({
-			...entry,
-			score: getMatchScore(entry, normalizedQuery),
-		}))
+	return SEARCH_INDEX.map((entry) => ({
+		...entry,
+		score: getMatchScore(entry, normalizedQuery),
+	}))
 		.filter((entry) => entry.score >= 0)
 		.sort((a, b) => b.score - a.score || a.title.localeCompare(b.title, 'ru-RU'))
 		.slice(0, limit);

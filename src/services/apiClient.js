@@ -1,9 +1,18 @@
 const DEFAULT_RETRY_DELAY_MS = 2200;
+const API_BASE_URL = String(import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
 
 function wait(ms) {
 	return new Promise((resolve) => {
 		window.setTimeout(resolve, ms);
 	});
+}
+
+function buildApiUrl(path) {
+	if (!API_BASE_URL || /^https?:\/\//i.test(path)) {
+		return path;
+	}
+
+	return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
 async function parseResponse(response) {
@@ -39,7 +48,7 @@ function getRetryDelay(response) {
 
 export async function apiRequest(path, options = {}) {
 	const { retryOnRateLimit = true, ...requestOptions } = options;
-	const response = await fetch(path, {
+	const response = await fetch(buildApiUrl(path), {
 		credentials: 'include',
 		headers: {
 			'Content-Type': 'application/json',
@@ -60,3 +69,5 @@ export async function apiRequest(path, options = {}) {
 
 	return payload;
 }
+
+export { buildApiUrl };
