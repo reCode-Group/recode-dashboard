@@ -4,6 +4,33 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="theme-color" content="#000000" />
+		<script>
+			(function () {
+				var colorMode = 'light';
+				try {
+					colorMode = localStorage.getItem('chakra-ui-color-mode') || colorMode;
+				} catch (error) {
+					// Keep the light fallback when storage is unavailable.
+				}
+				document.documentElement.style.setProperty('--chakra-ui-color-mode', colorMode);
+				document.documentElement.setAttribute('data-theme', colorMode);
+			})();
+		</script>
+		<style>
+			html,
+			body,
+			#root {
+				min-height: 100%;
+				background: #f8f9fa;
+			}
+
+			html[data-theme='dark'],
+			html[data-theme='dark'] body,
+			html[data-theme='dark'] #root {
+				background: #1a202c;
+				color-scheme: dark;
+			}
+		</style>
 		<link rel="manifest" href="/manifest.json" />
 		<link rel="icon" href="/favicon.ico" />
 		<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon.png" />

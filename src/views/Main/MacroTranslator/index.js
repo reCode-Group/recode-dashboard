@@ -28,7 +28,7 @@ import ConversionHistory from 'components/Tables/ConversionHistory';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FiAlertCircle, FiCheck, FiCopy } from 'react-icons/fi';
 import { IoArrowForwardSharp } from 'react-icons/io5';
-import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
 import { getUserConversions } from 'services/conversions';
 import { convertFreeMacro, convertPaidMacro } from 'services/macroTranslator';
@@ -85,12 +85,6 @@ function getTokenPanelLabel(tokenSource) {
 	return tokenSource === TOKEN_SOURCE.EMPLOYEE ? 'СЧЕТ СОТРУДНИКА' : 'ЛИЧНЫЙ СЧЕТ';
 }
 
-function getTokenSourceHint(tokenSource) {
-	return tokenSource === TOKEN_SOURCE.EMPLOYEE
-		? 'Списание токенов со счета сотрудника в организации'
-		: 'Списание токенов с личного счета';
-}
-
 function getTariffLabel(subscriptionName) {
 	return subscriptionName || 'Нет тарифа';
 }
@@ -134,15 +128,16 @@ export default function MacroTranslatorPage() {
 		selectedTokenSource === TOKEN_SOURCE.EMPLOYEE ? employeeTokens : personalTokens;
 	const isFreeTranslation = translationMode === TRANSLATION_MODE.FREE;
 
-	const loadData = useCallback(async () => {
-		setIsPageLoading(true);
+	const loadData = useCallback(async ({ showLoader = true } = {}) => {
+		if (showLoader) {
+			setIsPageLoading(true);
+		}
 		setErrorMessage('');
 
 		try {
 			const currentUser = await getCurrentUser();
 			setIsAuthenticated(true);
 			setUser(currentUser);
-			setSelectedTokenSource(TOKEN_SOURCE.PERSONAL);
 
 			const [subscriptionResult, conversionsResult] = await Promise.all([
 				getUserSubscription().catch((error) => {
@@ -171,13 +166,21 @@ export default function MacroTranslatorPage() {
 				setErrorMessage(error.message || 'Не удалось загрузить данные переводчика');
 			}
 		} finally {
-			setIsPageLoading(false);
+			if (showLoader) {
+				setIsPageLoading(false);
+			}
 		}
 	}, []);
 
 	useEffect(() => {
 		loadData();
 	}, [loadData]);
+
+	useEffect(() => {
+		if (errorMessage) {
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+	}, [errorMessage]);
 
 	useEffect(() => {
 		if (!canUseEmployeeAccount && selectedTokenSource === TOKEN_SOURCE.EMPLOYEE) {
@@ -238,7 +241,7 @@ export default function MacroTranslatorPage() {
 				  });
 
 			setTranslated(result?.target_code || '');
-			await loadData();
+			await loadData({ showLoader: false });
 		} catch (error) {
 			if (isUnauthorizedError(error)) {
 				navigate('/auth/login-page');
@@ -284,7 +287,7 @@ export default function MacroTranslatorPage() {
 				</Box>
 
 				{errorMessage ? (
-					<Alert status="error" borderRadius="15px">
+					<Alert status="error" borderRadius="15px" color={textColor}>
 						<AlertIcon />
 						<Text fontSize="sm">{errorMessage}</Text>
 					</Alert>
@@ -296,14 +299,32 @@ export default function MacroTranslatorPage() {
 					</Flex>
 				) : (
 					<>
-						<Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="20px">
-							<Box>
-								<Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap="12px" mb="12px">
+						<Box
+							borderWidth="1px"
+							borderColor={tableBorder}
+							borderRadius="15px"
+							bg={toggleBg}
+							px="16px"
+							py="12px"
+							mb="20px"
+						>
+							<Grid
+								templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
+								gap="20px"
+								alignItems="stretch"
+							>
+								<Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap="12px">
 									<Box>
 										<Text fontSize="xs" fontWeight="600" color={mutedColor} mb="6px">
 											ИСХОДНЫЙ ЯЗЫК
 										</Text>
-										<Select value="VBA" isDisabled bg={inputBg} borderColor={tableBorder} borderRadius="15px">
+										<Select
+											value="VBA"
+											isDisabled
+											bg={inputBg}
+											borderColor={tableBorder}
+											borderRadius="15px"
+										>
 											<option value="VBA">VBA</option>
 										</Select>
 									</Box>
@@ -328,6 +349,131 @@ export default function MacroTranslatorPage() {
 									</Box>
 								</Grid>
 
+								<Box
+									borderLeftWidth={{ base: '0', lg: '1px' }}
+									borderTopWidth={{ base: '1px', lg: '0' }}
+									borderColor={tableBorder}
+									pl={{ base: '0', lg: '20px' }}
+									pt={{ base: '20px', lg: '0' }}
+								>
+									<Text fontSize="xs" fontWeight="600" color={mutedColor} mb="6px">
+										РЕЖИМ ПЕРЕВОДА
+									</Text>
+									<Flex justify="space-between" align="center" gap="16px">
+										<Flex
+											minH="40px"
+											px="12px"
+											align="center"
+											flex="1"
+											bg={inputBg}
+											borderWidth="1px"
+											borderColor={tableBorder}
+											borderRadius="15px"
+										>
+											<Text fontSize="12px" color={textColor}>
+												{isFreeTranslation
+													? `Бесплатно, ${FREE_TRANSLATIONS_PER_DAY} перевода в день`
+													: 'Перевод с оплатой токенами'}
+											</Text>
+										</Flex>
+										<HStack spacing="8px" flexShrink={0}>
+											<Text
+												fontSize="sm"
+												fontWeight="600"
+												color={isFreeTranslation ? textColor : mutedColor}
+											>
+												Бесплатно
+											</Text>
+											<Switch
+												size="lg"
+												colorScheme="green"
+												isChecked={!isFreeTranslation}
+												onChange={(event) =>
+													setTranslationMode(
+														event.target.checked ? TRANSLATION_MODE.PAID : TRANSLATION_MODE.FREE
+													)
+												}
+											/>
+											<Text
+												fontSize="sm"
+												fontWeight="600"
+												color={!isFreeTranslation ? textColor : mutedColor}
+											>
+												За токены
+											</Text>
+										</HStack>
+									</Flex>
+									{!isFreeTranslation && canUseEmployeeAccount ? (
+										<Flex mt="12px" justify="space-between" align="center" gap="12px" wrap="wrap">
+											<Text fontSize="xs" fontWeight="600" color={mutedColor}>
+												СПИСЫВАТЬ ТОКЕНЫ
+											</Text>
+											<HStack spacing="6px">
+												<Button
+													size="xs"
+													h="30px"
+													px="10px"
+													borderRadius="8px"
+													bg={
+														selectedTokenSource === TOKEN_SOURCE.PERSONAL ? 'recode.300' : inputBg
+													}
+													color={
+														selectedTokenSource === TOKEN_SOURCE.PERSONAL ? 'white' : textColor
+													}
+													borderWidth="1px"
+													borderColor={
+														selectedTokenSource === TOKEN_SOURCE.PERSONAL
+															? 'recode.300'
+															: tableBorder
+													}
+													aria-pressed={selectedTokenSource === TOKEN_SOURCE.PERSONAL}
+													onClick={() => setSelectedTokenSource(TOKEN_SOURCE.PERSONAL)}
+													_hover={{
+														bg:
+															selectedTokenSource === TOKEN_SOURCE.PERSONAL
+																? 'recode.400'
+																: inputBg,
+													}}
+												>
+													Личный счет
+												</Button>
+												<Button
+													size="xs"
+													h="30px"
+													px="10px"
+													borderRadius="8px"
+													bg={
+														selectedTokenSource === TOKEN_SOURCE.EMPLOYEE ? 'recode.300' : inputBg
+													}
+													color={
+														selectedTokenSource === TOKEN_SOURCE.EMPLOYEE ? 'white' : textColor
+													}
+													borderWidth="1px"
+													borderColor={
+														selectedTokenSource === TOKEN_SOURCE.EMPLOYEE
+															? 'recode.300'
+															: tableBorder
+													}
+													aria-pressed={selectedTokenSource === TOKEN_SOURCE.EMPLOYEE}
+													onClick={() => setSelectedTokenSource(TOKEN_SOURCE.EMPLOYEE)}
+													_hover={{
+														bg:
+															selectedTokenSource === TOKEN_SOURCE.EMPLOYEE
+																? 'recode.400'
+																: inputBg,
+													}}
+												>
+													Счет сотрудника
+												</Button>
+											</HStack>
+										</Flex>
+									) : null}
+								</Box>
+							</Grid>
+						</Box>
+
+						<Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="20px">
+							<Box>
 								<Text fontSize="sm" color={textColor} mb="8px">
 									Исходный макрос
 								</Text>
@@ -338,6 +484,7 @@ export default function MacroTranslatorPage() {
 										placeholder="Введите или вставьте ваш код здесь..."
 										minH={{ base: '250px', md: '320px' }}
 										bg={inputBg}
+										color={textColor}
 										borderColor={tableBorder}
 										borderRadius="15px"
 										resize="none"
@@ -358,136 +505,9 @@ export default function MacroTranslatorPage() {
 										{charCounter}
 									</Text>
 								</Box>
-
-								<Flex
-									borderWidth="1px"
-									borderColor={tableBorder}
-									borderRadius="15px"
-									mt="12px"
-									px="16px"
-									py="12px"
-									justify="space-between"
-									align={{ base: 'flex-start', sm: 'center' }}
-									direction={{ base: 'column', sm: 'row' }}
-									gap="12px"
-								>
-									<Box>
-										<Text fontSize="xs" fontWeight="500" color={mutedColor}>
-											{getTokenPanelLabel(selectedTokenSource)}:{' '}
-											<Text as="span" color={textColor}>
-												{formatTokenValue(activeTokenBalance)}
-											</Text>
-										</Text>
-										<Text fontSize="xs" fontWeight="500" color={mutedColor}>
-											ТАРИФ:{' '}
-											<Link color={textColor} textDecor="underline">
-												{getTariffLabel(subscriptionName)}
-											</Link>
-										</Text>
-										<Text fontSize="11px" mt="4px" color={mutedColor}>
-											{getTokenSourceHint(selectedTokenSource)}
-										</Text>
-									</Box>
-									<Button
-										size="sm"
-										px="1rem"
-										bg="gray.200"
-										color="gray.700"
-										fontSize="xs"
-										fontWeight="semibold"
-										borderRadius="8px"
-										rightIcon={<IoArrowForwardSharp />}
-										onClick={() => navigate('/lk/tariff')}
-										_hover={{ bg: 'gray.300' }}
-									>
-										ТАРИФЫ
-									</Button>
-								</Flex>
-
-								{canUseEmployeeAccount ? (
-									<Flex
-										mt="12px"
-										px="16px"
-										py="12px"
-										borderRadius="15px"
-										borderWidth="1px"
-										borderColor={tableBorder}
-										bg={toggleBg}
-										justify="space-between"
-										align="center"
-										gap="12px"
-									>
-										<Box>
-											<Text fontSize="sm" fontWeight="600" color={textColor}>
-												Списывать токены со счета сотрудника
-											</Text>
-											<Text fontSize="12px" color={mutedColor} mt="2px">
-												Если выключено, списание идет с личного счета
-											</Text>
-										</Box>
-										<Switch
-											colorScheme="green"
-											isChecked={selectedTokenSource === TOKEN_SOURCE.EMPLOYEE}
-											onChange={(event) =>
-												setSelectedTokenSource(
-													event.target.checked ? TOKEN_SOURCE.EMPLOYEE : TOKEN_SOURCE.PERSONAL
-												)
-											}
-										/>
-									</Flex>
-								) : null}
 							</Box>
 
 							<Box>
-								<Flex
-									px="16px"
-									py="12px"
-									mb="12px"
-									borderRadius="15px"
-									borderWidth="1px"
-									borderColor={tableBorder}
-									bg={toggleBg}
-									justify="space-between"
-									align="center"
-									gap="16px"
-								>
-									<Box>
-										<Text fontSize="xs" fontWeight="600" color={mutedColor} mb="2px">
-											РЕЖИМ ПЕРЕВОДА
-										</Text>
-										<Text fontSize="12px" color={mutedColor} mt="2px">
-											{isFreeTranslation
-												? `Бесплатно, до ${FREE_TRANSLATIONS_PER_DAY} переводов в день`
-												: 'Перевод с оплатой токенами'}
-										</Text>
-									</Box>
-									<HStack spacing="8px" flexShrink={0}>
-										<Text
-											fontSize="xs"
-											fontWeight="600"
-											color={isFreeTranslation ? textColor : mutedColor}
-										>
-											Бесплатно
-										</Text>
-										<Switch
-											colorScheme="green"
-											isChecked={!isFreeTranslation}
-											onChange={(event) =>
-												setTranslationMode(
-													event.target.checked ? TRANSLATION_MODE.PAID : TRANSLATION_MODE.FREE
-												)
-											}
-										/>
-										<Text
-											fontSize="xs"
-											fontWeight="600"
-											color={!isFreeTranslation ? textColor : mutedColor}
-										>
-											За токены
-										</Text>
-									</HStack>
-								</Flex>
-
 								<Text fontSize="sm" color={textColor} mb="8px">
 									Переведенный макрос
 								</Text>
@@ -497,7 +517,7 @@ export default function MacroTranslatorPage() {
 										px="10px"
 										onClick={handleCopyResult}
 										bg="gray.200"
-										color="gray.400"
+										color="gray.500"
 										borderRadius="8px"
 										leftIcon={copied ? <FiCheck /> : <FiCopy />}
 										fontSize="xs"
@@ -507,7 +527,7 @@ export default function MacroTranslatorPage() {
 										right="10px"
 										zIndex={2}
 										_hover={{ bg: 'gray.300' }}
-										isDisabled={!translated}
+										// isDisabled={!translated}
 									>
 										{copied ? 'Скопировано.' : 'Копировать'}
 									</Button>
@@ -516,6 +536,7 @@ export default function MacroTranslatorPage() {
 										placeholder="..."
 										minH={{ base: '250px', md: '320px' }}
 										bg={inputBg}
+										color={textColor}
 										borderColor={tableBorder}
 										borderRadius="15px"
 										resize="none"
@@ -526,24 +547,69 @@ export default function MacroTranslatorPage() {
 										readOnly
 									/>
 								</Box>
-								<HStack spacing="12px" mt="8px" align="flex-start">
-									<Icon as={FiAlertCircle} color={mutedColor} stroke={1} boxSize="48px" mt="2px" />
-									<Text fontSize="12px" color={mutedColor}>
-										Внимание! Переведенный макрос может содержать неточности и ошибки. Рекомендуем
-										проверять результат перевода вручную перед его использованием в своих проектах.{` `}
-										<Link
-											textDecor="underline"
-											color={mutedColor}
-											onClick={(event) => {
-												event.preventDefault();
-												setIsDisclaimerOpen(true);
-											}}
-										>
-											Подробнее
+							</Box>
+						</Grid>
+
+						<Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="20px">
+							<Flex
+								borderWidth="1px"
+								borderColor={tableBorder}
+								borderRadius="15px"
+								px="16px"
+								py="12px"
+								justify="space-between"
+								align={{ base: 'flex-start', sm: 'center' }}
+								direction={{ base: 'column', sm: 'row' }}
+								gap="12px"
+							>
+								<Box>
+									<Text fontSize="xs" fontWeight="500" color={mutedColor}>
+										{getTokenPanelLabel(selectedTokenSource)}:{' '}
+										<Text as="span" color={textColor}>
+											{formatTokenValue(activeTokenBalance)}
+										</Text>
+									</Text>
+									<Text fontSize="xs" fontWeight="500" color={mutedColor}>
+										ТАРИФ:{' '}
+										<Link color={textColor} textDecor="underline">
+											{getTariffLabel(subscriptionName)}
 										</Link>
 									</Text>
-								</HStack>
-							</Box>
+								</Box>
+								<Button
+									size="sm"
+									px="1rem"
+									bg="gray.200"
+									color="gray.700"
+									fontSize="xs"
+									fontWeight="semibold"
+									borderRadius="8px"
+									rightIcon={<IoArrowForwardSharp />}
+									onClick={() => navigate('/lk/tariff')}
+									_hover={{ bg: 'gray.300' }}
+								>
+									ТАРИФЫ
+								</Button>
+							</Flex>
+
+							<HStack spacing="12px" align="center">
+								<Icon as={FiAlertCircle} color={mutedColor} stroke={1} boxSize="48px" mt="2px" />
+								<Text fontSize="12px" color={mutedColor}>
+									Внимание! Переведенный макрос может содержать неточности и ошибки. Рекомендуем
+									проверять результат перевода вручную перед его использованием в своих проектах.
+									{` `}
+									<Link
+										textDecor="underline"
+										color={mutedColor}
+										onClick={(event) => {
+											event.preventDefault();
+											setIsDisclaimerOpen(true);
+										}}
+									>
+										Подробнее
+									</Link>
+								</Text>
+							</HStack>
 						</Grid>
 
 						<Flex justify="center" mb="22px">
@@ -578,7 +644,14 @@ export default function MacroTranslatorPage() {
 					</>
 				)}
 
-				<Box borderRadius="15px" overflow="hidden">
+				<Link
+					as={RouterLink}
+					to="/constructor"
+					target="_blank"
+					display="block"
+					borderRadius="15px"
+					overflow="hidden"
+				>
 					<Image
 						src={BannerConstructor}
 						alt="reCode banner"
@@ -587,7 +660,7 @@ export default function MacroTranslatorPage() {
 						objectFit="contain"
 						display="block"
 					/>
-				</Box>
+				</Link>
 			</Flex>
 
 			<Modal

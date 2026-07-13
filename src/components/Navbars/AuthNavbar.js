@@ -86,17 +86,17 @@ function PublicNavLink({ item, children, onClick, ...rest }) {
 	);
 }
 
-function PublicMenuItem({ item }) {
+function PublicMenuItem({ color, item }) {
 	if (isExternalTarget(item.to)) {
 		return (
-			<MenuItem as="a" href={item.to} fontSize="14px" fontWeight="500">
+			<MenuItem as="a" href={item.to} color={color} fontSize="14px" fontWeight="500">
 				{item.label}
 			</MenuItem>
 		);
 	}
 
 	return (
-		<MenuItem as={RouterLink} to={item.to} fontSize="14px" fontWeight="500">
+		<MenuItem as={RouterLink} to={item.to} color={color} fontSize="14px" fontWeight="500">
 			{item.label}
 		</MenuItem>
 	);
@@ -138,6 +138,7 @@ export default function AuthNavbar(props) {
 	);
 	let navbarShadow = useColorModeValue('0px 7px 23px rgba(0, 0, 0, 0.05)', 'none');
 	let navbarFilter = useColorModeValue('none', 'drop-shadow(0px 7px 23px rgba(0, 0, 0, 0.05))');
+	const resourceItemColor = useColorModeValue('gray.700', 'white');
 	let navbarBackdrop = 'blur(18px)';
 	let bgButton = useColorModeValue(
 		'linear-gradient(81.62deg, #313860 2.25%, #151928 79.87%)',
@@ -224,7 +225,7 @@ export default function AuthNavbar(props) {
 				</MenuButton>
 				<MenuList borderRadius="16px" py="8px" minW="240px">
 					{RESOURCE_NAV_ITEMS.map((item) => (
-						<PublicMenuItem item={item} key={item.to} />
+						<PublicMenuItem color={resourceItemColor} item={item} key={item.to} />
 					))}
 				</MenuList>
 			</Menu>
@@ -297,10 +298,10 @@ export default function AuthNavbar(props) {
 								_active={{ bg: 'gray.50' }}
 								_focus={{ boxShadow: 'none' }}
 							>
-								<Text color="gray.700" fontSize="sm" fontWeight="medium" textAlign="left">
+								<Text color={resourceItemColor} fontSize="sm" fontWeight="medium" textAlign="left">
 									РЕСУРСЫ
 								</Text>
-								<Text color="gray.700" fontSize="10px">
+								<Text color={resourceItemColor} fontSize="10px">
 									{isResourcesOpen ? '▲' : '▼'}
 								</Text>
 							</Button>
@@ -320,7 +321,7 @@ export default function AuthNavbar(props) {
 											borderRadius="12px"
 											_hover={{ bg: 'gray.50', textDecoration: 'none' }}
 										>
-											<Text color="gray.700" fontSize="sm" fontWeight="medium" textAlign="left">
+											<Text color={resourceItemColor} fontSize="sm" fontWeight="medium" textAlign="left">
 												{item.label}
 											</Text>
 										</PublicNavLink>
