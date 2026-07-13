@@ -1,5 +1,14 @@
 // Chakra imports
-import { Alert, AlertIcon, Button, Flex, Grid, Spinner, useColorModeValue, useToast } from '@chakra-ui/react';
+import {
+	Alert,
+	AlertIcon,
+	Button,
+	Flex,
+	Grid,
+	Spinner,
+	useColorModeValue,
+	useToast,
+} from '@chakra-ui/react';
 import ProfileBgImage from 'assets/img/ProfileBackground.png';
 import ConversionHistory from 'components/Tables/ConversionHistory';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -36,7 +45,10 @@ function getHeaderDisplayName(user) {
 		return getDisplayName(user);
 	}
 
-	const initials = [nameInitial, middleInitial].filter(Boolean).map((letter) => `${letter}.`).join(' ');
+	const initials = [nameInitial, middleInitial]
+		.filter(Boolean)
+		.map((letter) => `${letter}.`)
+		.join(' ');
 
 	return initials ? `${surname} ${initials}` : surname;
 }
@@ -55,7 +67,9 @@ function Profile() {
 		'linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)'
 	);
 	const loadingColor = useColorModeValue('recode.300', 'recode.200');
-	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [location.search]);
+	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [
+		location.search,
+	]);
 	const hasCompletedRegistration = useMemo(
 		() => new URLSearchParams(location.search).get('completed') === '1',
 		[location.search]
@@ -162,7 +176,7 @@ function Profile() {
 	const fullName = getFullName(user);
 	const companyName = organization?.short_name || organization?.full_name || emptyValue;
 	const roleName = getRoleLabel(user?.organization_role);
-	const mobile = emptyValue;
+	const mobile = user?.phone || emptyValue;
 	const avatarImage = user?.avatar_url || user?.avatar || user?.photo_url || user?.photo || null;
 
 	return (
