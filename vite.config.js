@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import react from '@vitejs/plugin-react';
-import { defineConfig, transformWithEsbuild } from 'vite';
+import { defineConfig, loadEnv, transformWithEsbuild } from 'vite';
 
 const srcDir = path.resolve(__dirname, 'src');
 
@@ -30,37 +30,42 @@ const srcAliases = fs.readdirSync(srcDir, { withFileTypes: true }).flatMap((entr
 	];
 });
 
-export default defineConfig({
-	plugins: [
-		{
-			name: 'jsx-in-js',
-			enforce: 'pre',
-			async transform(code, id) {
-				if (!id.includes('/src/') || !/\.[jt]sx?$/.test(id)) {
-					return null;
-				}
+export default defineConfig(({ mode }) => {
+	const env = loadEnv(mode, process.cwd(), '');
+	const apiProxyTarget = env.VITE_API_PROXY_TARGET || env.VITE_API_BASE_URL || 'http://localhost:8080';
 
-				return transformWithEsbuild(code, id, {
-					loader: 'jsx',
-					jsx: 'automatic',
-				});
+	return {
+		plugins: [
+			{
+				name: 'jsx-in-js',
+				enforce: 'pre',
+				async transform(code, id) {
+					if (!id.includes('/src/') || !/\.[jt]sx?$/.test(id)) {
+						return null;
+					}
+
+					return transformWithEsbuild(code, id, {
+						loader: 'jsx',
+						jsx: 'automatic',
+					});
+				},
+			},
+			react(),
+		],
+		resolve: {
+			alias: srcAliases,
+		},
+		server: {
+			proxy: {
+				'/api': {
+					target: apiProxyTarget,
+					changeOrigin: true,
+				},
 			},
 		},
-		react(),
-	],
-	resolve: {
-		alias: srcAliases,
-	},
-	server: {
-		proxy: {
-			'/api': {
-				target: 'http://localhost:8080',
-				changeOrigin: true,
-			},
+		build: {
+			outDir: 'build',
+			target: 'esnext',
 		},
-	},
-	build: {
-		outDir: 'build',
-		target: 'esnext',
-	},
+	};
 });
