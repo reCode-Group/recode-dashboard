@@ -30,6 +30,8 @@ import { useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { confirmPasswordReset, login, requestPasswordReset } from 'services/auth';
 import { markAuthenticated } from 'services/session';
+import PasswordStrength, { getPasswordStrength } from './components/PasswordStrength';
+import useResendCooldown from './hooks/useResendCooldown';
 
 function getFriendlyError(error) {
 	const message = error.message || '';
@@ -71,6 +73,7 @@ function SignIn() {
 	const resetEmailInputRef = useRef();
 	const titleColor = useColorModeValue('recode.300', 'recode.200');
 	const textColor = useColorModeValue('gray.400', 'white');
+	const forgotPasswordColor = useColorModeValue('gray.500', 'gray.300');
 	const bgIcons = useColorModeValue('gray.50', 'rgba(255, 255, 255, 0.1)');
 	const iconColor = useColorModeValue('black', 'lightgray');
 	const modalBg = useColorModeValue('rgba(255, 255, 255, 0.9)', 'rgba(26, 32, 44, 0.94)');
@@ -105,11 +108,20 @@ function SignIn() {
 	const [resetEmail, setResetEmail] = useState('');
 	const [resetCode, setResetCode] = useState('');
 	const [newPassword, setNewPassword] = useState('');
+	const [isNewPasswordFocused, setIsNewPasswordFocused] = useState(false);
 	const [newPasswordConfirmation, setNewPasswordConfirmation] = useState('');
 	const [showNewPassword, setShowNewPassword] = useState(false);
 	const [resetError, setResetError] = useState('');
 	const [resetMessage, setResetMessage] = useState('');
 	const [isResetSubmitting, setIsResetSubmitting] = useState(false);
+	const [isResetResending, setIsResetResending] = useState(false);
+	const {
+		remainingSeconds: resetRemainingSeconds,
+		isCoolingDown: isResetCoolingDown,
+		startCooldown: startResetCooldown,
+		resetCooldown: resetResetCooldown,
+	} = useResendCooldown(30);
+	const isResetBusy = isResetSubmitting || isResetResending;
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
@@ -140,10 +152,13 @@ function SignIn() {
 		setResetEmail('');
 		setResetCode('');
 		setNewPassword('');
+		setIsNewPasswordFocused(false);
 		setNewPasswordConfirmation('');
 		setShowNewPassword(false);
 		setResetError('');
 		setResetMessage('');
+		setIsResetResending(false);
+		resetResetCooldown();
 	};
 
 	const openResetModal = () => {
@@ -154,7 +169,7 @@ function SignIn() {
 	};
 
 	const closeResetModal = () => {
-		if (isResetSubmitting) {
+		if (isResetBusy) {
 			return;
 		}
 		resetModal.onClose();
@@ -179,6 +194,7 @@ function SignIn() {
 			setResetEmail(normalizedEmail);
 			setResetStep('confirm');
 			setResetMessage(`Код восстановления отправлен на ${normalizedEmail}. Он действует 15 минут.`);
+			startResetCooldown();
 		} catch (requestError) {
 			setResetError(getPasswordResetError(requestError));
 		} finally {
@@ -186,16 +202,41 @@ function SignIn() {
 		}
 	};
 
+	const handleResetResend = async () => {
+		if (isResetCoolingDown || isResetBusy) {
+			return;
+		}
+
+		setIsResetResending(true);
+		setResetError('');
+
+		try {
+			await requestPasswordReset(resetEmail);
+			setResetCode('');
+			setResetMessage(
+				`Новый код восстановления отправлен на ${resetEmail}. Он действует 15 минут.`
+			);
+			startResetCooldown();
+		} catch (requestError) {
+			setResetError(getPasswordResetError(requestError));
+		} finally {
+			setIsResetResending(false);
+		}
+	};
+
 	const handleResetConfirm = async (event) => {
 		event.preventDefault();
+		if (isResetResending) {
+			return;
+		}
 		const trimmedCode = resetCode.trim();
 
 		if (!/^\d{6}$/.test(trimmedCode)) {
 			setResetError('Введите шестизначный код');
 			return;
 		}
-		if (newPassword.length < 8) {
-			setResetError('Новый пароль должен содержать не менее 8 символов');
+		if (!getPasswordStrength(newPassword).isValid) {
+			setResetError('Пароль пока слишком простой');
 			return;
 		}
 		if (newPassword !== newPasswordConfirmation) {
@@ -324,7 +365,7 @@ function SignIn() {
 							<Button
 								type="button"
 								variant="link"
-								color={titleColor}
+								color={forgotPasswordColor}
 								fontSize="sm"
 								fontWeight="medium"
 								onClick={openResetModal}
@@ -447,8 +488,8 @@ function SignIn() {
 				onClose={closeResetModal}
 				initialFocusRef={resetEmailInputRef}
 				isCentered
-				closeOnOverlayClick={!isResetSubmitting}
-				closeOnEsc={!isResetSubmitting}
+				closeOnOverlayClick={!isResetBusy}
+				closeOnEsc={!isResetBusy}
 			>
 				<ModalOverlay bg="rgba(0, 0, 0, 0.5)" backdropFilter="blur(4px)" />
 				<ModalContent
@@ -462,7 +503,7 @@ function SignIn() {
 					borderColor={modalBorderColor}
 					borderRadius="20px"
 					boxShadow="0 25px 50px -12px rgba(0, 0, 0, 0.25)"
-					overflow="hidden"
+					overflow={{ base: 'hidden', lg: 'visible' }}
 					mx="20px"
 				>
 					<ModalHeader
@@ -471,6 +512,7 @@ function SignIn() {
 						bg={modalSectionBg}
 						borderBottom="1px solid"
 						borderColor={modalDividerColor}
+						borderTopRadius="20px"
 					>
 						<Box maxW="calc(100% - 52px)">
 							<Text fontSize="24px" fontWeight="600" color={modalTitleColor} lineHeight="1.25">
@@ -490,7 +532,7 @@ function SignIn() {
 						</Box>
 					</ModalHeader>
 					<ModalCloseButton
-						isDisabled={isResetSubmitting}
+						isDisabled={isResetBusy}
 						top="20px"
 						right={{ base: '20px', md: '32px' }}
 						w="40px"
@@ -500,7 +542,12 @@ function SignIn() {
 						color={modalCloseColor}
 						_hover={{ bg: modalCloseHoverBg, color: modalTitleColor }}
 					/>
-					<ModalBody px={{ base: '20px', md: '30px' }} py="28px" bg={modalBodyBg} overflowY="auto">
+					<ModalBody
+						px={{ base: '20px', md: '30px' }}
+						py="28px"
+						bg={modalBodyBg}
+						overflowY={{ base: 'auto', lg: 'visible' }}
+					>
 						{resetError ? (
 							<Alert status="error" borderRadius="12px" mb="20px" fontSize="sm">
 								<AlertIcon />
@@ -559,14 +606,37 @@ function SignIn() {
 										onChange={(event) =>
 											setResetCode(event.target.value.replace(/\D/g, '').slice(0, 6))
 										}
-										isDisabled={isResetSubmitting}
+										isDisabled={isResetBusy}
 										autoComplete="one-time-code"
 										_hover={{ borderColor: modalInputHoverBorder }}
 										_focus={{ borderColor: modalInputFocusBorder, boxShadow: 'none' }}
 										_placeholder={{ color: modalPlaceholderColor }}
 									/>
+									<Flex align="center" gap="5px" wrap="wrap" mt="10px">
+										<Text color={modalDescriptionColor} fontSize="sm">
+											Не пришло письмо?
+										</Text>
+										<Button
+											type="button"
+											variant="link"
+											color={titleColor}
+											fontSize="sm"
+											fontWeight="600"
+											onClick={handleResetResend}
+											isDisabled={isResetCoolingDown || isResetBusy}
+											isLoading={isResetResending}
+											loadingText="Отправляем"
+										>
+											{isResetCoolingDown
+												? `Отправить повторно через 00:${String(resetRemainingSeconds).padStart(
+														2,
+														'0'
+												  )}`
+												: 'Отправить повторно'}
+										</Button>
+									</Flex>
 								</FormControl>
-								<FormControl isRequired mb="20px">
+								<FormControl isRequired mb="20px" position="relative">
 									<FormLabel fontSize="sm" fontWeight="500" color={modalTitleColor}>
 										Новый пароль
 									</FormLabel>
@@ -582,6 +652,8 @@ function SignIn() {
 											fontSize="sm"
 											value={newPassword}
 											onChange={(event) => setNewPassword(event.target.value)}
+											onFocus={() => setIsNewPasswordFocused(true)}
+											onBlur={() => setIsNewPasswordFocused(false)}
 											isDisabled={isResetSubmitting}
 											autoComplete="new-password"
 											minLength={8}
@@ -610,6 +682,7 @@ function SignIn() {
 											</Button>
 										</InputRightElement>
 									</InputGroup>
+									<PasswordStrength password={newPassword} isActive={isNewPasswordFocused} />
 								</FormControl>
 								<FormControl isRequired>
 									<FormLabel fontSize="sm" fontWeight="500" color={modalTitleColor}>
@@ -646,6 +719,7 @@ function SignIn() {
 						bg={modalSectionBg}
 						borderTop="1px solid"
 						borderColor={modalDividerColor}
+						borderBottomRadius="20px"
 					>
 						<Button
 							type="button"
@@ -660,8 +734,9 @@ function SignIn() {
 								setNewPasswordConfirmation('');
 								setResetError('');
 								setResetMessage('');
+								resetResetCooldown();
 							}}
-							isDisabled={isResetSubmitting}
+							isDisabled={isResetBusy}
 							flex="1"
 							px="24px"
 							h="45px"
@@ -685,6 +760,7 @@ function SignIn() {
 							fontWeight="500"
 							flex="1"
 							isLoading={isResetSubmitting}
+							isDisabled={isResetResending}
 							loadingText={resetStep === 'email' ? 'Отправляем' : 'Сохраняем'}
 							_hover={{ filter: 'saturate(0.5)' }}
 							_active={{ filter: 'brightness(0.85)' }}

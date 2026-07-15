@@ -22,6 +22,8 @@ import { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { login, register, sendVerificationCode, verifyCode } from 'services/auth';
 import { markAuthenticated, setPendingProfileEmail, setPendingProfileName } from 'services/session';
+import PasswordStrength, { getPasswordStrength } from './components/PasswordStrength';
+import useResendCooldown from './hooks/useResendCooldown';
 
 function getFriendlyError(error) {
 	const message = error.message || '';
@@ -54,12 +56,15 @@ function SignUp() {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [code, setCode] = useState('');
 	const [step, setStep] = useState('account');
 	const [error, setError] = useState('');
 	const [notice, setNotice] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isResendingCode, setIsResendingCode] = useState(false);
+	const { remainingSeconds, isCoolingDown, startCooldown, resetCooldown } = useResendCooldown(30);
 
 	const normalizedEmail = email.trim().toLowerCase();
 	const trimmedName = name.trim();
@@ -69,6 +74,10 @@ function SignUp() {
 
 		if (!trimmedName || !normalizedEmail || !password) {
 			setError('Введите имя, почту и пароль');
+			return;
+		}
+		if (!getPasswordStrength(password).isValid) {
+			setError('Пароль пока слишком простой. Следуйте подсказке рядом с полем');
 			return;
 		}
 
@@ -81,6 +90,7 @@ function SignUp() {
 			await sendVerificationCode(normalizedEmail);
 			setStep('verify');
 			setNotice('Код подтверждения отправлен на вашу почту ' + normalizedEmail);
+			startCooldown();
 		} catch (requestError) {
 			setError(getFriendlyError(requestError));
 		} finally {
@@ -88,8 +98,31 @@ function SignUp() {
 		}
 	};
 
+	const handleResendVerificationCode = async () => {
+		if (isCoolingDown || isResendingCode || isSubmitting) {
+			return;
+		}
+
+		setIsResendingCode(true);
+		setError('');
+
+		try {
+			await sendVerificationCode(normalizedEmail);
+			setCode('');
+			setNotice('Новый код подтверждения отправлен на ' + normalizedEmail);
+			startCooldown();
+		} catch (requestError) {
+			setError(getFriendlyError(requestError));
+		} finally {
+			setIsResendingCode(false);
+		}
+	};
+
 	const handleCodeSubmit = async (event) => {
 		event.preventDefault();
+		if (isResendingCode) {
+			return;
+		}
 		const trimmedCode = code.trim();
 		if (!trimmedCode) {
 			setError('Введите код подтверждения');
@@ -115,7 +148,7 @@ function SignUp() {
 	};
 
 	return (
-		<Flex direction="column" alignSelf="center" justifySelf="center" overflow="hidden">
+		<Flex direction="column" alignSelf="center" justifySelf="center">
 			<AuthNavbar secondary={true} logoText="RECODE DASHBOARD" />
 			<Box
 				position="absolute"
@@ -247,11 +280,11 @@ function SignUp() {
 									isDisabled={isSubmitting}
 								/>
 							</FormControl>
-							<FormControl isRequired>
+							<FormControl isRequired position="relative" mb={{ base: 0, lg: '24px' }}>
 								<FormLabel ms="4px" fontSize="sm" fontWeight="normal">
 									Пароль
 								</FormLabel>
-								<InputGroup size="lg" mb="24px">
+								<InputGroup size="lg">
 									<Input
 										fontSize="sm"
 										borderRadius="15px"
@@ -260,6 +293,8 @@ function SignUp() {
 										size="lg"
 										value={password}
 										onChange={(event) => setPassword(event.target.value)}
+										onFocus={() => setIsPasswordFocused(true)}
+										onBlur={() => setIsPasswordFocused(false)}
 										isDisabled={isSubmitting}
 										pr="3rem"
 									/>
@@ -276,10 +311,15 @@ function SignUp() {
 											_hover={{ bg: 'transparent' }}
 											_active={{ bg: 'transparent' }}
 										>
-											{showPassword ? <ViewOffIcon color="gray.400" /> : <ViewIcon color="gray.400" />}
+											{showPassword ? (
+												<ViewOffIcon color="gray.400" />
+											) : (
+												<ViewIcon color="gray.400" />
+											)}
 										</Button>
 									</InputRightElement>
 								</InputGroup>
+								<PasswordStrength password={password} isActive={isPasswordFocused} mb="24px" />
 							</FormControl>
 						</>
 					) : (
@@ -294,13 +334,33 @@ function SignUp() {
 									type="text"
 									inputMode="numeric"
 									placeholder="0000"
-									mb="24px"
+									mb="12px"
 									size="lg"
 									value={code}
 									onChange={(event) => setCode(event.target.value)}
-									isDisabled={isSubmitting}
+									isDisabled={isSubmitting || isResendingCode}
 								/>
 							</FormControl>
+							<Flex justify="center" align="center" gap="5px" wrap="wrap" mb="24px">
+								<Text color={secondTextColor} fontSize="sm">
+									Не пришло письмо?
+								</Text>
+								<Button
+									type="button"
+									variant="link"
+									color={titleColor}
+									fontSize="sm"
+									fontWeight="600"
+									onClick={handleResendVerificationCode}
+									isDisabled={isCoolingDown || isResendingCode || isSubmitting}
+									isLoading={isResendingCode}
+									loadingText="Отправляем"
+								>
+									{isCoolingDown
+										? `Отправить повторно через 00:${String(remainingSeconds).padStart(2, '0')}`
+										: 'Отправить повторно'}
+								</Button>
+							</Flex>
 						</>
 					)}
 					<Button
@@ -312,6 +372,7 @@ function SignUp() {
 						h="45"
 						mb="24px"
 						isLoading={isSubmitting}
+						isDisabled={step === 'verify' && isResendingCode}
 						loadingText={step === 'account' ? 'Отправляем код' : 'Проверяем код'}
 						_hover={{
 							bg: 'recode.200',
@@ -327,12 +388,13 @@ function SignUp() {
 							variant="ghost"
 							size="sm"
 							mb="18px"
-							isDisabled={isSubmitting}
+							isDisabled={isSubmitting || isResendingCode}
 							onClick={() => {
 								setStep('account');
 								setCode('');
 								setError('');
 								setNotice('');
+								resetCooldown();
 							}}
 						>
 							Изменить данные
