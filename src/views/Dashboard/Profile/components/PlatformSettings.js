@@ -96,7 +96,7 @@ const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
 	};
 
 	return (
-		<Card p='16px'>
+		<Card id='settings' scrollMarginTop='110px' p='16px'>
 			<CardHeader p='12px 5px' mb='12px'>
 				<Text fontSize='lg' color={textColor} fontWeight='bold'>
 					{title}

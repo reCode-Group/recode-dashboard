@@ -18,7 +18,7 @@ import { ProfileIcon, SettingsIcon } from 'components/Icons/Icons';
 // Custom Components
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive';
 import PropTypes from 'prop-types';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FiArrowRight } from 'react-icons/fi';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import routes from 'routes.js';
@@ -32,7 +32,6 @@ export default function HeaderLinks(props) {
 		children,
 		fixed,
 		secondary,
-		onOpen,
 		showOnlyMobileMenu = false,
 		...rest
 	} = props;
@@ -66,7 +65,6 @@ export default function HeaderLinks(props) {
 	if (secondary) {
 		navbarIcon = 'white';
 	}
-	const settingsRef = React.useRef();
 	const searchResults = useMemo(() => searchSite(searchQuery), [searchQuery]);
 
 	useEffect(() => {
@@ -319,17 +317,18 @@ export default function HeaderLinks(props) {
 					</Box>
 				) : null}
 			</Box>
-			<SettingsIcon
+			<Box
+				as={NavLink}
+				to="/lk/profile#settings"
+				aria-label="Настройки профиля"
 				display={showOnlyMobileMenu ? 'none' : { base: 'none', md: 'block' }}
 				cursor="pointer"
 				ms={{ base: '16px', xl: '0px' }}
 				me="16px"
-				ref={settingsRef}
-				onClick={props.onOpen}
 				color={navbarIcon}
-				w="18px"
-				h="18px"
-			/>
+			>
+				<SettingsIcon w="18px" h="18px" />
+			</Box>
 			<NavLink to="/lk/profile" end>
 				<IconButton
 					display={showOnlyMobileMenu ? 'none' : { base: 'none', md: 'inline-flex' }}
@@ -410,6 +409,5 @@ HeaderLinks.propTypes = {
 	variant: PropTypes.string,
 	fixed: PropTypes.bool,
 	secondary: PropTypes.bool,
-	onOpen: PropTypes.func,
 	showOnlyMobileMenu: PropTypes.bool,
 };

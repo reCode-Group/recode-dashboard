@@ -44,7 +44,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "start": "vite",
+    "start": "vite --mode production",
     "build": "vite build",
     "preview": "vite preview",
     "test": "echo \"No test runner configured\"",

@@ -85,8 +85,22 @@ function Profile() {
 	useEffect(() => {
 		if (queryTab === 'documents' || queryTab === 'overview') {
 			setActiveTab(queryTab);
+		} else if (location.hash === '#settings') {
+			setActiveTab('overview');
 		}
-	}, [queryTab]);
+	}, [location.hash, queryTab]);
+
+	useEffect(() => {
+		if (isLoading || activeTab !== 'overview' || location.hash !== '#settings') {
+			return undefined;
+		}
+
+		const animationFrame = window.requestAnimationFrame(() => {
+			document.getElementById('settings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		});
+
+		return () => window.cancelAnimationFrame(animationFrame);
+	}, [activeTab, isLoading, location.hash]);
 
 	useEffect(() => {
 		if (!hasCompletedRegistration) {

@@ -32,6 +32,7 @@ function RouteFallback() {
 export default function Dashboard(props) {
 	const { ...rest } = props;
 	const location = useLocation();
+	const isUiConfiguratorEnabled = import.meta.env.MODE !== 'production';
 	// states and functions
 	const [sidebarVariant, setSidebarVariant] = useState('transparent');
 	const [fixed, setFixed] = useState(false);
@@ -167,7 +168,6 @@ export default function Dashboard(props) {
 			>
 				<Portal>
 					<AdminNavbar
-						onOpen={onOpen}
 						logoText={'RECODE DASHBOARD'}
 						brandText={getActiveRoute(routes)}
 						secondary={getActiveNavbar(routes)}
@@ -187,20 +187,24 @@ export default function Dashboard(props) {
 					</PanelContent>
 				) : null}
 				<Footer />
-				<Portal>
-					<FixedPlugin secondary={getActiveNavbar(routes)} fixed={fixed} onOpen={onOpen} />
-				</Portal>
-				<Configurator
-					secondary={getActiveNavbar(routes)}
-					isOpen={isOpen}
-					onClose={onClose}
-					isChecked={fixed}
-					onSwitch={(value) => {
-						setFixed(value);
-					}}
-					onOpaque={() => setSidebarVariant('opaque')}
-					onTransparent={() => setSidebarVariant('transparent')}
-				/>
+				{isUiConfiguratorEnabled ? (
+					<>
+						<Portal>
+							<FixedPlugin secondary={getActiveNavbar(routes)} fixed={fixed} onOpen={onOpen} />
+						</Portal>
+						<Configurator
+							secondary={getActiveNavbar(routes)}
+							isOpen={isOpen}
+							onClose={onClose}
+							isChecked={fixed}
+							onSwitch={(value) => {
+								setFixed(value);
+							}}
+							onOpaque={() => setSidebarVariant('opaque')}
+							onTransparent={() => setSidebarVariant('transparent')}
+						/>
+					</>
+				) : null}
 			</MainPanel>
 		</ChakraProvider>
 	);

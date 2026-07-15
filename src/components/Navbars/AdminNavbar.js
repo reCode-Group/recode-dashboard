@@ -15,7 +15,7 @@ import AdminNavbarLinks from './AdminNavbarLinks';
 
 export default function AdminNavbar(props) {
 	const [scrolled, setScrolled] = useState(false);
-	const { variant, children, fixed, secondary, brandText, onOpen, hasLeftInset, ...rest } = props;
+	const { variant, children, fixed, secondary, brandText, hasLeftInset, ...rest } = props;
 
 	// Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
 	let mainText = useColorModeValue('gray.700', 'gray.200');
@@ -148,7 +148,6 @@ export default function AdminNavbar(props) {
 						</Box>
 						<Box display={{ base: 'flex', md: 'none' }} flexShrink={0} alignItems="center">
 							<AdminNavbarLinks
-								onOpen={props.onOpen}
 								logoText={props.logoText}
 								secondary={props.secondary}
 								fixed={props.fixed}
@@ -160,7 +159,6 @@ export default function AdminNavbar(props) {
 				</Box>
 				<Box ms="auto" w={{ sm: '100%', md: 'unset' }} display={{ base: 'none', md: 'block' }}>
 					<AdminNavbarLinks
-						onOpen={props.onOpen}
 						logoText={props.logoText}
 						secondary={props.secondary}
 						fixed={props.fixed}
@@ -178,5 +176,4 @@ AdminNavbar.propTypes = {
 	secondary: PropTypes.bool,
 	fixed: PropTypes.bool,
 	hasLeftInset: PropTypes.bool,
-	onOpen: PropTypes.func,
 };
