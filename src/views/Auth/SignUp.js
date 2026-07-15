@@ -1,3 +1,4 @@
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {
 	Alert,
 	AlertIcon,
@@ -14,7 +15,6 @@ import {
 	Text,
 	useColorModeValue,
 } from '@chakra-ui/react';
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import BgSignUp from 'assets/img/BgSignUp.png';
 import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
 import AuthNavbar from 'components/Navbars/AuthNavbar.js';
@@ -77,7 +77,7 @@ function SignUp() {
 			return;
 		}
 		if (!getPasswordStrength(password).isValid) {
-			setError('Пароль пока слишком простой. Следуйте подсказке рядом с полем');
+			setError('Пароль пока слишком простой');
 			return;
 		}
 
@@ -204,36 +204,38 @@ function SignUp() {
 					<Text fontSize="xl" color={textColor} fontWeight="bold" textAlign="center" mb="22px">
 						{step === 'account' ? 'Регистрация' : 'Подтверждение почты'}
 					</Text>
-					<HStack spacing="15px" justify="center" mb="25px">
-						<Flex
-							justify="center"
-							align="center"
-							h="70px"
-							p="20px"
-							borderRadius="15px"
-							border="1px solid lightgray"
-							cursor="not-allowed"
-							opacity={0.55}
-							transition="all .25s ease"
-							_hover={{ bg: bgIcons }}
-						>
-							<SberIdIcon color={iconColor} w="105px" h="105px" />
-						</Flex>
-						<Flex
-							justify="center"
-							align="center"
-							p="20px"
-							h="70px"
-							borderRadius="15px"
-							border="1px solid lightgray"
-							cursor="not-allowed"
-							opacity={0.55}
-							transition="all .25s ease"
-							_hover={{ bg: bgIcons }}
-						>
-							<YandexIdIcon color={iconColor} w="100px" h="23px" />
-						</Flex>
-					</HStack>
+					{step === 'account' ? (
+						<HStack spacing="15px" justify="center" mb="25px">
+							<Flex
+								justify="center"
+								align="center"
+								h="70px"
+								p="20px"
+								borderRadius="15px"
+								border="1px solid lightgray"
+								cursor="not-allowed"
+								opacity={0.55}
+								transition="all .25s ease"
+								_hover={{ bg: bgIcons }}
+							>
+								<SberIdIcon color={iconColor} w="105px" h="105px" />
+							</Flex>
+							<Flex
+								justify="center"
+								align="center"
+								p="20px"
+								h="70px"
+								borderRadius="15px"
+								border="1px solid lightgray"
+								cursor="not-allowed"
+								opacity={0.55}
+								transition="all .25s ease"
+								_hover={{ bg: bgIcons }}
+							>
+								<YandexIdIcon color={iconColor} w="100px" h="23px" />
+							</Flex>
+						</HStack>
+					) : null}
 					{error ? (
 						<Alert status="error" borderRadius="12px" mb="20px" fontSize="sm">
 							<AlertIcon />
