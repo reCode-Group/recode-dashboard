@@ -13,14 +13,22 @@ import {
 	InputGroup,
 	InputRightElement,
 	Link,
+	Modal,
+	ModalBody,
+	ModalCloseButton,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
+	ModalOverlay,
 	Text,
 	useColorModeValue,
+	useDisclosure,
 } from '@chakra-ui/react';
 import signInImage from 'assets/img/signInImage.png';
 import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { login } from 'services/auth';
+import { confirmPasswordReset, login, requestPasswordReset } from 'services/auth';
 import { markAuthenticated } from 'services/session';
 
 function getFriendlyError(error) {
@@ -37,17 +45,71 @@ function getFriendlyError(error) {
 	return message || 'Не удалось войти';
 }
 
+function getPasswordResetError(error) {
+	const message = error.message || '';
+	if (message.includes('invalid or expired password reset code')) {
+		return 'Неверный или просроченный код восстановления';
+	}
+	if (message.includes('Invalid input')) {
+		return 'Проверьте правильность введённых данных';
+	}
+	if (message.includes('Cannot send password reset code')) {
+		return 'Не удалось отправить код восстановления. Попробуйте позже';
+	}
+	if (message.includes('Cannot reset password')) {
+		return 'Не удалось изменить пароль. Попробуйте позже';
+	}
+	if (message.includes('Too Many Requests')) {
+		return 'Слишком много запросов. Подождите и попробуйте снова';
+	}
+	return message || 'Не удалось восстановить пароль';
+}
+
 function SignIn() {
 	const navigate = useNavigate();
+	const resetModal = useDisclosure();
+	const resetEmailInputRef = useRef();
 	const titleColor = useColorModeValue('recode.300', 'recode.200');
 	const textColor = useColorModeValue('gray.400', 'white');
 	const bgIcons = useColorModeValue('gray.50', 'rgba(255, 255, 255, 0.1)');
 	const iconColor = useColorModeValue('black', 'lightgray');
+	const modalBg = useColorModeValue('rgba(255, 255, 255, 0.9)', 'rgba(26, 32, 44, 0.94)');
+	const modalSectionBg = useColorModeValue('rgba(255, 255, 255, 0.6)', 'rgba(23, 25, 35, 0.72)');
+	const modalBodyBg = useColorModeValue('white', 'gray.800');
+	const modalBorderColor = useColorModeValue(
+		'rgba(255, 255, 255, 0.3)',
+		'rgba(255, 255, 255, 0.16)'
+	);
+	const modalDividerColor = useColorModeValue('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.12)');
+	const modalTitleColor = useColorModeValue('#1f2937', 'white');
+	const modalDescriptionColor = useColorModeValue('#6b7280', 'gray.200');
+	const modalInputBg = useColorModeValue('white', 'rgba(255, 255, 255, 0.05)');
+	const modalInputBorder = useColorModeValue('#d1d5db', '#4a5568');
+	const modalInputHoverBorder = useColorModeValue('#9ca3af', '#718096');
+	const modalInputFocusBorder = useColorModeValue('#313860', 'recode.200');
+	const modalInputColor = useColorModeValue('#1f2937', 'white');
+	const modalPlaceholderColor = useColorModeValue('gray.400', 'gray.400');
+	const modalCloseBg = useColorModeValue('rgba(0, 0, 0, 0.05)', 'rgba(255, 255, 255, 0.08)');
+	const modalCloseHoverBg = useColorModeValue('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.16)');
+	const modalCloseColor = useColorModeValue('#6b7280', 'gray.300');
+	const modalCancelBg = useColorModeValue('rgba(0, 0, 0, 0.05)', 'rgba(255, 255, 255, 0.08)');
+	const modalCancelHoverBg = useColorModeValue('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.16)');
+	const modalCancelColor = useColorModeValue('#4b5563', 'gray.200');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
 	const [error, setError] = useState('');
+	const [notice, setNotice] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [resetStep, setResetStep] = useState('email');
+	const [resetEmail, setResetEmail] = useState('');
+	const [resetCode, setResetCode] = useState('');
+	const [newPassword, setNewPassword] = useState('');
+	const [newPasswordConfirmation, setNewPasswordConfirmation] = useState('');
+	const [showNewPassword, setShowNewPassword] = useState(false);
+	const [resetError, setResetError] = useState('');
+	const [resetMessage, setResetMessage] = useState('');
+	const [isResetSubmitting, setIsResetSubmitting] = useState(false);
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
@@ -60,6 +122,7 @@ function SignIn() {
 
 		setIsSubmitting(true);
 		setError('');
+		setNotice('');
 
 		try {
 			await login(normalizedEmail, password);
@@ -69,6 +132,92 @@ function SignIn() {
 			setError(getFriendlyError(requestError));
 		} finally {
 			setIsSubmitting(false);
+		}
+	};
+
+	const clearResetForm = () => {
+		setResetStep('email');
+		setResetEmail('');
+		setResetCode('');
+		setNewPassword('');
+		setNewPasswordConfirmation('');
+		setShowNewPassword(false);
+		setResetError('');
+		setResetMessage('');
+	};
+
+	const openResetModal = () => {
+		clearResetForm();
+		setResetEmail(email.trim().toLowerCase());
+		setNotice('');
+		resetModal.onOpen();
+	};
+
+	const closeResetModal = () => {
+		if (isResetSubmitting) {
+			return;
+		}
+		resetModal.onClose();
+		clearResetForm();
+	};
+
+	const handleResetRequest = async (event) => {
+		event.preventDefault();
+		const normalizedEmail = resetEmail.trim().toLowerCase();
+
+		if (!normalizedEmail) {
+			setResetError('Введите корректную почту');
+			return;
+		}
+
+		setIsResetSubmitting(true);
+		setResetError('');
+		setResetMessage('');
+
+		try {
+			await requestPasswordReset(normalizedEmail);
+			setResetEmail(normalizedEmail);
+			setResetStep('confirm');
+			setResetMessage(`Код восстановления отправлен на ${normalizedEmail}. Он действует 15 минут.`);
+		} catch (requestError) {
+			setResetError(getPasswordResetError(requestError));
+		} finally {
+			setIsResetSubmitting(false);
+		}
+	};
+
+	const handleResetConfirm = async (event) => {
+		event.preventDefault();
+		const trimmedCode = resetCode.trim();
+
+		if (!/^\d{6}$/.test(trimmedCode)) {
+			setResetError('Введите шестизначный код');
+			return;
+		}
+		if (newPassword.length < 8) {
+			setResetError('Новый пароль должен содержать не менее 8 символов');
+			return;
+		}
+		if (newPassword !== newPasswordConfirmation) {
+			setResetError('Пароли не совпадают');
+			return;
+		}
+
+		setIsResetSubmitting(true);
+		setResetError('');
+
+		try {
+			await confirmPasswordReset(resetEmail, trimmedCode, newPassword);
+			setEmail(resetEmail);
+			setPassword('');
+			setError('');
+			setNotice('Пароль успешно изменён. Теперь вы можете войти с новым паролем');
+			resetModal.onClose();
+			clearResetForm();
+		} catch (requestError) {
+			setResetError(getPasswordResetError(requestError));
+		} finally {
+			setIsResetSubmitting(false);
 		}
 	};
 
@@ -110,6 +259,12 @@ function SignIn() {
 								{error}
 							</Alert>
 						) : null}
+						{notice ? (
+							<Alert status="success" borderRadius="12px" mb="20px" fontSize="sm">
+								<AlertIcon />
+								{notice}
+							</Alert>
+						) : null}
 						<FormControl isRequired>
 							<FormLabel ms="4px" fontSize="sm" fontWeight="normal">
 								Email
@@ -144,6 +299,7 @@ function SignIn() {
 								/>
 								<InputRightElement width="3rem" h="100%">
 									<Button
+										type="button"
 										variant="ghost"
 										size="sm"
 										minW="auto"
@@ -164,6 +320,19 @@ function SignIn() {
 								</InputRightElement>
 							</InputGroup>
 						</FormControl>
+						<Flex justify="flex-end" mt="-12px" mb="12px">
+							<Button
+								type="button"
+								variant="link"
+								color={titleColor}
+								fontSize="sm"
+								fontWeight="medium"
+								onClick={openResetModal}
+								isDisabled={isSubmitting}
+							>
+								Забыли пароль?
+							</Button>
+						</Flex>
 						<Button
 							fontSize="xs"
 							fontWeight="medium"
@@ -273,6 +442,258 @@ function SignIn() {
 					></Box>
 				</Box>
 			</Flex>
+			<Modal
+				isOpen={resetModal.isOpen}
+				onClose={closeResetModal}
+				initialFocusRef={resetEmailInputRef}
+				isCentered
+				closeOnOverlayClick={!isResetSubmitting}
+				closeOnEsc={!isResetSubmitting}
+			>
+				<ModalOverlay bg="rgba(0, 0, 0, 0.5)" backdropFilter="blur(4px)" />
+				<ModalContent
+					as="form"
+					onSubmit={resetStep === 'email' ? handleResetRequest : handleResetConfirm}
+					maxW="500px"
+					maxH="90vh"
+					bg={modalBg}
+					backdropFilter="blur(20px)"
+					border="1px solid"
+					borderColor={modalBorderColor}
+					borderRadius="20px"
+					boxShadow="0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+					overflow="hidden"
+					mx="20px"
+				>
+					<ModalHeader
+						px={{ base: '20px', md: '32px' }}
+						py="24px"
+						bg={modalSectionBg}
+						borderBottom="1px solid"
+						borderColor={modalDividerColor}
+					>
+						<Box maxW="calc(100% - 52px)">
+							<Text fontSize="24px" fontWeight="600" color={modalTitleColor} lineHeight="1.25">
+								{resetStep === 'email' ? 'Восстановление пароля' : 'Создание нового пароля'}
+							</Text>
+							<Text
+								mt="6px"
+								color={modalDescriptionColor}
+								fontSize="14px"
+								fontWeight="400"
+								lineHeight="1.5"
+							>
+								{resetStep === 'email'
+									? 'Введите email, указанный при регистрации. Отправим на него код восстановления.'
+									: 'Введите код из письма и задайте новый пароль для входа.'}
+							</Text>
+						</Box>
+					</ModalHeader>
+					<ModalCloseButton
+						isDisabled={isResetSubmitting}
+						top="20px"
+						right={{ base: '20px', md: '32px' }}
+						w="40px"
+						h="40px"
+						borderRadius="50%"
+						bg={modalCloseBg}
+						color={modalCloseColor}
+						_hover={{ bg: modalCloseHoverBg, color: modalTitleColor }}
+					/>
+					<ModalBody px={{ base: '20px', md: '30px' }} py="28px" bg={modalBodyBg} overflowY="auto">
+						{resetError ? (
+							<Alert status="error" borderRadius="12px" mb="20px" fontSize="sm">
+								<AlertIcon />
+								{resetError}
+							</Alert>
+						) : null}
+						{resetMessage ? (
+							<Alert status="info" borderRadius="12px" mb="20px" fontSize="sm">
+								<AlertIcon />
+								{resetMessage}
+							</Alert>
+						) : null}
+						{resetStep === 'email' ? (
+							<FormControl isRequired>
+								<FormLabel fontSize="sm" fontWeight="500" color={modalTitleColor}>
+									Email
+								</FormLabel>
+								<Input
+									ref={resetEmailInputRef}
+									type="email"
+									placeholder="Ваша почта"
+									size="lg"
+									borderRadius="10px"
+									borderWidth="2px"
+									borderColor={modalInputBorder}
+									bg={modalInputBg}
+									color={modalInputColor}
+									fontSize="sm"
+									value={resetEmail}
+									onChange={(event) => setResetEmail(event.target.value)}
+									isDisabled={isResetSubmitting}
+									autoComplete="email"
+									_hover={{ borderColor: modalInputHoverBorder }}
+									_focus={{ borderColor: modalInputFocusBorder, boxShadow: 'none' }}
+									_placeholder={{ color: modalPlaceholderColor }}
+								/>
+							</FormControl>
+						) : (
+							<>
+								<FormControl isRequired mb="20px">
+									<FormLabel fontSize="sm" fontWeight="500" color={modalTitleColor}>
+										Код восстановления
+									</FormLabel>
+									<Input
+										type="text"
+										inputMode="numeric"
+										placeholder="000000"
+										size="lg"
+										borderRadius="10px"
+										borderWidth="2px"
+										borderColor={modalInputBorder}
+										bg={modalInputBg}
+										color={modalInputColor}
+										fontSize="sm"
+										value={resetCode}
+										onChange={(event) =>
+											setResetCode(event.target.value.replace(/\D/g, '').slice(0, 6))
+										}
+										isDisabled={isResetSubmitting}
+										autoComplete="one-time-code"
+										_hover={{ borderColor: modalInputHoverBorder }}
+										_focus={{ borderColor: modalInputFocusBorder, boxShadow: 'none' }}
+										_placeholder={{ color: modalPlaceholderColor }}
+									/>
+								</FormControl>
+								<FormControl isRequired mb="20px">
+									<FormLabel fontSize="sm" fontWeight="500" color={modalTitleColor}>
+										Новый пароль
+									</FormLabel>
+									<InputGroup size="lg">
+										<Input
+											type={showNewPassword ? 'text' : 'password'}
+											placeholder="Не менее 8 символов"
+											borderRadius="10px"
+											borderWidth="2px"
+											borderColor={modalInputBorder}
+											bg={modalInputBg}
+											color={modalInputColor}
+											fontSize="sm"
+											value={newPassword}
+											onChange={(event) => setNewPassword(event.target.value)}
+											isDisabled={isResetSubmitting}
+											autoComplete="new-password"
+											minLength={8}
+											pr="3rem"
+											_hover={{ borderColor: modalInputHoverBorder }}
+											_focus={{ borderColor: modalInputFocusBorder, boxShadow: 'none' }}
+											_placeholder={{ color: modalPlaceholderColor }}
+										/>
+										<InputRightElement width="3rem" h="100%">
+											<Button
+												type="button"
+												variant="ghost"
+												size="sm"
+												minW="auto"
+												h="auto"
+												p="0"
+												onClick={() => setShowNewPassword((value) => !value)}
+												isDisabled={isResetSubmitting}
+												aria-label={showNewPassword ? 'Скрыть пароль' : 'Показать пароль'}
+											>
+												{showNewPassword ? (
+													<ViewOffIcon color="gray.400" />
+												) : (
+													<ViewIcon color="gray.400" />
+												)}
+											</Button>
+										</InputRightElement>
+									</InputGroup>
+								</FormControl>
+								<FormControl isRequired>
+									<FormLabel fontSize="sm" fontWeight="500" color={modalTitleColor}>
+										Повторите новый пароль
+									</FormLabel>
+									<Input
+										type={showNewPassword ? 'text' : 'password'}
+										placeholder="Повторите пароль"
+										size="lg"
+										borderRadius="10px"
+										borderWidth="2px"
+										borderColor={modalInputBorder}
+										bg={modalInputBg}
+										color={modalInputColor}
+										fontSize="sm"
+										value={newPasswordConfirmation}
+										onChange={(event) => setNewPasswordConfirmation(event.target.value)}
+										isDisabled={isResetSubmitting}
+										autoComplete="new-password"
+										minLength={8}
+										_hover={{ borderColor: modalInputHoverBorder }}
+										_focus={{ borderColor: modalInputFocusBorder, boxShadow: 'none' }}
+										_placeholder={{ color: modalPlaceholderColor }}
+									/>
+								</FormControl>
+							</>
+						)}
+					</ModalBody>
+					<ModalFooter
+						gap="16px"
+						justifyContent="space-between"
+						px={{ base: '20px', md: '32px' }}
+						py="20px"
+						bg={modalSectionBg}
+						borderTop="1px solid"
+						borderColor={modalDividerColor}
+					>
+						<Button
+							type="button"
+							onClick={() => {
+								if (resetStep === 'email') {
+									closeResetModal();
+									return;
+								}
+								setResetStep('email');
+								setResetCode('');
+								setNewPassword('');
+								setNewPasswordConfirmation('');
+								setResetError('');
+								setResetMessage('');
+							}}
+							isDisabled={isResetSubmitting}
+							flex="1"
+							px="24px"
+							h="45px"
+							borderRadius="12px"
+							bg={modalCancelBg}
+							color={modalCancelColor}
+							fontSize="15px"
+							fontWeight="500"
+							_hover={{ bg: modalCancelHoverBg }}
+						>
+							{resetStep === 'email' ? 'Отмена' : 'Изменить email'}
+						</Button>
+						<Button
+							type="submit"
+							px="24px"
+							h="45px"
+							borderRadius="12px"
+							bgGradient="linear(135deg, #313860 0%, #151928 100%)"
+							color="white"
+							fontSize="15px"
+							fontWeight="500"
+							flex="1"
+							isLoading={isResetSubmitting}
+							loadingText={resetStep === 'email' ? 'Отправляем' : 'Сохраняем'}
+							_hover={{ filter: 'saturate(0.5)' }}
+							_active={{ filter: 'brightness(0.85)' }}
+						>
+							{resetStep === 'email' ? 'Получить код' : 'Изменить пароль'}
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
 		</Flex>
 	);
 }

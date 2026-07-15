@@ -28,6 +28,20 @@ export function verifyCode(email, code) {
 	});
 }
 
+export function requestPasswordReset(email) {
+	return apiRequest('/api/password-reset/request', {
+		method: 'POST',
+		body: JSON.stringify({ email }),
+	});
+}
+
+export function confirmPasswordReset(email, code, password) {
+	return apiRequest('/api/password-reset/confirm', {
+		method: 'POST',
+		body: JSON.stringify({ email, code, password }),
+	});
+}
+
 export function completeRegistration(profile) {
 	return apiRequest('/api/registration/complete', {
 		method: 'POST',
