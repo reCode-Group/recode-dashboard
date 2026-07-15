@@ -1,7 +1,7 @@
 export const DOCUMENTATION_SECTIONS = [
 	{
 		id: 'services',
-		title: 'Все сервисы Ре-Код.рф',
+		title: 'Все сервисы reCode-Group.ru',
 		items: [
 			{
 				title: 'Конвертер макросов',
