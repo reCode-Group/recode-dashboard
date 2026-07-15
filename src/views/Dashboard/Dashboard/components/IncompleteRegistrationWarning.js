@@ -4,7 +4,7 @@ import CardBody from 'components/Card/CardBody';
 import { FiAlertCircle } from 'react-icons/fi';
 
 export default function IncompleteRegistrationWarning({ onCompleteRegistration, ...rest }) {
-	const textColor = useColorModeValue('#1F2650', '#1F2650');
+	const textColor = useColorModeValue('#1F2650', 'white');
 	const iconColor = useColorModeValue('#E3B800', '#E3B800');
 
 	return (
