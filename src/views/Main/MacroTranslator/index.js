@@ -25,7 +25,7 @@ import {
 } from '@chakra-ui/react';
 import BannerConstructor from 'assets/img/banner_constructor.png';
 import ConversionHistory from 'components/Tables/ConversionHistory';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FiAlertCircle, FiCheck, FiCopy } from 'react-icons/fi';
 import { IoArrowForwardSharp } from 'react-icons/io5';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
@@ -58,6 +58,9 @@ const TRANSLATION_MODE = {
 };
 
 const FREE_TRANSLATIONS_PER_DAY = 4;
+const FREE_TRANSLATION_CHAR_LIMIT = 600;
+const FREE_TRANSLATION_LIMIT_MESSAGE =
+	`В бесплатном переводе можно ввести не более ${FREE_TRANSLATION_CHAR_LIMIT} символов`;
 
 const conversionDateFormat = {
 	day: '2-digit',
@@ -117,8 +120,6 @@ export default function MacroTranslatorPage() {
 	const modalSectionBg = useColorModeValue('rgba(255, 255, 255, 0.72)', 'rgba(26, 32, 44, 0.72)');
 	const selectPlaceholderColor = useColorModeValue('gray.600', 'gray.200');
 	const toggleBg = useColorModeValue('gray.50', 'whiteAlpha.100');
-
-	const charCounter = useMemo(() => `${source.length} / 600`, [source.length]);
 
 	const canUseEmployeeAccount =
 		user?.has_organization === true && user?.organization_status === 'active';
@@ -209,6 +210,33 @@ export default function MacroTranslatorPage() {
 			}, 3000);
 		} catch (error) {
 			// Clipboard API may be unavailable in restricted browser contexts.
+		}
+	};
+
+	const handleTranslationModeChange = (event) => {
+		const nextMode = event.target.checked ? TRANSLATION_MODE.PAID : TRANSLATION_MODE.FREE;
+		setTranslationMode(nextMode);
+
+		if (nextMode === TRANSLATION_MODE.FREE && source.length > FREE_TRANSLATION_CHAR_LIMIT) {
+			setSource(source.slice(0, FREE_TRANSLATION_CHAR_LIMIT));
+			setErrorMessage(FREE_TRANSLATION_LIMIT_MESSAGE);
+		} else if (errorMessage === FREE_TRANSLATION_LIMIT_MESSAGE) {
+			setErrorMessage('');
+		}
+	};
+
+	const handleSourceChange = (event) => {
+		const nextSource = event.target.value;
+
+		if (isFreeTranslation && nextSource.length > FREE_TRANSLATION_CHAR_LIMIT) {
+			setSource(nextSource.slice(0, FREE_TRANSLATION_CHAR_LIMIT));
+			setErrorMessage(FREE_TRANSLATION_LIMIT_MESSAGE);
+			return;
+		}
+
+		setSource(nextSource);
+		if (errorMessage === FREE_TRANSLATION_LIMIT_MESSAGE) {
+			setErrorMessage('');
 		}
 	};
 
@@ -388,11 +416,7 @@ export default function MacroTranslatorPage() {
 												size="lg"
 												colorScheme="green"
 												isChecked={!isFreeTranslation}
-												onChange={(event) =>
-													setTranslationMode(
-														event.target.checked ? TRANSLATION_MODE.PAID : TRANSLATION_MODE.FREE
-													)
-												}
+												onChange={handleTranslationModeChange}
 											/>
 											<Text
 												fontSize="sm"
@@ -480,7 +504,7 @@ export default function MacroTranslatorPage() {
 								<Box position="relative">
 									<Textarea
 										value={source}
-										onChange={(event) => setSource(event.target.value.slice(0, 600))}
+										onChange={handleSourceChange}
 										placeholder="Введите или вставьте ваш код здесь..."
 										minH={{ base: '250px', md: '320px' }}
 										bg={inputBg}
@@ -489,21 +513,23 @@ export default function MacroTranslatorPage() {
 										borderRadius="15px"
 										resize="none"
 										fontSize="sm"
-										pb="34px"
+										pb={isFreeTranslation ? '34px' : undefined}
 										position="relative"
 										zIndex={1}
 									/>
-									<Text
-										position="absolute"
-										right="12px"
-										bottom="10px"
-										fontSize="xs"
-										color={mutedColor}
-										zIndex={2}
-										pointerEvents="none"
-									>
-										{charCounter}
-									</Text>
+									{isFreeTranslation ? (
+										<Text
+											position="absolute"
+											right="12px"
+											bottom="10px"
+											fontSize="xs"
+											color={mutedColor}
+											zIndex={2}
+											pointerEvents="none"
+										>
+											{source.length} / {FREE_TRANSLATION_CHAR_LIMIT}
+										</Text>
+									) : null}
 								</Box>
 							</Box>
 
