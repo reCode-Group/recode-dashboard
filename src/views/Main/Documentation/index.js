@@ -10,6 +10,7 @@ import {
 	useColorModeValue,
 } from '@chakra-ui/react';
 import recodeLogoColored from 'assets/svg/recode-logo-colored.svg';
+import recodeLogoWhite from 'assets/svg/recode-logo-white.svg';
 import { useEffect, useMemo, useState } from 'react';
 import { FiChevronRight, FiFileText, FiSearch } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +40,7 @@ export default function DocumentationPage() {
 	const mainBg = useColorModeValue('white', 'gray.800');
 	const dropdownBg = useColorModeValue('white', 'gray.800');
 	const searchResultHoverBg = useColorModeValue('gray.100', 'whiteAlpha.200');
+	const logoSrc = useColorModeValue(recodeLogoColored, recodeLogoWhite);
 
 	const searchableItems = useMemo(
 		() =>
@@ -107,7 +109,12 @@ export default function DocumentationPage() {
 	};
 
 	return (
-		<Flex w="100%" minW="0" color={textColor}>
+		<Flex
+			w="100%"
+			minW="0"
+			color={textColor}
+			sx={{ '& button': { fontFamily: "'Roboto', sans-serif" } }}
+		>
 			<Box
 				as="aside"
 				display={{ base: 'none', md: 'block' }}
@@ -127,7 +134,7 @@ export default function DocumentationPage() {
 							cursor="pointer"
 							onClick={() => navigate('/')}
 						>
-							<Image src={recodeLogoColored} alt="reCode" w="8vw" minW="96px" mr="0.5rem" />
+							<Image src={logoSrc} alt="reCode" w="8vw" minW="96px" mr="0.5rem" />
 						</Box>
 						<Text color={mutedColor}>/ Документация</Text>
 					</Flex>
@@ -171,7 +178,7 @@ export default function DocumentationPage() {
 					justify="space-between"
 					gap={{ base: '10px', md: '0' }}
 					px="4vw"
-					py={{ base: '4.5vw', md: '0.8rem' }}
+					py={{ base: '4.5vw', md: '1.2rem' }}
 					bg={mainBg}
 					borderBottom="1px solid"
 					borderColor={dividerColor}
@@ -181,7 +188,7 @@ export default function DocumentationPage() {
 					}}
 				>
 					<Flex display={{ base: 'flex', md: 'none' }} w="100%">
-						<Image src={recodeLogoColored} alt="reCode" w="8rem" />
+						<Image src={logoSrc} alt="reCode" w="8rem" />
 					</Flex>
 					<Box
 						position="relative"
@@ -275,11 +282,11 @@ export default function DocumentationPage() {
 						display={{ base: 'none', md: 'inline-flex' }}
 						bg="recode.500"
 						color="white"
-						borderRadius="999px"
-						px="1.6rem"
+						borderRadius="10px"
+						px="2rem"
 						py="0.5rem"
 						fontSize="sm"
-						fontWeight="medium"
+						fontWeight="500"
 						_hover={{ bg: 'recode.400' }}
 						onClick={() => navigate('/translator')}
 					>
