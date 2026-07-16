@@ -34,6 +34,7 @@ import { getUserConversions } from 'services/conversions';
 import { convertFreeMacro, convertPaidMacro } from 'services/macroTranslator';
 import { getUserSubscription } from 'services/subscription';
 import { mapConversion } from 'utils/conversions';
+import IncorrectMacroModal from './components/IncorrectMacroModal';
 
 const NO_SUBSCRIPTION_MESSAGES = [
 	'subscription not found',
@@ -99,6 +100,12 @@ export default function MacroTranslatorPage() {
 	const [targetLanguage, setTargetLanguage] = useState('JS');
 	const [copied, setCopied] = useState(false);
 	const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
+	const [isIncorrectMacroModalOpen, setIsIncorrectMacroModalOpen] = useState(false);
+	const [incorrectMacroSnapshot, setIncorrectMacroSnapshot] = useState({
+		source: '',
+		translated: '',
+		targetLanguage: 'JS',
+	});
 	const [isPageLoading, setIsPageLoading] = useState(true);
 	const [isConverting, setIsConverting] = useState(false);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -211,6 +218,12 @@ export default function MacroTranslatorPage() {
 		} catch (error) {
 			// Clipboard API may be unavailable in restricted browser contexts.
 		}
+	};
+
+	const handleOpenIncorrectMacroModal = () => {
+		if (!translated.trim()) return;
+		setIncorrectMacroSnapshot({ source, translated, targetLanguage });
+		setIsIncorrectMacroModalOpen(true);
 	};
 
 	const handleTranslationModeChange = (event) => {
@@ -534,9 +547,24 @@ export default function MacroTranslatorPage() {
 							</Box>
 
 							<Box>
-								<Text fontSize="sm" color={textColor} mb="8px">
-									Переведенный макрос
-								</Text>
+								<Flex justify="space-between" align="center" gap="12px" mb="8px">
+									<Text fontSize="sm" color={textColor}>
+										Переведенный макрос
+									</Text>
+									{translated.trim() ? (
+										<Button
+											size="xs"
+											variant="link"
+											color="gray.400"
+											fontSize="xs"
+											fontWeight="400"
+											onClick={handleOpenIncorrectMacroModal}
+											_hover={{ color: 'gray.500' }}
+										>
+											Некорректный макрос?
+										</Button>
+									) : null}
+								</Flex>
 								<Box position="relative">
 									<Button
 										size="xs"
@@ -752,6 +780,14 @@ export default function MacroTranslatorPage() {
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
+
+			<IncorrectMacroModal
+				isOpen={isIncorrectMacroModalOpen}
+				onClose={() => setIsIncorrectMacroModalOpen(false)}
+				source={incorrectMacroSnapshot.source}
+				translated={incorrectMacroSnapshot.translated}
+				targetLanguage={incorrectMacroSnapshot.targetLanguage}
+			/>
 		</>
 	);
 }
