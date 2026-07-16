@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getCurrentUser } from 'services/auth';
 import { getOrganizationDetails } from 'services/organization';
 import { AppMarkup } from './AppMarkup.jsx';
 import {
@@ -18,9 +17,8 @@ import {
 import { initTips } from './tips.js';
 import { initBlocklyApp } from './blocklyApp.js';
 
-export default function App() {
+export default function App({ viewerContext }) {
   const [isAppReady, setIsAppReady] = useState(false);
-  const [viewerContext, setViewerContext] = useState(null);
   const [organization, setOrganization] = useState(null);
 
   const handlers = useMemo(
@@ -51,27 +49,16 @@ export default function App() {
 
     const bootstrap = async () => {
       try {
-        try {
-          const currentUser = await getCurrentUser();
-          if (isMounted) {
-            setViewerContext(currentUser);
-          }
-          if (currentUser?.has_organization) {
-            try {
-              const organizationDetails = await getOrganizationDetails();
-              if (isMounted) {
-                setOrganization(organizationDetails);
-              }
-            } catch {
-              if (isMounted) {
-                setOrganization(null);
-              }
+        if (viewerContext?.has_organization) {
+          try {
+            const organizationDetails = await getOrganizationDetails();
+            if (isMounted) {
+              setOrganization(organizationDetails);
             }
-          }
-        } catch {
-          if (isMounted) {
-            setViewerContext(null);
-            setOrganization(null);
+          } catch {
+            if (isMounted) {
+              setOrganization(null);
+            }
           }
         }
 
@@ -112,7 +99,7 @@ export default function App() {
         if (typeof cleanup === 'function') cleanup();
       });
     };
-  }, []);
+  }, [viewerContext]);
 
   return <AppMarkup handlers={handlers} isReady={isAppReady} viewerContext={viewerContext} organization={organization} />;
 }

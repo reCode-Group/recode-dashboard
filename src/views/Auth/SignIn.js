@@ -27,7 +27,7 @@ import {
 import signInImage from 'assets/img/signInImage.png';
 import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
 import { useRef, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { confirmPasswordReset, login, requestPasswordReset } from 'services/auth';
 import { markAuthenticated } from 'services/session';
 import PasswordStrength, { getPasswordStrength } from './components/PasswordStrength';
@@ -69,6 +69,7 @@ function getPasswordResetError(error) {
 
 function SignIn() {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const resetModal = useDisclosure();
 	const resetEmailInputRef = useRef();
 	const titleColor = useColorModeValue('recode.300', 'recode.200');
@@ -139,7 +140,9 @@ function SignIn() {
 		try {
 			await login(normalizedEmail, password);
 			markAuthenticated();
-			navigate('/lk/dashboard', { replace: true });
+			const requestedPath = location.state?.from?.pathname;
+			const destination = requestedPath === '/constructor' ? '/constructor' : '/lk/dashboard';
+			navigate(destination, { replace: true });
 		} catch (requestError) {
 			setError(getFriendlyError(requestError));
 		} finally {

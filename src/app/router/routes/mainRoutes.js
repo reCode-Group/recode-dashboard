@@ -1,5 +1,6 @@
 import { routePaths } from '../routePaths';
 import { lazyRouteElement } from '../lazyRouteElement';
+import { RequireMacroConstructorAccess } from '../ui/RequireMacroConstructorAccess';
 
 export const mainRoutes = [
 	{
@@ -7,8 +8,13 @@ export const mainRoutes = [
 		element: lazyRouteElement(() => import('views/Main/Documentation')),
 	},
 	{
-		path: routePaths.public.macroConstructor(),
-		element: lazyRouteElement(() => import('features/macroConstructor/MacroConstructorPage')),
+		element: <RequireMacroConstructorAccess />,
+		children: [
+			{
+				path: routePaths.public.macroConstructor(),
+				element: lazyRouteElement(() => import('features/macroConstructor/MacroConstructorPage')),
+			},
+		],
 	},
 	{
 		path: routePaths.public.macroTranslator(),
