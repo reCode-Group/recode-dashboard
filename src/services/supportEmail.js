@@ -1,6 +1,16 @@
-import { buildApiUrl } from './apiClient';
+import { apiRequest, buildApiUrl } from './apiClient';
 
 export const SUPPORT_EMAIL = 'help@recode-group.ru';
+
+export function sendSupportRequest({ subject, description }) {
+	return apiRequest('/api/support/requests', {
+		method: 'POST',
+		body: JSON.stringify({
+			subject: subject.trim(),
+			message: description.trim(),
+		}),
+	});
+}
 
 export function getAllowedAttachmentTypes() {
 	return [

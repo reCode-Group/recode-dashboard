@@ -18,12 +18,14 @@ import CardHeader from 'components/Card/CardHeader.js';
 import InvoicesRow from 'components/Tables/InvoicesRow';
 import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import DocumentRequestModal from './DocumentRequestModal';
 
 const Documents = ({ title, data, fixedHeight = '855px' }) => {
 	const textColor = useColorModeValue('gray.700', 'white');
 	const cardBg = useColorModeValue('white', 'gray.700');
 	const scrollRef = useRef(null);
 	const [hasScrollbar, setHasScrollbar] = useState(false);
+	const [documentRequest, setDocumentRequest] = useState(null);
 	const captions = ['Дата', 'Сумма, ₽', 'Акты', 'Счета-фактуры'];
 
 	useEffect(() => {
@@ -138,12 +140,14 @@ const Documents = ({ title, data, fixedHeight = '855px' }) => {
 									actFormat={row.actFormat ?? row.format}
 									invoiceLogo={row.invoiceLogo ?? row.logo}
 									invoiceFormat={row.invoiceFormat ?? row.format}
+									onDocumentRequest={setDocumentRequest}
 								/>
 							))}
 						</Tbody>
 					</Table>
 				</Box>
 			</CardBody>
+			<DocumentRequestModal request={documentRequest} onClose={() => setDocumentRequest(null)} />
 		</Card>
 	);
 };

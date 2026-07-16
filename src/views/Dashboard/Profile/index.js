@@ -207,7 +207,7 @@ function Profile() {
 			/>
 
 			{activeTab === 'documents' ? (
-				<DocumentsFull title="Отчеты" data={invoicesData} />
+				<DocumentsFull title="Отчеты" data={invoicesData} user={user} organization={organization} />
 			) : (
 				<>
 					<Grid templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }} gap="22px">

@@ -43,7 +43,16 @@ const formatReportCode = (rawDate = '', rawCode = '') => {
 
 function InvoicesRow(props) {
 	const textColor = useColorModeValue('gray.700', 'white');
-	const { date, code, price, actFormat, actLogo, invoiceFormat, invoiceLogo } = props;
+	const {
+		date,
+		code,
+		price,
+		actFormat,
+		actLogo,
+		invoiceFormat,
+		invoiceLogo,
+		onDocumentRequest,
+	} = props;
 	const formattedDate = formatReportDate(date);
 	const formattedCode = formatReportCode(date, code);
 
@@ -65,7 +74,12 @@ function InvoicesRow(props) {
 				</Text>
 			</Td>
 			<Td>
-				<Button p="0px" bg="transparent" variant="no-hover">
+				<Button
+					p="0px"
+					bg="transparent"
+					variant="no-hover"
+					onClick={() => onDocumentRequest?.({ documentType: 'Акт', date, code, price })}
+				>
 					<Flex alignItems="center">
 						<Icon as={actLogo} w="18px" h="auto" me="5px" />
 						<Text fontSize="sm" color={textColor} fontWeight="bold">
@@ -75,7 +89,12 @@ function InvoicesRow(props) {
 				</Button>
 			</Td>
 			<Td>
-				<Button p="0px" bg="transparent" variant="no-hover">
+				<Button
+					p="0px"
+					bg="transparent"
+					variant="no-hover"
+					onClick={() => onDocumentRequest?.({ documentType: 'Счёт-фактура', date, code, price })}
+				>
 					<Flex alignItems="center">
 						<Icon as={invoiceLogo} w="18px" h="auto" me="5px" />
 						<Text fontSize="sm" color={textColor} fontWeight="bold">
