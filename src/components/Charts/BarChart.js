@@ -5,7 +5,32 @@ import { barChartData, barChartOptions } from 'variables/charts';
 
 const formatUsageValue = (value) => new Intl.NumberFormat('ru-RU').format(Number(value) || 0);
 
+const formatUsageAxisValue = (value) => {
+	const numericValue = Number(value) || 0;
+	const absoluteValue = Math.abs(numericValue);
+	const units = [
+		{ threshold: 1_000_000_000, suffix: 'млрд' },
+		{ threshold: 1_000_000, suffix: 'млн' },
+		{ threshold: 1_000, suffix: 'тыс.' },
+	];
+	const unit = units.find(({ threshold }) => absoluteValue >= threshold);
+
+	if (!unit) {
+		return new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(numericValue);
+	}
+
+	const compactValue = numericValue / unit.threshold;
+	return `${new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 }).format(compactValue)} ${
+		unit.suffix
+	}`;
+};
+
 const getUsageChartOptions = () => ({
+	chart: {
+		parentHeightOffset: 0,
+		redrawOnParentResize: true,
+		redrawOnWindowResize: true,
+	},
 	grid: {
 		show: true,
 		borderColor: 'rgba(255, 255, 255, 0.12)',
@@ -36,6 +61,15 @@ const getUsageChartOptions = () => ({
 			formatter: (value) => formatUsageValue(value),
 		},
 	},
+	yaxis: {
+		min: 0,
+		tickAmount: 4,
+		forceNiceScale: true,
+		decimalsInFloat: 0,
+		labels: {
+			formatter: (value) => formatUsageAxisValue(value),
+		},
+	},
 	responsive: [
 		{
 			breakpoint: 768,
@@ -58,6 +92,10 @@ const BarChart = ({ series = barChartData, categories, maxValue, variant = 'defa
 	const chartOptions = {
 		...barChartOptions,
 		...usageChartOptions,
+		chart: {
+			...barChartOptions.chart,
+			...(usageChartOptions.chart || {}),
+		},
 		xaxis: {
 			...barChartOptions.xaxis,
 			categories: categories || barChartOptions.xaxis.categories,
@@ -69,6 +107,11 @@ const BarChart = ({ series = barChartData, categories, maxValue, variant = 'defa
 		},
 		yaxis: {
 			...barChartOptions.yaxis,
+			...(usageChartOptions.yaxis || {}),
+			labels: {
+				...barChartOptions.yaxis.labels,
+				...(usageChartOptions.yaxis?.labels || {}),
+			},
 			max: maxValue,
 		},
 		plotOptions: {
@@ -99,10 +142,23 @@ const BarChart = ({ series = barChartData, categories, maxValue, variant = 'defa
 			py="1rem"
 			height={{ sm: '200px' }}
 			width="100%"
+			minW="0"
 			bg="linear-gradient(81.62deg, #313860 2.25%, #151928 79.87%)"
 			position="relative"
 		>
-			<Flex w="100%" h="100%" filter={hasData ? 'none' : 'blur(3px)'} opacity={hasData ? 1 : 0.45}>
+			<Flex
+				w="100%"
+				minW="0"
+				h="100%"
+				flex="1 1 auto"
+				filter={hasData ? 'none' : 'blur(3px)'}
+				opacity={hasData ? 1 : 0.45}
+				sx={{
+					'& > div, & .apexcharts-canvas, & .apexcharts-svg': {
+						width: '100% !important',
+					},
+				}}
+			>
 				<Chart options={chartOptions} series={series} type="bar" width="100%" height="100%" />
 			</Flex>
 			{!hasData ? (

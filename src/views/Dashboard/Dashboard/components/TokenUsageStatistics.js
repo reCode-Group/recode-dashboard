@@ -74,6 +74,13 @@ function getProgressValue(value, maxValue) {
 	return Math.max(0, Math.min(100, (value / maxValue) * 100));
 }
 
+function getChartMaxValue(value) {
+	const numericValue = Number(value) || 0;
+	if (numericValue <= 0) return 1;
+
+	return Math.ceil(numericValue * 1.1);
+}
+
 function isOlderThanRange(conversion, rangeStart) {
 	const createdAt = new Date(conversion?.created_at);
 	return !Number.isNaN(createdAt.getTime()) && createdAt < rangeStart;
@@ -203,7 +210,7 @@ const TokenUsageStatistics = () => {
 		};
 	}, [months]);
 
-	const chartMaxValue = usageStats.maxMonthlyTokens || subscription.packageTokens || 1;
+	const chartMaxValue = getChartMaxValue(usageStats.maxMonthlyTokens || subscription.packageTokens);
 	const tokensRemainProgress = getProgressValue(
 		subscription.tokensRemain,
 		subscription.packageTokens
@@ -211,9 +218,9 @@ const TokenUsageStatistics = () => {
 	const macrosProgress = getProgressValue(usageStats.macrosThisMonth, usageStats.maxMonthlyMacros);
 
 	return (
-		<Card p="16px">
-			<CardBody h="100%">
-				<Flex direction="column" justifyContent="space-between" w="100%" h="100%">
+		<Card p="16px" minW="0">
+			<CardBody h="100%" minW="0">
+				<Flex direction="column" justifyContent="space-between" w="100%" minW="0" h="100%">
 					<BarChart
 						categories={months.map((month) => month.label)}
 						maxValue={chartMaxValue}
