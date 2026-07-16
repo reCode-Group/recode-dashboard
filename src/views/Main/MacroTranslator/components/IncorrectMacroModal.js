@@ -20,15 +20,28 @@ import {
 	useColorModeValue,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { sendSupportEmail } from 'services/supportEmail';
+import { sendSupportRequest } from 'services/supportEmail';
 
-const EMAIL_SUBJECT = 'Некорректный перевод макроса';
+const MAX_CODE_LENGTH = 1900;
+const MAX_COMMENT_LENGTH = 700;
 
-function buildEmailDescription({ source, translated, targetLanguage, comment }) {
+function truncateCode(value) {
+	const normalizedValue = String(value || '').trim();
+	if (normalizedValue.length <= MAX_CODE_LENGTH) return normalizedValue;
+	return `${normalizedValue.slice(
+		0,
+		MAX_CODE_LENGTH
+	)}\n[Код сокращён из-за ограничения длины обращения]`;
+}
+
+function buildEmailDescription({ conversionId, source, translated, targetLanguage, comment }) {
 	const sections = [
+		'Источник обращения: страница «Переводчик макросов» (/translator)',
+		`ID перевода: ${conversionId || 'не определён'}`,
+		'Исходный язык: VBA',
 		`Целевой язык: ${targetLanguage}`,
-		`Исходный макрос:\n${source}`,
-		`Переведенный макрос:\n${translated}`,
+		`Исходный макрос:\n${truncateCode(source)}`,
+		`Переведённый макрос:\n${truncateCode(translated)}`,
 	];
 
 	if (comment.trim()) {
@@ -41,6 +54,7 @@ function buildEmailDescription({ source, translated, targetLanguage, comment }) 
 export default function IncorrectMacroModal({
 	isOpen,
 	onClose,
+	conversionId,
 	source,
 	translated,
 	targetLanguage,
@@ -72,9 +86,17 @@ export default function IncorrectMacroModal({
 		setRequestError('');
 
 		try {
-			await sendSupportEmail({
-				subject: EMAIL_SUBJECT,
-				description: buildEmailDescription({ source, translated, targetLanguage, comment }),
+			await sendSupportRequest({
+				subject: `Некорректный перевод макроса${
+					conversionId ? ` #${conversionId}` : ''
+				}: VBA → ${targetLanguage}`,
+				description: buildEmailDescription({
+					conversionId,
+					source,
+					translated,
+					targetLanguage,
+					comment,
+				}),
 			});
 			setSubmitState('success');
 		} catch (error) {
@@ -109,6 +131,11 @@ export default function IncorrectMacroModal({
 						Опишите неточность, и мы получим исходный и переведенный макросы вместе с вашим
 						комментарием.
 					</Text>
+					{conversionId ? (
+						<Text mt="4px" fontSize="xs" fontWeight="normal" color={textColor}>
+							ID перевода: {conversionId}
+						</Text>
+					) : null}
 				</ModalHeader>
 				<ModalCloseButton top="20px" right="20px" isDisabled={isSending} />
 
@@ -177,6 +204,7 @@ export default function IncorrectMacroModal({
 										value={comment}
 										onChange={(event) => setComment(event.target.value)}
 										placeholder="Опишите, что именно переведено некорректно"
+										maxLength={MAX_COMMENT_LENGTH}
 										minH="120px"
 										isDisabled={isSending}
 										bg={inputBg}
@@ -184,6 +212,9 @@ export default function IncorrectMacroModal({
 										borderRadius="12px"
 										resize="none"
 									/>
+									<Text mt="4px" textAlign="right" fontSize="xs" color={textColor}>
+										{comment.length}/{MAX_COMMENT_LENGTH}
+									</Text>
 								</FormControl>
 							</>
 						) : null}

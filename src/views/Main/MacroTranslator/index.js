@@ -60,8 +60,7 @@ const TRANSLATION_MODE = {
 
 const FREE_TRANSLATIONS_PER_DAY = 4;
 const FREE_TRANSLATION_CHAR_LIMIT = 600;
-const FREE_TRANSLATION_LIMIT_MESSAGE =
-	`В бесплатном переводе можно ввести не более ${FREE_TRANSLATION_CHAR_LIMIT} символов`;
+const FREE_TRANSLATION_LIMIT_MESSAGE = `В бесплатном переводе можно ввести не более ${FREE_TRANSLATION_CHAR_LIMIT} символов`;
 
 const conversionDateFormat = {
 	day: '2-digit',
@@ -102,10 +101,12 @@ export default function MacroTranslatorPage() {
 	const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
 	const [isIncorrectMacroModalOpen, setIsIncorrectMacroModalOpen] = useState(false);
 	const [incorrectMacroSnapshot, setIncorrectMacroSnapshot] = useState({
+		conversionId: '',
 		source: '',
 		translated: '',
 		targetLanguage: 'JS',
 	});
+	const [lastConversion, setLastConversion] = useState(null);
 	const [isPageLoading, setIsPageLoading] = useState(true);
 	const [isConverting, setIsConverting] = useState(false);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -158,11 +159,11 @@ export default function MacroTranslatorPage() {
 			]);
 
 			setSubscriptionName(getTariffLabel(subscriptionResult?.package_name));
-			setHistoryItems(
-				(conversionsResult?.items || []).map((conversion) =>
-					mapConversion(conversion, { dateFormat: conversionDateFormat })
-				)
+			const mappedConversions = (conversionsResult?.items || []).map((conversion) =>
+				mapConversion(conversion, { dateFormat: conversionDateFormat })
 			);
+			setHistoryItems(mappedConversions);
+			return mappedConversions;
 		} catch (error) {
 			if (isUnauthorizedError(error)) {
 				setIsAuthenticated(false);
@@ -173,6 +174,7 @@ export default function MacroTranslatorPage() {
 			} else {
 				setErrorMessage(error.message || 'Не удалось загрузить данные переводчика');
 			}
+			return [];
 		} finally {
 			if (showLoader) {
 				setIsPageLoading(false);
@@ -222,7 +224,9 @@ export default function MacroTranslatorPage() {
 
 	const handleOpenIncorrectMacroModal = () => {
 		if (!translated.trim()) return;
-		setIncorrectMacroSnapshot({ source, translated, targetLanguage });
+		setIncorrectMacroSnapshot(
+			lastConversion || { conversionId: '', source, translated, targetLanguage }
+		);
 		setIsIncorrectMacroModalOpen(true);
 	};
 
@@ -281,8 +285,19 @@ export default function MacroTranslatorPage() {
 						as_employee: selectedTokenSource === TOKEN_SOURCE.EMPLOYEE,
 				  });
 
-			setTranslated(result?.target_code || '');
-			await loadData({ showLoader: false });
+			const translatedCode = result?.target_code || '';
+			setTranslated(translatedCode);
+			const refreshedHistory = await loadData({ showLoader: false });
+			const matchingConversion = refreshedHistory.find(
+				(item) =>
+					item.sourceCode === requestPayload.origin_code && item.translatedCode === translatedCode
+			);
+			setLastConversion({
+				conversionId: matchingConversion?.id || '',
+				source: requestPayload.origin_code,
+				translated: translatedCode,
+				targetLanguage: result?.target_language || targetLanguage,
+			});
 		} catch (error) {
 			if (isUnauthorizedError(error)) {
 				navigate('/auth/login-page');
@@ -784,6 +799,7 @@ export default function MacroTranslatorPage() {
 			<IncorrectMacroModal
 				isOpen={isIncorrectMacroModalOpen}
 				onClose={() => setIsIncorrectMacroModalOpen(false)}
+				conversionId={incorrectMacroSnapshot.conversionId}
 				source={incorrectMacroSnapshot.source}
 				translated={incorrectMacroSnapshot.translated}
 				targetLanguage={incorrectMacroSnapshot.targetLanguage}
