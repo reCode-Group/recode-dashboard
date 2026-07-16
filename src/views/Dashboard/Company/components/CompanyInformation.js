@@ -1,4 +1,15 @@
-import { Avatar, Box, Flex, Text, useColorModeValue } from '@chakra-ui/react';
+import {
+	Accordion,
+	AccordionButton,
+	AccordionIcon,
+	AccordionItem,
+	AccordionPanel,
+	Avatar,
+	Box,
+	Flex,
+	Text,
+	useColorModeValue,
+} from '@chakra-ui/react';
 import Card from 'components/Card/Card';
 import CardBody from 'components/Card/CardBody';
 import CardHeader from 'components/Card/CardHeader';
@@ -34,6 +45,8 @@ const CompanyInformation = ({
 }) => {
 	const mainColor = useColorModeValue('gray.700', 'white');
 	const borderProfileColor = useColorModeValue('gray.100', 'rgba(255, 255, 255, 0.31)');
+	const tokensBg = useColorModeValue('gray.50', 'whiteAlpha.100');
+	const tokensLabelColor = useColorModeValue('gray.500', 'gray.300');
 	const glassBg = useColorModeValue(
 		'linear-gradient(113.34deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.8) 110.84%)',
 		'linear-gradient(113.34deg, rgba(26, 32, 44, 0.82) 0%, rgba(26, 32, 44, 0.8) 110.84%)'
@@ -89,6 +102,26 @@ const CompanyInformation = ({
 						</Flex>
 					</Flex>
 
+					<Flex
+						align={{ base: 'flex-start', sm: 'center' }}
+						justify="space-between"
+						direction={{ base: 'column', sm: 'row' }}
+						gap="6px"
+						p="16px"
+						mb="22px"
+						borderRadius="12px"
+						border="1px solid"
+						borderColor={borderProfileColor}
+						bg={tokensBg}
+					>
+						<Text fontSize="xs" color={tokensLabelColor} fontWeight="bold">
+							ОСТАТОК ТОКЕНОВ
+						</Text>
+						<Text fontSize="2xl" lineHeight="1" color={mainColor} fontWeight="bold">
+							{formattedTokens}
+						</Text>
+					</Flex>
+
 					<CardHeader p="0" mb="10px">
 						<Text fontSize="lg" color={mainColor} fontWeight="bold">
 							{title}
@@ -106,12 +139,31 @@ const CompanyInformation = ({
 
 					<Separator mb="10px" />
 
-					<Flex direction="column" gap="14px">
-						<InfoRow label="ЮРИДИЧЕСКИЙ АДРЕС" value={legalAddress} />
-						<InfoRow label="EMAIL КОМПАНИИ" value={email} />
-						<InfoRow label="ФИО ОТВЕТСТВЕННОГО" value={responsibleFullName} />
-						<InfoRow label="ТЕЛЕФОН" value={phone} />
-					</Flex>
+					<Accordion allowToggle>
+						<AccordionItem border="0">
+							<AccordionButton px="0" py="4px" _hover={{ bg: 'transparent' }}>
+								<Box
+									as="span"
+									flex="1"
+									textAlign="left"
+									fontSize="sm"
+									fontWeight="bold"
+									color={mainColor}
+								>
+									Дополнительно
+								</Box>
+								<AccordionIcon color={mainColor} />
+							</AccordionButton>
+							<AccordionPanel px="0" pt="14px" pb="0">
+								<Flex direction="column" gap="14px">
+									<InfoRow label="ЮРИДИЧЕСКИЙ АДРЕС" value={legalAddress} />
+									<InfoRow label="EMAIL КОМПАНИИ" value={email} />
+									<InfoRow label="ФИО ОТВЕТСТВЕННОГО" value={responsibleFullName} />
+									<InfoRow label="ТЕЛЕФОН" value={phone} />
+								</Flex>
+							</AccordionPanel>
+						</AccordionItem>
+					</Accordion>
 				</Flex>
 			</CardBody>
 		</Card>
