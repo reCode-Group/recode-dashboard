@@ -8,6 +8,7 @@ import '@fontsource/roboto/700.css';
 import AuthNavbar from 'components/Navbars/AuthNavbar.js';
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { sharedColorModeManager } from 'theme/colorModeManager.js';
 import theme from 'theme/theme.js';
 
 export default function Pages(props) {
@@ -23,7 +24,7 @@ export default function Pages(props) {
 	});
 	const navRef = React.useRef();
 	return (
-		<ChakraProvider theme={theme} resetCss={false}>
+		<ChakraProvider theme={theme} colorModeManager={sharedColorModeManager} resetCss={false}>
 			<Box ref={navRef} w="100%">
 				{!isSignUpPage ? (
 					<Portal containerRef={navRef}>

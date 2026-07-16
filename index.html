@@ -8,7 +8,17 @@
 			(function () {
 				var colorMode = 'light';
 				try {
-					colorMode = localStorage.getItem('chakra-ui-color-mode') || colorMode;
+					var cookieMatch = document.cookie.match(
+						/(?:^|;\s*)recode-color-mode=(light|dark)(?:;|$)/
+					);
+					if (cookieMatch) {
+						colorMode = cookieMatch[1];
+					} else {
+						var storedColorMode = localStorage.getItem('chakra-ui-color-mode');
+						if (storedColorMode === 'dark' || storedColorMode === 'light') {
+							colorMode = storedColorMode;
+						}
+					}
 				} catch (error) {
 					// Keep the light fallback when storage is unavailable.
 				}

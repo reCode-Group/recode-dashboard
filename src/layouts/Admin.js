@@ -14,6 +14,7 @@ import routes from 'routes.js';
 import { getCurrentUser } from 'services/auth';
 import { clearPendingProfileEmail } from 'services/session';
 // Custom Chakra theme
+import { sharedColorModeManager } from 'theme/colorModeManager.js';
 import theme from 'theme/theme.js';
 import FixedPlugin from '../components/FixedPlugin/FixedPlugin';
 // Custom components
@@ -142,7 +143,7 @@ export default function Dashboard(props) {
 	// Chakra Color Mode
 	if (isCheckingAuth) {
 		return (
-			<ChakraProvider theme={theme} resetCss={false}>
+			<ChakraProvider theme={theme} colorModeManager={sharedColorModeManager} resetCss={false}>
 				<Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
 					<Spinner color="recode.300" size="xl" />
 				</Box>
@@ -151,7 +152,7 @@ export default function Dashboard(props) {
 	}
 
 	return (
-		<ChakraProvider theme={theme} resetCss={false}>
+		<ChakraProvider theme={theme} colorModeManager={sharedColorModeManager} resetCss={false}>
 			<Sidebar
 				routes={routes}
 				viewerContext={viewerContext}
