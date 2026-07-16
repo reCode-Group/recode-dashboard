@@ -5,6 +5,32 @@ import { defineConfig, loadEnv, transformWithEsbuild } from 'vite';
 
 const srcDir = path.resolve(__dirname, 'src');
 
+const isSensitiveFileRequest = (url = '') => {
+	let pathname;
+
+	try {
+		pathname = decodeURIComponent(url.split('?', 1)[0]);
+	} catch {
+		return true;
+	}
+
+	return /(?:^|\/)\.(?:env(?:\.[^/]*)?|git)(?:\/|$)/i.test(pathname);
+};
+
+const blockSensitiveFileRequests = {
+	name: 'block-sensitive-file-requests',
+	configureServer(server) {
+		server.middlewares.use((request, response, next) => {
+			if (!isSensitiveFileRequest(request.url)) {
+				return next();
+			}
+
+			response.statusCode = 404;
+			response.end('Not found');
+		});
+	},
+};
+
 const srcAliases = fs.readdirSync(srcDir, { withFileTypes: true }).flatMap((entry) => {
 	const absolutePath = path.resolve(srcDir, entry.name);
 
@@ -36,6 +62,7 @@ export default defineConfig(({ mode }) => {
 
 	return {
 		plugins: [
+			blockSensitiveFileRequests,
 			{
 				name: 'jsx-in-js',
 				enforce: 'pre',
