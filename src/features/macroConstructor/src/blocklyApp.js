@@ -16,6 +16,50 @@ export async function initBlocklyApp() {
 
   let workspace = null;
 
+  function updateEmptyState() {
+    const emptyState = document.querySelector('.empty-state');
+    if (!emptyState || !workspace) return;
+    emptyState.style.display = workspace.getTopBlocks().length > 0 ? 'none' : '';
+  }
+
+  function persistWorkspace() {
+    const state = Blockly.serialization.workspaces.save(workspace);
+    localStorage.setItem('blocklyWorkspaceState', JSON.stringify(state));
+  }
+
+  function showImportNotification(message, type) {
+    document.querySelector('.notification')?.remove();
+
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    const host = document.getElementById('notifications-root') || document.body;
+    host.appendChild(notification);
+
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
+  function isValidJsonState(state) {
+    if (!state || typeof state !== 'object' || Array.isArray(state)) return false;
+
+    const knownKeys = new Set(['blocks', 'variables', 'workspaceComments']);
+    if (Object.keys(state).some((key) => !knownKeys.has(key))) return false;
+    if (
+      state.blocks &&
+      (!Array.isArray(state.blocks.blocks) ||
+        (state.blocks.languageVersion !== undefined && typeof state.blocks.languageVersion !== 'number'))
+    ) {
+      return false;
+    }
+    if (state.variables && !Array.isArray(state.variables)) return false;
+    if (state.workspaceComments && !Array.isArray(state.workspaceComments)) return false;
+
+    return true;
+  }
+
   function saveJson() {
     const output = document.getElementById('importExport');
     const state = Blockly.serialization.workspaces.save(workspace);
@@ -30,12 +74,29 @@ export async function initBlocklyApp() {
     if (!input.value) return;
 
     const valid = saveIsValid(input.value);
-    if (valid.json) {
-      const state = JSON.parse(input.value);
-      Blockly.serialization.workspaces.load(state, workspace);
-    } else if (valid.xml) {
-      const xml = Blockly.utils.xml.textToDom(input.value);
-      Blockly.Xml.domToWorkspace(xml, workspace);
+    const previousState = Blockly.serialization.workspaces.save(workspace);
+
+    try {
+      if (valid.json) {
+        Blockly.serialization.workspaces.load(valid.jsonState, workspace);
+      } else if (valid.xml) {
+        const xml = Blockly.utils.xml.textToDom(input.value);
+        Blockly.Xml.domToWorkspace(xml, workspace);
+      } else {
+        return;
+      }
+
+      persistWorkspace();
+      updateEmptyState();
+      const topBlocks = workspace.getTopBlocks();
+      if (topBlocks.length > 0) workspace.centerOnBlock(topBlocks[0].id);
+      showImportNotification('Блоки успешно импортированы!', 'success');
+    } catch (error) {
+      console.error('Ошибка импорта блоков:', error);
+      Blockly.serialization.workspaces.load(previousState, workspace);
+      persistWorkspace();
+      updateEmptyState();
+      showImportNotification('Не удалось импортировать блоки. Проверьте данные.', 'error');
     }
 
     taChange();
@@ -52,11 +113,14 @@ export async function initBlocklyApp() {
   }
 
   function saveIsValid(save) {
-    let validJson = true;
+    let jsonState = null;
     try {
-      JSON.parse(save);
+      const parsed = JSON.parse(save);
+      if (isValidJsonState(parsed)) {
+        jsonState = parsed;
+      }
     } catch {
-      validJson = false;
+      jsonState = null;
     }
 
     let validXml = true;
@@ -66,7 +130,7 @@ export async function initBlocklyApp() {
       validXml = false;
     }
 
-    return {json: validJson, xml: validXml};
+    return {json: jsonState !== null, jsonState, xml: validXml};
   }
 
   function configureContextMenu(menuOptions) {
@@ -207,6 +271,13 @@ export async function initBlocklyApp() {
   function addEventHandlers() {
     document.getElementById('save-json').addEventListener('click', saveJson);
     document.getElementById('import').addEventListener('click', load);
+    document.getElementById('importExport').addEventListener('input', taChange);
+  }
+
+  function removeEventHandlers() {
+    document.getElementById('save-json')?.removeEventListener('click', saveJson);
+    document.getElementById('import')?.removeEventListener('click', load);
+    document.getElementById('importExport')?.removeEventListener('input', taChange);
   }
 
   function setupFirstBlockMechanism() {
@@ -290,10 +361,20 @@ export async function initBlocklyApp() {
     workspace.configureContextMenu = configureContextMenu;
     Blockly.ContextMenuItems.registerCommentOptions();
 
-    workspace.addChangeListener(function () {
-      const state = Blockly.serialization.workspaces.save(workspace);
-      localStorage.setItem('blocklyWorkspaceState', JSON.stringify(state));
-    });
+    const savedState = localStorage.getItem('blocklyWorkspaceState');
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        Blockly.serialization.workspaces.load(state, workspace);
+        const topBlocks = workspace.getTopBlocks();
+        if (topBlocks.length > 0) workspace.centerOnBlock(topBlocks[0].id);
+        updateEmptyState();
+      } catch (error) {
+        console.error('Ошибка загрузки сохраненного состояния:', error);
+      }
+    }
+
+    workspace.addChangeListener(persistWorkspace);
 
     if (sessionStorage) {
       const text = sessionStorage.getItem('textarea');
@@ -308,24 +389,6 @@ export async function initBlocklyApp() {
     addEventHandlers();
     setupSidebarControls();
     setupFirstBlockMechanism();
-
-    setTimeout(() => {
-      const savedState = localStorage.getItem('blocklyWorkspaceState');
-      if (!savedState) return;
-
-      try {
-        const state = JSON.parse(savedState);
-        Blockly.serialization.workspaces.load(state, workspace);
-        const topBlocks = workspace.getTopBlocks();
-        if (topBlocks.length > 0) {
-          workspace.centerOnBlock(topBlocks[0].id);
-          const emptyState = document.querySelector('.empty-state');
-          if (emptyState) emptyState.style.display = 'none';
-        }
-      } catch (e) {
-        console.error('Ошибка загрузки сохраненного состояния:', e);
-      }
-    }, 100);
 
     document.querySelectorAll('.tool-icon').forEach((icon) => {
       icon.addEventListener('click', () => {
@@ -346,6 +409,8 @@ export async function initBlocklyApp() {
   start();
 
   return () => {
+    removeEventHandlers();
+    workspace?.removeChangeListener(persistWorkspace);
     workspace?.dispose();
   };
 }
