@@ -1,6 +1,6 @@
+import react from '@vitejs/plugin-react';
 import fs from 'node:fs';
 import path from 'node:path';
-import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv, transformWithEsbuild } from 'vite';
 
 const srcDir = path.resolve(__dirname, 'src');
@@ -58,7 +58,8 @@ const srcAliases = fs.readdirSync(srcDir, { withFileTypes: true }).flatMap((entr
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
-	const apiProxyTarget = env.VITE_API_PROXY_TARGET || env.VITE_API_BASE_URL || 'http://localhost:8080';
+	const apiProxyTarget =
+		env.VITE_API_PROXY_TARGET || env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 	return {
 		plugins: [
@@ -89,6 +90,7 @@ export default defineConfig(({ mode }) => {
 					changeOrigin: true,
 				},
 			},
+			allowedHosts: ['app.recode-group.ru', 'recode-group.ru'],
 		},
 		build: {
 			outDir: 'build',
