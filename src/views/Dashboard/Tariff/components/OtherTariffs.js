@@ -32,6 +32,7 @@ function OtherTariffs({
 		name: String(tariff.name || 'Тариф').toUpperCase(),
 		tokensLabel: `${formatTokenValue(tariff.amount)}/мес.`,
 		priceLabel: formatTariffPrice(tariff.price),
+		paymentPath: `/lk/billing/pay?package=${encodeURIComponent(tariff.id)}`,
 	}));
 
 	return (
@@ -129,7 +130,7 @@ function OtherTariffs({
 
 								<Button
 									as={RouterLink}
-									to="/lk/billing/pay"
+									to={tariff.paymentPath}
 									variant="outline"
 									alignSelf="flex-start"
 									mt="auto"

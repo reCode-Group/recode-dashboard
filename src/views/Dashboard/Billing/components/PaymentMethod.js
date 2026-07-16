@@ -5,29 +5,13 @@ import CardHeader from 'components/Card/CardHeader.js';
 import { useEffect, useMemo, useState } from 'react';
 import { getCurrentUser } from 'services/auth';
 
-import mirLogo from 'assets/img/payment-methods/mir.png';
-import sbpLogo from 'assets/img/payment-methods/sbp.png';
 import statementLogo from 'assets/img/payment-methods/statement.png';
 import tbankLogo from 'assets/img/payment-methods/tbank.png';
 
 const DEFAULT_METHODS = [
 	{
-		id: 'sbp',
-		title: 'Система быстрых платежей (СБП)',
-		icon: sbpLogo,
-		iconW: '56px',
-		iconH: '33px',
-	},
-	{
-		id: 'card',
-		title: 'Банковская карта',
-		icon: mirLogo,
-		iconW: '47px',
-		iconH: '14px',
-	},
-	{
 		id: 'tbank',
-		title: 'Через Т-Банк',
+		title: 'Онлайн через Т-Банк',
 		icon: tbankLogo,
 		iconW: '69px',
 		iconH: '25px',
@@ -55,42 +39,20 @@ const EXPLANATIONS = {
 			'Зачисление средств на баланс аккаунта производится в будние дни после поступления средств на расчетный счет.',
 		],
 	},
-	card: {
-		commissionText: 'Комиссия',
-		commissionLabel: 'по тарифу банка-эмитента',
-		processingText: 'до 10 минут',
-		processingLabel: 'в рабочее время',
-		bullets: [
-			'Поддерживаются карты Mastercard, Visa и МИР, выпущенные банками РФ.',
-			'Для успешной оплаты может потребоваться подтверждение 3-D Secure.',
-			'Квитанция формируется автоматически и доступна в разделе документов.',
-		],
-	},
-	sbp: {
-		commissionText: '0%',
-		commissionLabel: 'для большинства банков',
-		processingText: 'мгновенно',
-		processingLabel: 'после подтверждения',
-		bullets: [
-			'Оплата выполняется через приложение банка по QR или deep-link.',
-			'Лимиты и доступность метода зависят от банка отправителя.',
-			'После оплаты баланс обновляется автоматически.',
-		],
-	},
 	tbank: {
-		commissionText: '0%',
-		commissionLabel: 'по внутреннему тарифу Т-Банка',
-		processingText: 'до 5 минут',
-		processingLabel: 'в рабочее время',
+		commissionText: 'Безопасно',
+		commissionLabel: 'на защищенной форме Т-Банка',
+		processingText: 'онлайн',
+		processingLabel: 'после подтверждения банком',
 		bullets: [
-			'Оплата выполняется через приложение Т-Банка с подтверждением операции.',
-			'Комиссия и лимиты зависят от условий обслуживающего банка.',
-			'После успешной оплаты баланс обновляется автоматически.',
+			'Доступные способы оплаты будут показаны на форме Т-Банка.',
+			'Онлайн-покупка пополняет ваш личный баланс, даже если вы директор организации.',
+			'После подтверждения банком тариф и баланс обновятся автоматически.',
 		],
 	},
 };
 
-const TEMPORARILY_UNAVAILABLE_METHOD_IDS = new Set(['sbp', 'card']);
+const TEMPORARILY_UNAVAILABLE_METHOD_IDS = new Set();
 const STATEMENT_METHOD_ID = 'statement';
 
 const PaymentMethod = ({
@@ -161,9 +123,10 @@ const PaymentMethod = ({
 		}
 	}, [canUseStatementPayment, onChange, selectedMethod, value]);
 
-	const explanation = useMemo(() => EXPLANATIONS[effectiveSelectedMethod] ?? EXPLANATIONS.statement, [
-		effectiveSelectedMethod,
-	]);
+	const explanation = useMemo(
+		() => EXPLANATIONS[effectiveSelectedMethod] ?? EXPLANATIONS.statement,
+		[effectiveSelectedMethod]
+	);
 
 	const handleSelect = (id) => {
 		if (TEMPORARILY_UNAVAILABLE_METHOD_IDS.has(id)) {
@@ -186,7 +149,11 @@ const PaymentMethod = ({
 				</Text>
 			</CardHeader>
 			<CardBody p="0" style={{ flexDirection: 'column' }}>
-				<Flex direction={{ base: 'column', md: 'row' }} wrap={{ base: 'nowrap', md: 'wrap' }} gap="8px">
+				<Flex
+					direction={{ base: 'column', md: 'row' }}
+					wrap={{ base: 'nowrap', md: 'wrap' }}
+					gap="8px"
+				>
 					{availableMethods.map((method) => {
 						const isActive = effectiveSelectedMethod === method.id;
 						const isTemporarilyUnavailable = TEMPORARILY_UNAVAILABLE_METHOD_IDS.has(method.id);
@@ -224,7 +191,11 @@ const PaymentMethod = ({
 										objectFit="contain"
 									/>
 								</Flex>
-								<Text color={mutedColor} whiteSpace={{ base: 'normal', md: 'nowrap' }} noOfLines={{ base: 1, md: undefined }}>
+								<Text
+									color={mutedColor}
+									whiteSpace={{ base: 'normal', md: 'nowrap' }}
+									noOfLines={{ base: 1, md: undefined }}
+								>
 									{method.title}
 								</Text>
 							</Flex>

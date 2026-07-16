@@ -11,3 +11,10 @@ export function getTokenPackages() {
 		method: 'GET',
 	});
 }
+
+export function initSubscriptionPayment(tokenPackageId) {
+	return apiRequest('/api/subscription/payment/init', {
+		method: 'POST',
+		body: JSON.stringify({ token_package_id: Number(tokenPackageId) }),
+	});
+}

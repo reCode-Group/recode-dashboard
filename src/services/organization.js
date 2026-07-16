@@ -56,3 +56,10 @@ export function transferTokensToEmployee(organizationMemberID, amount) {
 		}),
 	});
 }
+
+export function createOrganizationBill(tokenPackageId) {
+	return apiRequest('/api/organization/bills/create', {
+		method: 'POST',
+		body: JSON.stringify({ token_package_id: Number(tokenPackageId) }),
+	});
+}
