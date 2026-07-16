@@ -1,3 +1,6 @@
+const getDocumentHref = (fileName) =>
+	`${import.meta.env.BASE_URL}docs/${encodeURIComponent(fileName)}`;
+
 export const DOCUMENTATION_SECTIONS = [
 	{
 		id: 'services',
@@ -6,7 +9,7 @@ export const DOCUMENTATION_SECTIONS = [
 			{
 				title: 'Конвертер макросов',
 				description: 'Переводчик устаревших макросов и скриптов на новые языки программирования',
-				href: '/docs/Описание_продукта.pdf',
+				href: getDocumentHref('Описание_продукта.pdf'),
 			},
 		],
 	},
@@ -17,12 +20,12 @@ export const DOCUMENTATION_SECTIONS = [
 			{
 				title: 'Анализ сферы макросов',
 				description: 'Системный анализ предметной области скриптовых языков и макросов',
-				href: '/docs/Анализ_предметной_области.pdf',
+				href: getDocumentHref('Анализ_предметной_области.pdf'),
 			},
 			{
 				title: 'Анализ проекта и риски',
 				description: 'Анализ перспектив проекта и возможные риски',
-				href: '/docs/Анализ_проекта_и_риски.pdf',
+				href: getDocumentHref('Анализ_проекта_и_риски.pdf'),
 			},
 		],
 	},
@@ -33,17 +36,17 @@ export const DOCUMENTATION_SECTIONS = [
 			{
 				title: 'Описание продукта',
 				description: 'Переводчик устаревших макросов и скриптов на новые языки программирования',
-				href: '/docs/Описание_продукта.pdf',
+				href: getDocumentHref('Описание_продукта.pdf'),
 			},
 			{
 				title: 'Демонстрация работы',
 				description: 'Примеры взаимодействия с продуктом',
-				href: '/docs/Демонстрация_работы.pdf',
+				href: getDocumentHref('Демонстрация_работы.pdf'),
 			},
 			{
 				title: 'Модули продукта',
 				description: 'Функциональное описание работы переводчика',
-				href: '/docs/Модули_продукта.pdf',
+				href: getDocumentHref('Модули_продукта.pdf'),
 			},
 		],
 	},
