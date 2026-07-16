@@ -10,31 +10,37 @@ import { mainRoutes } from './routes/mainRoutes';
 import { routePaths } from './routePaths';
 import { RequireAuth } from './ui/RequireAuth';
 import { RequireGuest } from './ui/RequireGuest';
+import { RouteMetadata } from './ui/RouteMetadata';
 
 const appRouter = createBrowserRouter([
 	{
-		element: <MainLayout />,
-		children: mainRoutes,
-	},
-	{
-		element: <RequireGuest />,
+		element: <RouteMetadata />,
 		children: [
 			{
-				element: <AuthLayout />,
-				children: authRoutes,
+				element: <MainLayout />,
+				children: mainRoutes,
 			},
-		],
-	},
-	{
-		element: <RequireAuth />,
-		children: [
 			{
-				element: <AdminLayout />,
-				children: dashboardRoutes,
+				element: <RequireGuest />,
+				children: [
+					{
+						element: <AuthLayout />,
+						children: authRoutes,
+					},
+				],
 			},
+			{
+				element: <RequireAuth />,
+				children: [
+					{
+						element: <AdminLayout />,
+						children: dashboardRoutes,
+					},
+				],
+			},
+			{ path: '*', element: <Navigate to={routePaths.home()} replace /> },
 		],
 	},
-	{ path: '*', element: <Navigate to={routePaths.home()} replace /> },
 ]);
 
 export function AppRouter() {
