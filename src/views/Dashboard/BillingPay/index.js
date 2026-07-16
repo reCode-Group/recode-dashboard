@@ -19,17 +19,9 @@ import { getTokenPackages } from 'services/subscription';
 import { formatPaymentAmount, normalizeTokenPackages } from 'utils/subscription';
 import PaymentMethod from 'views/Dashboard/Billing/components/PaymentMethod';
 
-const PERIODS = [
-	{ id: '1', label: '1 месяц', value: 1 },
-	{ id: '3', label: '3 месяца', value: 3 },
-	{ id: '6', label: '6 месяцев', value: 6 },
-	{ id: '12', label: '12 месяцев', value: 12 },
-];
-
 function BillingPay() {
 	const [tariffs, setTariffs] = useState([]);
 	const [tariffId, setTariffId] = useState('');
-	const [periodId, setPeriodId] = useState('1');
 	const [inn, setInn] = useState('0239951661');
 	const [paymentMethodId, setPaymentMethodId] = useState('tbank');
 	const [isLoadingTariffs, setIsLoadingTariffs] = useState(true);
@@ -85,14 +77,11 @@ function BillingPay() {
 		tariffs,
 		tariffId,
 	]);
-	const selectedPeriod = useMemo(() => PERIODS.find((item) => item.id === periodId) || PERIODS[0], [
-		periodId,
-	]);
 	const isStatementMethod = paymentMethodId === 'statement';
 	const submitButtonLabel = isStatementMethod ? 'ВЫПИСАТЬ СЧЕТ' : 'ОПЛАТИТЬ';
 	const paymentAmount = useMemo(
-		() => formatPaymentAmount((Number(selectedTariff?.price) || 0) * selectedPeriod.value),
-		[selectedPeriod.value, selectedTariff?.price]
+		() => formatPaymentAmount(Number(selectedTariff?.price) || 0),
+		[selectedTariff?.price]
 	);
 
 	const inputStyles = {
@@ -154,18 +143,7 @@ function BillingPay() {
 								<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
 									Заплатить за
 								</FormLabel>
-								<Select
-									value={periodId}
-									onChange={(event) => setPeriodId(event.target.value)}
-									bg={inputBg}
-									{...inputStyles}
-								>
-									{PERIODS.map((period) => (
-										<option key={period.id} value={period.id}>
-											{period.label}
-										</option>
-									))}
-								</Select>
+								<Input value="1 месяц" readOnly bg={readonlyBg} {...inputStyles} />
 							</FormControl>
 
 							{isStatementMethod ? (

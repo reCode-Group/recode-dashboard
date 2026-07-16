@@ -3,7 +3,6 @@ import { lazy } from 'react';
 import {
 	CompanyIcon,
 	ConverterIcon,
-	CreditIcon,
 	EmployersIcon,
 	HistoryIcon,
 	HomeIcon,
@@ -12,7 +11,6 @@ import {
 	SupportIcon,
 } from 'components/Icons/Icons';
 
-const Billing = lazy(() => import('views/Dashboard/Billing'));
 const BillingPay = lazy(() => import('views/Dashboard/BillingPay'));
 const CompanyRegistration = lazy(() => import('views/Dashboard/CompanyRegistration'));
 const Company = lazy(() => import('views/Dashboard/Company'));
@@ -79,13 +77,6 @@ const dashRoutes = [
 		component: BillingPay,
 		layout: '/lk',
 		hiddenInSidebar: true,
-	},
-	{
-		path: '/billing',
-		name: 'Финансы',
-		icon: <CreditIcon color="inherit" />,
-		component: Billing,
-		layout: '/lk',
 	},
 	{
 		path: '/support',

@@ -87,7 +87,7 @@ export default function Dashboard() {
 				if (!isMounted) return;
 
 				setSubscriptionStats({
-					packageName: isNoSubscriptionError(error) ? 'Пакет «Старт»' : 'Нет данных',
+					packageName: isNoSubscriptionError(error) ? 'Пакет «Бесплатный»' : 'Нет данных',
 					tokensRemain: '0',
 					tokensRemainValue: 0,
 					packageTokensValue: 0,
@@ -207,10 +207,10 @@ export default function Dashboard() {
 						}
 						onInlineAction={
 							isSubscriptionLoaded && subscriptionStats.tokensRemainValue === 0
-								? () => setRedirectPath('/lk/billing')
+								? () => setRedirectPath('/lk/tariff')
 								: undefined
 						}
-						inlineActionLabel="Перейти в финансы"
+						inlineActionLabel="Перейти к тарифам"
 					/>
 					{showEmployeesStats ? (
 						<MiniStatistics
@@ -295,11 +295,7 @@ export default function Dashboard() {
 				</Flex>
 			</Grid>
 
-			<CreateSupportTicketModal
-				isOpen={isOpen}
-				onClose={onClose}
-				onEmailSent={() => {}}
-			/>
+			<CreateSupportTicketModal isOpen={isOpen} onClose={onClose} onEmailSent={() => {}} />
 		</Flex>
 	);
 }

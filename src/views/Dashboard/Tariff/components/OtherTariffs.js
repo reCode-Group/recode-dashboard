@@ -11,48 +11,8 @@ import {
 import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
-import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { formatTariffPrice, formatTokenValue } from 'utils/subscription';
-
-function PeriodSwitcher({ value, onChange }) {
-	const borderColor = useColorModeValue('#E2E8F0', 'whiteAlpha.300');
-	const activeBg = 'linear-gradient(135deg, #313860 2.25%, #151928 79.87%)';
-	const inactiveText = useColorModeValue('#A0AEC0', 'gray.400');
-
-	return (
-		<Flex border="1px solid" borderColor={borderColor} borderRadius="8px" p="2px" h="30px">
-			<Button
-				variant="unstyled"
-				h="25px"
-				minW="55px"
-				px="10px"
-				borderRadius="6px"
-				fontSize="10px"
-				fontWeight="medium"
-				color={value === 'year' ? 'white' : inactiveText}
-				bg={value === 'year' ? activeBg : 'white'}
-				onClick={() => onChange('year')}
-			>
-				ГОД
-			</Button>
-			<Button
-				variant="unstyled"
-				h="25px"
-				minW="55px"
-				px="10px"
-				borderRadius="6px"
-				fontSize="10px"
-				fontWeight="medium"
-				color={value === 'month' ? 'white' : inactiveText}
-				bg={value === 'month' ? activeBg : 'white'}
-				onClick={() => onChange('month')}
-			>
-				МЕСЯЦ
-			</Button>
-		</Flex>
-	);
-}
 
 function OtherTariffs({
 	title = 'Другие тарифы',
@@ -61,7 +21,6 @@ function OtherTariffs({
 	error = '',
 	onRetry,
 }) {
-	const [period, setPeriod] = useState('month');
 	const titleColor = useColorModeValue('#2D3748', 'white');
 	const mutedColor = useColorModeValue('#A0AEC0', 'gray.400');
 	const borderColor = useColorModeValue('#E2E8F0', 'whiteAlpha.300');
@@ -72,20 +31,16 @@ function OtherTariffs({
 		id: tariff.id,
 		name: String(tariff.name || 'Тариф').toUpperCase(),
 		tokensLabel: `${formatTokenValue(tariff.amount)}/мес.`,
-		priceLabel:
-			period === 'year'
-				? formatTariffPrice(Number(tariff.price) * 12, '₽/год')
-				: formatTariffPrice(tariff.price),
+		priceLabel: formatTariffPrice(tariff.price),
 	}));
 
 	return (
 		<Card p="24px" bg={cardBg} h={{ base: 'auto', lg: '100%' }}>
 			<CardHeader p="0" pb="4px">
-				<Flex align="center" justify="flex-start" gap="12px" w="100%" wrap="wrap">
+				<Flex align="center" justify="flex-start" w="100%">
 					<Text fontSize="18px" lineHeight="1.4" color={titleColor} fontWeight="bold">
 						{title}
 					</Text>
-					<PeriodSwitcher value={period} onChange={setPeriod} />
 				</Flex>
 			</CardHeader>
 			<CardBody

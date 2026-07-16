@@ -14,7 +14,10 @@ export const dashboardRoutes = [
 	},
 	{ path: routePaths.dashboard.profile(), element: lazyRouteElement(() => import('views/Dashboard/Profile')) },
 	{ path: routePaths.dashboard.billingPay(), element: lazyRouteElement(() => import('views/Dashboard/BillingPay')) },
-	{ path: routePaths.dashboard.billing(), element: lazyRouteElement(() => import('views/Dashboard/Billing')) },
+	{
+		path: routePaths.dashboard.billing(),
+		element: <Navigate to={routePaths.dashboard.tariff()} replace />,
+	},
 	{ path: routePaths.dashboard.support(), element: lazyRouteElement(() => import('views/Dashboard/Support')) },
 	{ path: routePaths.dashboard.tariff(), element: lazyRouteElement(() => import('views/Dashboard/Tariff')) },
 	{ path: routePaths.dashboard.company(), element: lazyRouteElement(() => import('views/Dashboard/Company')) },
