@@ -31,6 +31,7 @@ export default function Pages(props) {
 						<AuthNavbar
 							secondary={false}
 							logoText="RECODE DASHBOARD"
+							useDarkModeLogo={true}
 							usePublicDrawer={true}
 						/>
 					</Portal>
