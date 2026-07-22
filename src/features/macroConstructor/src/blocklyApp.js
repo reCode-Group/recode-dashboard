@@ -6,6 +6,10 @@ import {javascriptGenerator} from '../blockly/javascript.loader.mjs';
 import {pythonGenerator} from '../blockly/python.loader.mjs';
 import {downloadScreenshot} from './screenshot.js';
 
+const AUTOSAVE_INTERVAL_STORAGE_KEY = 'constructorAutosaveInterval';
+const DEFAULT_AUTOSAVE_INTERVAL = 180000;
+const AUTOSAVE_INTERVALS = new Set([0, 30000, 60000, 180000, 300000]);
+
 function setToolboxIcon(index, iconName) {
   const icon = document.querySelector(`#blockly-${index} .blocklyToolboxCategoryIcon`);
   if (icon) icon.textContent = iconName;
@@ -15,6 +19,9 @@ export async function initBlocklyApp() {
   await loadScript('/blockly/msg/ru.js');
 
   let workspace = null;
+  let autosaveTimeout = null;
+  let isResettingProject = false;
+  let isWorkspaceDirty = false;
 
   function updateEmptyState() {
     const emptyState = document.querySelector('.empty-state');
@@ -23,8 +30,55 @@ export async function initBlocklyApp() {
   }
 
   function persistWorkspace() {
+    if (!workspace || isResettingProject) return;
+    if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
+    autosaveTimeout = null;
     const state = Blockly.serialization.workspaces.save(workspace);
     localStorage.setItem('blocklyWorkspaceState', JSON.stringify(state));
+    isWorkspaceDirty = false;
+  }
+
+  function getAutosaveInterval() {
+    const savedInterval = Number(localStorage.getItem(AUTOSAVE_INTERVAL_STORAGE_KEY));
+    return AUTOSAVE_INTERVALS.has(savedInterval) ? savedInterval : DEFAULT_AUTOSAVE_INTERVAL;
+  }
+
+  function scheduleWorkspacePersistence() {
+    if (isResettingProject) return;
+    isWorkspaceDirty = true;
+    if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
+
+    const autosaveInterval = getAutosaveInterval();
+    if (autosaveInterval === 0) return;
+
+    autosaveTimeout = window.setTimeout(() => {
+      autosaveTimeout = null;
+      persistWorkspace();
+    }, autosaveInterval);
+  }
+
+  function resetProject() {
+    if (!workspace) return;
+    if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
+    autosaveTimeout = null;
+    isWorkspaceDirty = false;
+    isResettingProject = true;
+    workspace.clear();
+    localStorage.removeItem('blocklyWorkspaceState');
+    sessionStorage.removeItem('textarea');
+
+    const importExport = document.getElementById('importExport');
+    if (importExport) importExport.value = '';
+    const generatedCode = document.getElementById('generatedCode');
+    if (generatedCode) generatedCode.textContent = '';
+    updateEmptyState();
+    isResettingProject = false;
+  }
+
+  function handleAutosaveIntervalChange() {
+    if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
+    autosaveTimeout = null;
+    if (isWorkspaceDirty) scheduleWorkspacePersistence();
   }
 
   function showImportNotification(message, type) {
@@ -374,7 +428,9 @@ export async function initBlocklyApp() {
       }
     }
 
-    workspace.addChangeListener(persistWorkspace);
+    workspace.addChangeListener(scheduleWorkspacePersistence);
+    document.addEventListener('constructor:project-deleted', resetProject);
+    document.addEventListener('constructor:autosave-interval-changed', handleAutosaveIntervalChange);
 
     if (sessionStorage) {
       const text = sessionStorage.getItem('textarea');
@@ -410,7 +466,10 @@ export async function initBlocklyApp() {
 
   return () => {
     removeEventHandlers();
-    workspace?.removeChangeListener(persistWorkspace);
+    if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
+    document.removeEventListener('constructor:project-deleted', resetProject);
+    document.removeEventListener('constructor:autosave-interval-changed', handleAutosaveIntervalChange);
+    workspace?.removeChangeListener(scheduleWorkspacePersistence);
     workspace?.dispose();
   };
 }

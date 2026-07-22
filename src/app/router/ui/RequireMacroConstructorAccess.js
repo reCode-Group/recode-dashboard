@@ -24,6 +24,7 @@ import { isNoSubscriptionError } from 'utils/subscription';
 import { routePaths } from '../routePaths';
 
 const MINIMUM_TOKEN_PACKAGE_ID = 2;
+const IS_DEVELOPMENT = import.meta.env.DEV;
 
 function AccessLoadingScreen() {
 	const background = useColorModeValue('gray.50', 'gray.900');
@@ -177,6 +178,11 @@ export function RequireMacroConstructorAccess() {
 
 			if (!isMounted) return;
 			setCurrentUser(user);
+
+			if (IS_DEVELOPMENT) {
+				setStatus('authorized');
+				return;
+			}
 
 			try {
 				const subscription = await getUserSubscription();

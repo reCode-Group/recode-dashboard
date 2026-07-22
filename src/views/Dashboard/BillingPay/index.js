@@ -30,8 +30,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { createOrganizationBill } from 'services/organization';
 import {
-	getUserSubscription,
 	getTokenPackages,
+	getUserSubscription,
 	initSubscriptionPayment,
 } from 'services/subscription';
 import { getTBankTerminalKey, mountTBankPaymentForm } from 'services/tbankPayment';
@@ -467,7 +467,7 @@ function BillingPay() {
 										<Box>
 											<AlertTitle fontSize="sm">Проверяем предыдущий платёж</AlertTitle>
 											<AlertDescription fontSize="sm">
-												Баланс обновится автоматически после подтверждения банка.
+												Тариф обновится автоматически после подтверждения банка.
 											</AlertDescription>
 										</Box>
 									</Alert>
@@ -476,7 +476,7 @@ function BillingPay() {
 								{paymentReturnStatus === 'success' && !pendingPayment && !isPaymentConfirmed ? (
 									<Alert status="info" borderRadius="12px">
 										<AlertIcon />
-										Платёж принят банком и ожидает подтверждения. Баланс обновится автоматически.
+										Платёж принят банком и ожидает подтверждения. Тариф обновится автоматически.
 									</Alert>
 								) : null}
 

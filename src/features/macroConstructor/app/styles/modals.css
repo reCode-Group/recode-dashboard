@@ -52,6 +52,80 @@
   max-width: 500px;
 }
 
+#projectDeleteModal .modal-container {
+  max-width: 500px;
+}
+
+.autosave-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+  color: #374151;
+  font-size: 14px;
+}
+
+.autosave-setting select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f2937;
+  font-size: 16px;
+  outline: none;
+}
+
+.autosave-setting select:focus {
+  border-color: #313860;
+}
+
+.danger-zone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 8px 0 24px;
+  padding: 16px;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  background: #fef2f2;
+}
+
+.danger-zone h3 {
+  margin: 0 0 4px;
+  color: #991b1b;
+}
+
+.danger-zone p,
+.confirmation-content {
+  margin: 0;
+  color: #7f1d1d;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.confirmation-content {
+  padding: 24px 32px !important;
+}
+
+.btn-danger {
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 12px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -303,6 +377,11 @@
   .modal-footer {
     padding-left: 20px;
     padding-right: 20px;
+  }
+
+  .danger-zone {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 

@@ -12,6 +12,10 @@
   {id: 11, name: 'Без_названия_проект_011.rcd', lastModified: '2 недели назад', createdDate: '15.12.2023', status: 'active'},
 ];
 
+const AUTOSAVE_INTERVAL_STORAGE_KEY = 'constructorAutosaveInterval';
+const DEFAULT_AUTOSAVE_INTERVAL = 180000;
+const AUTOSAVE_INTERVALS = new Set([0, 30000, 60000, 180000, 300000]);
+
 let initialized = false;
 const listeners = [];
 
@@ -27,8 +31,28 @@ function closeOverlay(modalId) {
   modal.style.opacity = '0';
   setTimeout(() => {
     modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
+    const hasOpenModal = [...document.querySelectorAll('.modal-overlay')].some(
+      (overlay) => overlay.style.display === 'flex',
+    );
+    if (!hasOpenModal) document.body.style.overflow = 'auto';
   }, 300);
+}
+
+function openOverlay(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return null;
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => {
+    modal.style.opacity = '1';
+  }, 10);
+  return modal;
+}
+
+function getAutosaveInterval() {
+  const savedInterval = Number(localStorage.getItem(AUTOSAVE_INTERVAL_STORAGE_KEY));
+  return AUTOSAVE_INTERVALS.has(savedInterval) ? savedInterval : DEFAULT_AUTOSAVE_INTERVAL;
 }
 
 export function openModal() {
@@ -117,14 +141,14 @@ export function createNewProject() {
 }
 
 export function openProjectEditModal() {
-  const modal = document.getElementById('projectEditModal');
+  const modal = openOverlay('projectEditModal');
   const currentName = document.querySelector('.project-name')?.textContent || '';
   const input = document.getElementById('projectNameInput');
+  const autosaveSelect = document.getElementById('autosaveIntervalSelect');
   if (!modal || !input) return;
 
   input.value = currentName;
-  modal.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+  if (autosaveSelect) autosaveSelect.value = String(getAutosaveInterval());
 
   setTimeout(() => {
     modal.style.opacity = '1';
@@ -135,6 +159,25 @@ export function openProjectEditModal() {
 
 export function closeProjectEditModal() {
   closeOverlay('projectEditModal');
+}
+
+export function openProjectDeleteModal() {
+  openOverlay('projectDeleteModal');
+}
+
+export function closeProjectDeleteModal() {
+  closeOverlay('projectDeleteModal');
+}
+
+export function confirmProjectDeletion() {
+  localStorage.removeItem('projectName');
+  const projectNameEl = document.querySelector('.project-name');
+  if (projectNameEl) projectNameEl.textContent = 'Без_названия_проект_001.rcd';
+
+  document.dispatchEvent(new CustomEvent('constructor:project-deleted'));
+  closeProjectDeleteModal();
+  closeProjectEditModal();
+  showNotification('Проект удалён. Открыт новый пустой проект.', 'info');
 }
 
 export function saveProjectName() {
@@ -279,6 +322,7 @@ export function initModals() {
   const onKeydown = (e) => {
     if (e.key !== 'Escape') return;
     if (document.getElementById('codeFullModal')?.style.display === 'flex') closeCodeFullModal();
+    if (document.getElementById('projectDeleteModal')?.style.display === 'flex') closeProjectDeleteModal();
     if (document.getElementById('projectEditModal')?.style.display === 'flex') closeProjectEditModal();
     closeModal();
   };
@@ -293,6 +337,10 @@ export function initModals() {
     if (e.target === this) closeProjectEditModal();
   });
 
+  addListener(document.getElementById('projectDeleteModal'), 'click', function (e) {
+    if (e.target === this) closeProjectDeleteModal();
+  });
+
   addListener(document.getElementById('codeFullModal'), 'click', function (e) {
     if (e.target === this) closeCodeFullModal();
   });
@@ -300,6 +348,19 @@ export function initModals() {
   addListener(document.getElementById('projectNameInput'), 'keypress', (e) => {
     if (e.key === 'Enter') saveProjectName();
   });
+
+  addListener(document.getElementById('autosaveIntervalSelect'), 'change', (e) => {
+    const interval = Number(e.target.value);
+    localStorage.setItem(
+      AUTOSAVE_INTERVAL_STORAGE_KEY,
+      String(AUTOSAVE_INTERVALS.has(interval) ? interval : DEFAULT_AUTOSAVE_INTERVAL),
+    );
+    document.dispatchEvent(new CustomEvent('constructor:autosave-interval-changed'));
+  });
+
+  if (!localStorage.getItem(AUTOSAVE_INTERVAL_STORAGE_KEY)) {
+    localStorage.setItem(AUTOSAVE_INTERVAL_STORAGE_KEY, String(DEFAULT_AUTOSAVE_INTERVAL));
+  }
 
   const savedName = localStorage.getItem('projectName');
   if (savedName) {
