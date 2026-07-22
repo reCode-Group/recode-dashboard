@@ -50,10 +50,11 @@ function getRetryDelay(response) {
 
 export async function apiRequest(path, options = {}) {
 	const { retryOnRateLimit = true, ...requestOptions } = options;
+	const isFormData = requestOptions.body instanceof FormData;
 	const response = await fetch(buildApiUrl(path), {
 		credentials: 'include',
 		headers: {
-			'Content-Type': 'application/json',
+			...(isFormData ? {} : { 'Content-Type': 'application/json' }),
 			...(requestOptions.headers || {}),
 		},
 		...requestOptions,

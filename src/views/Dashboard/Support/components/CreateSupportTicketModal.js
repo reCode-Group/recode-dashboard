@@ -27,11 +27,30 @@ import { sendSupportRequest } from 'services/supportEmail';
 
 const MAX_SUBJECT_LENGTH = 200;
 const MAX_DESCRIPTION_LENGTH = 5000;
+const MAX_ATTACHMENTS = 3;
+const MAX_ATTACHMENTS_SIZE = 5 * 1024 * 1024;
+const ACCEPTED_FILE_TYPES = '.pdf,.docx,.jpg,.png';
+const ALLOWED_FILE_EXTENSIONS = new Set(ACCEPTED_FILE_TYPES.split(','));
+
+function isAllowedAttachment(file) {
+	const extension = `.${file.name.split('.').pop()?.toLowerCase() || ''}`;
+	return ALLOWED_FILE_EXTENSIONS.has(extension);
+}
+
+function formatFileSize(size) {
+	if (size < 1024 * 1024) {
+		return `${Math.max(1, Math.round(size / 1024))} КБ`;
+	}
+
+	return `${(size / (1024 * 1024)).toFixed(1)} МБ`;
+}
 
 export default function CreateSupportTicketModal({ isOpen, onClose, onEmailSent }) {
 	const [subject, setSubject] = useState('');
 	const [description, setDescription] = useState('');
+	const [attachments, setAttachments] = useState([]);
 	const [formError, setFormError] = useState('');
+	const [attachmentError, setAttachmentError] = useState('');
 	const [submitState, setSubmitState] = useState('idle');
 	const [requestError, setRequestError] = useState('');
 
@@ -54,7 +73,9 @@ export default function CreateSupportTicketModal({ isOpen, onClose, onEmailSent 
 	const resetState = () => {
 		setSubject('');
 		setDescription('');
+		setAttachments([]);
 		setFormError('');
+		setAttachmentError('');
 		setSubmitState('idle');
 		setRequestError('');
 	};
@@ -70,8 +91,17 @@ export default function CreateSupportTicketModal({ isOpen, onClose, onEmailSent 
 			setFormError('Заполните тему и описание обращения.');
 			return;
 		}
+		if (attachments.length > MAX_ATTACHMENTS) {
+			setAttachmentError('Можно прикрепить не более 3 файлов.');
+			return;
+		}
+		if (attachments.reduce((total, file) => total + file.size, 0) > MAX_ATTACHMENTS_SIZE) {
+			setAttachmentError('Общий размер вложений не должен превышать 5 МБ.');
+			return;
+		}
 
 		setFormError('');
+		setAttachmentError('');
 		setRequestError('');
 		setSubmitState('sending');
 
@@ -79,6 +109,7 @@ export default function CreateSupportTicketModal({ isOpen, onClose, onEmailSent 
 			const result = await sendSupportRequest({
 				subject,
 				description,
+				attachments,
 			});
 			setSubmitState('success');
 			onEmailSent?.(result);
@@ -86,6 +117,35 @@ export default function CreateSupportTicketModal({ isOpen, onClose, onEmailSent 
 			setSubmitState('error');
 			setRequestError(error.message || 'Не удалось отправить обращение.');
 		}
+	};
+
+	const handleAttachmentsChange = (event) => {
+		const selectedAttachments = Array.from(event.target.files || []);
+		const nextAttachments = [...attachments, ...selectedAttachments];
+		event.target.value = '';
+
+		if (selectedAttachments.some((file) => !isAllowedAttachment(file))) {
+			setAttachmentError('Допустимые форматы: PDF, DOCX, JPG и PNG.');
+			return;
+		}
+		if (nextAttachments.length > MAX_ATTACHMENTS) {
+			setAttachmentError('Можно прикрепить не более 3 файлов.');
+			return;
+		}
+		if (nextAttachments.reduce((total, file) => total + file.size, 0) > MAX_ATTACHMENTS_SIZE) {
+			setAttachmentError('Общий размер вложений не должен превышать 5 МБ.');
+			return;
+		}
+
+		setAttachmentError('');
+		setAttachments(nextAttachments);
+	};
+
+	const removeAttachment = (index) => {
+		setAttachments((currentAttachments) =>
+			currentAttachments.filter((_, currentIndex) => currentIndex !== index)
+		);
+		setAttachmentError('');
 	};
 
 	return (
@@ -198,6 +258,69 @@ export default function CreateSupportTicketModal({ isOpen, onClose, onEmailSent 
 									/>
 									{formError ? <FormErrorMessage>{formError}</FormErrorMessage> : null}
 								</FormControl>
+
+								<FormControl isInvalid={Boolean(attachmentError)}>
+									<FormLabel fontSize="14px" color={subtitleColor} mb="8px">
+										Вложения
+									</FormLabel>
+									<Input
+										type="file"
+										multiple
+										accept={ACCEPTED_FILE_TYPES}
+										onChange={handleAttachmentsChange}
+										isDisabled={isSending || attachments.length >= MAX_ATTACHMENTS}
+										h="46px"
+										p="6px 8px"
+										fontSize="sm"
+										bg={inputBg}
+										color={subtitleColor}
+										borderColor={inputBorderColor}
+										borderRadius="12px"
+										sx={{
+											'&::file-selector-button, &::-webkit-file-upload-button': {
+												mr: '10px',
+												px: '10px',
+												py: '7px',
+												border: 0,
+												borderRadius: '8px',
+												bg: 'recode.500',
+												color: 'white',
+												fontSize: '15px',
+												lineHeight: '16px',
+												cursor: 'pointer',
+											},
+											'&::file-selector-button:hover, &::-webkit-file-upload-button:hover': {
+												bg: 'recode.400',
+											},
+										}}
+									/>
+									<Text mt="6px" fontSize="sm" color={subtitleColor}>
+										PDF, DOCX, JPG или PNG: до 3 файлов, общий размер до 5 МБ.
+									</Text>
+									{attachments.map((attachment, index) => (
+										<Flex
+											key={`${attachment.name}-${attachment.lastModified}-${index}`}
+											mt="8px"
+											align="center"
+											gap="8px"
+										>
+											<Text flex="1" fontSize="sm" noOfLines={1} color={subtitleColor}>
+												{attachment.name} ({formatFileSize(attachment.size)})
+											</Text>
+											<IconButton
+												aria-label={`Удалить ${attachment.name}`}
+												icon={<FiX />}
+												size="sm"
+												variant="ghost"
+												color={subtitleColor}
+												_hover={{ bg: closeButtonHoverBg }}
+												onClick={() => removeAttachment(index)}
+												isDisabled={isSending}
+											/>
+										</Flex>
+									))}
+									{attachmentError ? <FormErrorMessage>{attachmentError}</FormErrorMessage> : null}
+								</FormControl>
 							</>
 						) : null}
 					</Stack>
@@ -219,11 +342,13 @@ export default function CreateSupportTicketModal({ isOpen, onClose, onEmailSent 
 					) : (
 						<Flex w="100%" justify="flex-end">
 							<Button
-								colorScheme="recode"
+								bg="linear-gradient(135deg, #313860 0%, #151928 100%)"
+								color="white"
 								borderRadius="12px"
 								minW="150px"
 								onClick={handleSubmit}
 								isLoading={isSending}
+								_hover={{ filter: 'saturate(0.5)' }}
 							>
 								Отправить
 							</Button>
