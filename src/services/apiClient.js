@@ -1,7 +1,5 @@
 const DEFAULT_RETRY_DELAY_MS = 2200;
-const API_BASE_URL = import.meta.env.DEV
-	? ''
-	: String(import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
+const API_BASE_URL = String(import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
 
 function wait(ms) {
 	return new Promise((resolve) => {
@@ -50,13 +48,18 @@ function getRetryDelay(response) {
 
 export async function apiRequest(path, options = {}) {
 	const { retryOnRateLimit = true, ...requestOptions } = options;
+	const headers = new Headers(requestOptions.headers || {});
+	const hasBody = requestOptions.body !== undefined && requestOptions.body !== null;
+	const isFormData = typeof FormData !== 'undefined' && requestOptions.body instanceof FormData;
+
+	if (hasBody && !isFormData && !headers.has('Content-Type')) {
+		headers.set('Content-Type', 'application/json');
+	}
+
 	const response = await fetch(buildApiUrl(path), {
 		credentials: 'include',
-		headers: {
-			'Content-Type': 'application/json',
-			...(requestOptions.headers || {}),
-		},
 		...requestOptions,
+		headers,
 	});
 
 	if (response.status === 429 && retryOnRateLimit) {
