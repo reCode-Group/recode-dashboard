@@ -55,7 +55,6 @@ export async function apiRequest(path, options = {}) {
 			...(requestOptions.headers || {}),
 		},
 		...requestOptions,
-		headers,
 	});
 
 	if (response.status === 429 && retryOnRateLimit) {
