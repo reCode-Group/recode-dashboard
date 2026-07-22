@@ -5,8 +5,9 @@ import {luaGenerator} from '../blockly/lua.loader.mjs';
 import {javascriptGenerator} from '../blockly/javascript.loader.mjs';
 import {pythonGenerator} from '../blockly/python.loader.mjs';
 import {downloadScreenshot} from './screenshot.js';
+import {getActiveProject, initializeProjects, saveActiveProject} from './projectStore.js';
+import {showToast} from './notifications.js';
 
-const AUTOSAVE_INTERVAL_STORAGE_KEY = 'constructorAutosaveInterval';
 const DEFAULT_AUTOSAVE_INTERVAL = 180000;
 const AUTOSAVE_INTERVALS = new Set([0, 30000, 60000, 180000, 300000]);
 
@@ -29,18 +30,47 @@ export async function initBlocklyApp() {
     emptyState.style.display = workspace.getTopBlocks().length > 0 ? 'none' : '';
   }
 
-  function persistWorkspace() {
+  function getSelectedLanguage() {
+    const activeOption = document.querySelector('.radio-option.active');
+    return activeOption ? activeOption.dataset.lang : 'js';
+  }
+
+  function getProjectData() {
+    return {
+      workspace: Blockly.serialization.workspaces.save(workspace),
+      language: getSelectedLanguage(),
+      autosave_interval_ms: getAutosaveInterval(),
+    };
+  }
+
+  async function persistWorkspace() {
     if (!workspace || isResettingProject) return;
     if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
     autosaveTimeout = null;
-    const state = Blockly.serialization.workspaces.save(workspace);
-    localStorage.setItem('blocklyWorkspaceState', JSON.stringify(state));
+    const project = await saveActiveProject(getProjectData());
     isWorkspaceDirty = false;
+    return project;
   }
 
   function getAutosaveInterval() {
-    const savedInterval = Number(localStorage.getItem(AUTOSAVE_INTERVAL_STORAGE_KEY));
-    return AUTOSAVE_INTERVALS.has(savedInterval) ? savedInterval : DEFAULT_AUTOSAVE_INTERVAL;
+    const interval = Number(getActiveProject()?.data?.autosave_interval_ms);
+    return AUTOSAVE_INTERVALS.has(interval) ? interval : DEFAULT_AUTOSAVE_INTERVAL;
+  }
+
+  function formatLastSaved(value) {
+    if (!value) return 'только что';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'только что';
+
+    const now = new Date();
+    const isSameDay = date.toDateString() === now.toDateString();
+    const formatter = new Intl.DateTimeFormat('ru-RU', {
+      day: isSameDay ? undefined : '2-digit',
+      month: isSameDay ? undefined : '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    return formatter.format(date);
   }
 
   function scheduleWorkspacePersistence() {
@@ -49,11 +79,21 @@ export async function initBlocklyApp() {
     if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
 
     const autosaveInterval = getAutosaveInterval();
-    if (autosaveInterval === 0) return;
+    if (autosaveInterval === 0) {
+      document.dispatchEvent(new CustomEvent('constructor:autosave-status', { detail: 'disabled' }));
+      return;
+    }
 
-    autosaveTimeout = window.setTimeout(() => {
+    document.dispatchEvent(new CustomEvent('constructor:autosave-status', { detail: 'saving' }));
+
+    autosaveTimeout = window.setTimeout(async () => {
       autosaveTimeout = null;
-      persistWorkspace();
+      try {
+        await persistWorkspace();
+      } catch (error) {
+        console.error('Autosave error:', error);
+        showToast('Не удалось сохранить проект. Повторим при следующем изменении.', 'error');
+      }
     }, autosaveInterval);
   }
 
@@ -64,9 +104,6 @@ export async function initBlocklyApp() {
     isWorkspaceDirty = false;
     isResettingProject = true;
     workspace.clear();
-    localStorage.removeItem('blocklyWorkspaceState');
-    sessionStorage.removeItem('textarea');
-
     const importExport = document.getElementById('importExport');
     if (importExport) importExport.value = '';
     const generatedCode = document.getElementById('generatedCode');
@@ -78,22 +115,73 @@ export async function initBlocklyApp() {
   function handleAutosaveIntervalChange() {
     if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
     autosaveTimeout = null;
-    if (isWorkspaceDirty) scheduleWorkspacePersistence();
+    persistWorkspace()
+      .then((project) => {
+        document.dispatchEvent(
+          new CustomEvent('constructor:autosave-status', {
+            detail:
+              getAutosaveInterval() === 0
+                ? {status: 'disabled'}
+                : {status: 'saved', savedAt: project?.updated_at || project?.updatedAt},
+          }),
+        );
+      })
+      .catch((error) => {
+        console.error('Autosave settings error:', error);
+        showToast('Не удалось сохранить настройки автосохранения.', 'error');
+      });
+  }
+
+  function loadProject(project) {
+    if (!workspace || !project) return;
+    isResettingProject = true;
+    workspace.clear();
+    Blockly.serialization.workspaces.load(project.data?.workspace || {}, workspace);
+
+    const language = project.data?.language || 'js';
+    document.querySelectorAll('.radio-option').forEach((option) => {
+      const isActive = option.dataset.lang === language;
+      option.classList.toggle('active', isActive);
+      const input = option.querySelector('input');
+      if (input) input.checked = isActive;
+    });
+    const autosaveSelect = document.getElementById('autosaveIntervalSelect');
+    if (autosaveSelect) autosaveSelect.value = String(getAutosaveInterval());
+    isWorkspaceDirty = false;
+    updateEmptyState();
+    isResettingProject = false;
+    document.dispatchEvent(
+      new CustomEvent('constructor:autosave-status', {
+        detail:
+          getAutosaveInterval() === 0
+            ? {status: 'disabled'}
+            : {status: 'saved', savedAt: project.updated_at || project.updatedAt},
+      }),
+    );
   }
 
   function showImportNotification(message, type) {
-    document.querySelector('.notification')?.remove();
+    showToast(message, type);
+  }
 
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
-    const host = document.getElementById('notifications-root') || document.body;
-    host.appendChild(notification);
+  function updateAutosaveStatus(event) {
+    const detail = typeof event.detail === 'object' && event.detail !== null ? event.detail : {status: event.detail || 'saved'};
+    const status = detail.status || 'saved';
+    const labels = {
+      saved: `Всё сохранено · ${formatLastSaved(detail.savedAt || new Date())}`,
+      saving: 'Сохранение...',
+      disabled: 'Автосохранение выключено',
+    };
+    const className = `autosave-state-${status}`;
 
-    setTimeout(() => {
-      notification.style.animation = 'slideOut 0.3s ease';
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    document.querySelectorAll('.project-info .status-dot, .autosave-dot').forEach((node) => {
+      node.classList.remove('autosave-state-saved', 'autosave-state-saving', 'autosave-state-disabled');
+      node.classList.add(className);
+    });
+
+    document.querySelectorAll('.autosave').forEach((node) => {
+      node.textContent = labels[status] || labels.saved;
+    });
   }
 
   function isValidJsonState(state) {
@@ -213,6 +301,7 @@ export async function initBlocklyApp() {
         this.classList.add('active');
         const radioInput = this.querySelector('input[type="radio"]');
         if (radioInput) radioInput.checked = true;
+        scheduleWorkspacePersistence();
       });
     });
 
@@ -229,18 +318,18 @@ export async function initBlocklyApp() {
 
       if (workspace.getTopBlocks().length === 0) {
         output.textContent = '// Нет блоков для генерации кода\n// Добавьте блоки в рабочую область';
-        showNotification('Добавьте блоки в рабочую область перед генерацией кода', 'warning');
+        showToast('Добавьте блоки в рабочую область перед генерацией кода.', 'warning');
         return;
       }
 
       try {
         output.textContent = currentLanguage.generator.workspaceToCode(workspace);
         output.className = selectedLang;
-        showNotification(`Код на ${currentLanguage.label} успешно сгенерирован!`, 'success');
+        showToast(`Код на ${currentLanguage.label} сгенерирован.`, 'success');
       } catch (error) {
         console.error('Ошибка генерации кода:', error);
         output.textContent = `// Ошибка при генерации кода\n// ${error.message}`;
-        showNotification('Ошибка при генерации кода', 'error');
+        showToast('Не удалось сгенерировать код.', 'error');
       }
     });
 
@@ -250,7 +339,8 @@ export async function initBlocklyApp() {
         '// Рабочая область очищена\n// Создайте новые блоки и нажмите "Генерировать"';
       document.getElementById('importExport').value = '';
       taChange();
-      showNotification('Рабочая область успешно очищена!', 'info');
+      persistWorkspace().catch((error) => console.error('Clear save error:', error));
+      showToast('Рабочая область очищена.', 'info');
     });
 
     copyBtn.addEventListener('click', function () {
@@ -258,68 +348,13 @@ export async function initBlocklyApp() {
       navigator.clipboard
         .writeText(codeToCopy)
         .then(() => {
-          showNotification('Код скопирован в буфер обмена!', 'success');
+          showToast('Код скопирован в буфер обмена.', 'success');
         })
         .catch((err) => {
           console.error('Ошибка копирования:', err);
-          showNotification('Ошибка при копировании кода', 'error');
+          showToast('Не удалось скопировать код.', 'error');
         });
     });
-
-    function getSelectedLanguage() {
-      const activeOption = document.querySelector('.radio-option.active');
-      return activeOption ? activeOption.dataset.lang : 'js';
-    }
-
-    function showNotification(message, type) {
-      const existingNotification = document.querySelector('.notification');
-      if (existingNotification) {
-        existingNotification.remove();
-      }
-
-      const notification = document.createElement('div');
-      notification.className = `notification notification-${type}`;
-      notification.textContent = message;
-      notification.style.cssText = `
-        position: fixed;
-        top: 120px;
-        right: 32px;
-        padding: 12px 16px;
-        background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
-        color: white;
-        border-radius: 8px;
-        z-index: 1000;
-        font-size: 14px;
-        animation: slideIn 0.3s ease;
-        max-width: 300px;
-      `;
-
-      if (!document.querySelector('#notification-styles')) {
-        const style = document.createElement('style');
-        style.id = 'notification-styles';
-        style.textContent = `
-          @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-          }
-          @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-          }
-        `;
-        document.head.appendChild(style);
-      }
-
-      const host = document.getElementById('notifications-root') || document.body;
-      host.appendChild(notification);
-
-      setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => {
-          if (notification.parentNode) notification.parentNode.removeChild(notification);
-        }, 300);
-      }, 3000);
-    }
   }
 
   function addEventHandlers() {
@@ -379,7 +414,7 @@ export async function initBlocklyApp() {
     }
   }
 
-  function start() {
+  async function start() {
     const match = location.search.match(/dir=([^&]+)/);
     const rtl = match && match[1] === 'rtl';
     const toolbox = document.getElementById('toolbox-categories');
@@ -415,22 +450,10 @@ export async function initBlocklyApp() {
     workspace.configureContextMenu = configureContextMenu;
     Blockly.ContextMenuItems.registerCommentOptions();
 
-    const savedState = localStorage.getItem('blocklyWorkspaceState');
-    if (savedState) {
-      try {
-        const state = JSON.parse(savedState);
-        Blockly.serialization.workspaces.load(state, workspace);
-        const topBlocks = workspace.getTopBlocks();
-        if (topBlocks.length > 0) workspace.centerOnBlock(topBlocks[0].id);
-        updateEmptyState();
-      } catch (error) {
-        console.error('Ошибка загрузки сохраненного состояния:', error);
-      }
-    }
-
     workspace.addChangeListener(scheduleWorkspacePersistence);
-    document.addEventListener('constructor:project-deleted', resetProject);
+    document.addEventListener('constructor:project-loaded', onProjectLoaded);
     document.addEventListener('constructor:autosave-interval-changed', handleAutosaveIntervalChange);
+    document.addEventListener('constructor:autosave-status', updateAutosaveStatus);
 
     if (sessionStorage) {
       const text = sessionStorage.getItem('textarea');
@@ -460,15 +483,27 @@ export async function initBlocklyApp() {
     setToolboxIcon(6, 'calculate');
     setToolboxIcon(7, 'format_quote');
     setToolboxIcon(8, 'list_alt');
+
+    try {
+      await initializeProjects();
+    } catch (error) {
+      console.error('Project initialization error:', error);
+      showToast('Не удалось загрузить проекты.', 'error');
+    }
   }
 
-  start();
+  function onProjectLoaded(event) {
+    loadProject(event.detail);
+  }
+
+  await start();
 
   return () => {
     removeEventHandlers();
     if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
-    document.removeEventListener('constructor:project-deleted', resetProject);
+    document.removeEventListener('constructor:project-loaded', onProjectLoaded);
     document.removeEventListener('constructor:autosave-interval-changed', handleAutosaveIntervalChange);
+    document.removeEventListener('constructor:autosave-status', updateAutosaveStatus);
     workspace?.removeChangeListener(scheduleWorkspacePersistence);
     workspace?.dispose();
   };

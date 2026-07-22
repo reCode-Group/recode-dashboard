@@ -97,7 +97,7 @@ export function Header({handlers, viewerContext, organization}) {
   <nav className="top-nav">
     <a className="active">Рабочая область</a>
     <a onClick={handlers.openModal}>Проекты</a>
-    <a href="https://docs.recode-group.ru" target="_blank" rel="noreferrer">Документация</a>
+    <a href="https://app.recode-group.ru/documentation" target="_blank" rel="noreferrer">Документация</a>
     <a onClick={handlers.openProjectEditModal}>Настройки</a>
   </nav>
   <CreateSupportTicketModal isOpen={isOpen} onClose={onClose} onEmailSent={() => {}} />

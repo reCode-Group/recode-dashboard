@@ -57,6 +57,55 @@ export function Modals({ handlers }) {
 					</div>
 				</div>
 			</div>
+			<div className="modal-overlay" id="projectCreateModal">
+				<div
+					className="modal-container confirmation-modal"
+					role="dialog"
+					aria-modal="true"
+					aria-labelledby="projectCreateTitle"
+				>
+					<div className="modal-header">
+						<div className="modal-title">
+							<h2 id="projectCreateTitle">Новый проект</h2>
+							<p className="modal-subtitle">Задайте понятное название, чтобы быстро найти проект в списке.</p>
+						</div>
+						<button
+							className="modal-close"
+							type="button"
+							aria-label="Закрыть"
+							onClick={handlers.closeProjectCreateModal}
+						>
+							<svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+								<path
+									d="M18 6L6 18M6 6L18 18"
+									stroke="currentColor"
+									strokeWidth={2}
+									strokeLinecap="round"
+								/>
+							</svg>
+						</button>
+					</div>
+					<div className="modal-content confirmation-content">
+						<label className="project-field" htmlFor="newProjectNameInput">
+							<span>Название проекта</span>
+							<input
+								type="text"
+								id="newProjectNameInput"
+								placeholder="Например: Фарм ресурсов"
+								autoComplete="off"
+							/>
+						</label>
+					</div>
+					<div className="modal-footer">
+						<button className="btn-cancel" type="button" onClick={handlers.closeProjectCreateModal}>
+							Отмена
+						</button>
+						<button className="btn-create" type="button" onClick={handlers.confirmProjectCreation}>
+							Создать проект
+						</button>
+					</div>
+				</div>
+			</div>
 			<div className="modal-overlay" id="projectEditModal">
 				<div className="modal-container">
 					{/* Заголовок */}
@@ -108,7 +157,7 @@ export function Modals({ handlers }) {
 							<div className="danger-zone">
 								<div>
 									<h3>Удаление проекта</h3>
-									<p>Все блоки и настройки будут потеряны.</p>
+									<p>Проект будет удалён на сервере вместе с блоками и настройками.</p>
 								</div>
 								<button
 									className="btn-danger"
@@ -147,7 +196,7 @@ export function Modals({ handlers }) {
 				>
 					<div className="modal-header">
 						<div className="modal-title">
-							<h2 id="projectDeleteTitle">Удалить этот проект?</h2>
+							<h2 id="projectDeleteTitle">Удалить проект?</h2>
 							<p className="modal-subtitle">Это действие нельзя отменить.</p>
 						</div>
 						<button
@@ -167,15 +216,32 @@ export function Modals({ handlers }) {
 						</button>
 					</div>
 					<div className="modal-content confirmation-content">
-						Все блоки, сгенерированный код и название проекта будут безвозвратно удалены из этого
-						браузера. После удаления откроется новый пустой проект.
+						Проект <strong id="projectDeleteName">Новый проект</strong> будет удалён вместе со всеми блоками и настройками.
+						Если это последний проект, конструктор сразу создаст новый пустой проект.
+						<label className="delete-confirmation" htmlFor="projectDeleteConfirmInput">
+							<span>
+								Для подтверждения введите <strong id="projectDeleteConfirmName">Новый проект</strong>
+							</span>
+							<input
+								type="text"
+								id="projectDeleteConfirmInput"
+								autoComplete="off"
+								placeholder="Название проекта"
+							/>
+						</label>
 					</div>
 					<div className="modal-footer">
 						<button className="btn-cancel" type="button" onClick={handlers.closeProjectDeleteModal}>
-							Не удалять
+							Оставить проект
 						</button>
-						<button className="btn-danger" type="button" onClick={handlers.confirmProjectDeletion}>
-							Удалить навсегда
+						<button
+							className="btn-danger"
+							type="button"
+							id="projectDeleteConfirmButton"
+							onClick={handlers.confirmProjectDeletion}
+							disabled
+						>
+							Удалить проект
 						</button>
 					</div>
 				</div>

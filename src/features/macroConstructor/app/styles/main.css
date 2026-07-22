@@ -158,6 +158,24 @@ body {
   border-radius: 50%;
 }
 
+.status-dot.autosave-state-saved,
+.autosave-dot.autosave-state-saved {
+  background: #22c55e;
+  animation: none;
+}
+
+.status-dot.autosave-state-saving,
+.autosave-dot.autosave-state-saving {
+  background: #f59e0b;
+  animation: pulse 1s infinite;
+}
+
+.status-dot.autosave-state-disabled,
+.autosave-dot.autosave-state-disabled {
+  background: #111827;
+  animation: none;
+}
+
 /* NAV */
 
 .top-nav {
@@ -388,7 +406,7 @@ body {
   height: 6px;
   background: #22c55e;
   border-radius: 50%;
-  animation: pulse 2s infinite;
+  animation: none;
 }
 
 @keyframes pulse {
