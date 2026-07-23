@@ -28,10 +28,7 @@ function getInitials(name) {
 		return 'ПР';
 	}
 
-	const parts = name
-		.trim()
-		.split(/\s+/)
-		.filter(Boolean);
+	const parts = name.trim().split(/\s+/).filter(Boolean);
 
 	if (parts.length === 0) {
 		return 'ПР';
@@ -47,17 +44,17 @@ function getInitials(name) {
 function AvatarFallback({ initials, size, radius, fontSize }) {
 	return (
 		<Flex
-			align='center'
-			justify='center'
-			bg='gray.800'
-			color='white'
+			align="center"
+			justify="center"
+			bg="gray.800"
+			color="white"
 			w={size}
 			h={size}
 			borderRadius={radius}
-			fontWeight='800'
+			fontWeight="800"
 			fontSize={fontSize}
-			letterSpacing='0.04em'
-			userSelect='none'
+			letterSpacing="0.04em"
+			userSelect="none"
 		>
 			{initials}
 		</Flex>
@@ -183,7 +180,12 @@ const Header = ({
 										imgProps={{ objectFit: 'cover' }}
 									/>
 								) : (
-									<AvatarFallback initials={avatarFallback} size="80px" radius="15px" fontSize="2xl" />
+									<AvatarFallback
+										initials={avatarFallback}
+										size="80px"
+										radius="15px"
+										fontSize="2xl"
+									/>
 								)}
 								<Box
 									position="absolute"
@@ -262,26 +264,26 @@ const Header = ({
 				</Box>
 			</Box>
 
-			<Modal isOpen={isOpen} onClose={handleCloseModal} isCentered size='lg'>
-				<ModalOverlay bg='blackAlpha.600' backdropFilter='blur(4px)' />
+			<Modal isOpen={isOpen} onClose={handleCloseModal} isCentered size="lg">
+				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
 				<ModalContent
 					bg={modalBg}
-					border='1px solid'
-					borderColor='whiteAlpha.400'
-					borderRadius='20px'
-					boxShadow='0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-					overflow='hidden'
+					border="1px solid"
+					borderColor="whiteAlpha.400"
+					borderRadius="20px"
+					boxShadow="0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+					overflow="hidden"
 				>
-					<ModalHeader px='24px' py='20px' borderBottom='1px solid' borderColor='blackAlpha.200'>
-						<Flex justify='space-between' align='center'>
-							<Text fontSize='24px' fontWeight='600'>
-								Загрузка новой аватарки
+					<ModalHeader px="24px" py="20px" borderBottom="1px solid" borderColor="blackAlpha.200">
+						<Flex justify="space-between" align="center">
+							<Text fontSize="24px" fontWeight="600">
+								Загрузка нового фото профиля
 							</Text>
 							<Button
-								variant='ghost'
-								p='0'
-								minW='32px'
-								h='32px'
+								variant="ghost"
+								p="0"
+								minW="32px"
+								h="32px"
 								onClick={handleCloseModal}
 								leftIcon={<FiX />}
 							>
@@ -289,25 +291,25 @@ const Header = ({
 							</Button>
 						</Flex>
 					</ModalHeader>
-					<ModalBody px='24px' py='20px'>
-						<Flex direction='column' gap='14px'>
-							<Text fontSize='14px' color='gray.500'>
+					<ModalBody px="24px" py="20px">
+						<Flex direction="column" gap="14px">
+							<Text fontSize="14px" color="gray.500">
 								Допустимые форматы: PNG и JPG. Размер файла не более 2 МБ.
 							</Text>
 							<Button
 								leftIcon={<FiUploadCloud />}
-								borderRadius='10px'
-								colorScheme='blue'
-								variant='outline'
+								borderRadius="10px"
+								colorScheme="recode"
+								variant="outline"
 								onClick={() => fileInputRef.current?.click()}
 							>
 								Выбрать файл
 							</Button>
 							<Input
 								ref={fileInputRef}
-								type='file'
-								accept='.png,.jpg,.jpeg,image/png,image/jpeg'
-								display='none'
+								type="file"
+								accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+								display="none"
 								onChange={(event) => {
 									handlePickAvatar(event);
 									event.target.value = '';
@@ -315,43 +317,48 @@ const Header = ({
 							/>
 							{avatarPreviewUrl ? (
 								<Box
-									border='1px solid'
-									borderColor='blackAlpha.200'
-									borderRadius='12px'
-									p='12px'
-									display='flex'
-									alignItems='center'
-									gap='12px'
+									border="1px solid"
+									borderColor="blackAlpha.200"
+									borderRadius="12px"
+									p="12px"
+									display="flex"
+									alignItems="center"
+									gap="12px"
 								>
 									{avatarPreviewUrl ? (
-										<Avatar src={avatarPreviewUrl} w='56px' h='56px' borderRadius='12px' />
+										<Avatar src={avatarPreviewUrl} w="56px" h="56px" borderRadius="12px" />
 									) : (
-										<AvatarFallback initials={avatarFallback} size='56px' radius='12px' fontSize='lg' />
+										<AvatarFallback
+											initials={avatarFallback}
+											size="56px"
+											radius="12px"
+											fontSize="lg"
+										/>
 									)}
 									<Box>
-										<Text fontSize='12px' color='gray.500' fontWeight='600'>
+										<Text fontSize="12px" color="gray.500" fontWeight="600">
 											Предпросмотр
 										</Text>
-										<Text fontSize='12px' color='gray.500'>
+										<Text fontSize="12px" color="gray.500">
 											Новая аватарка будет сохранена после подтверждения.
 										</Text>
 									</Box>
 								</Box>
 							) : null}
 							{avatarFile ? (
-								<Text fontSize='12px' color='gray.500'>
+								<Text fontSize="12px" color="gray.500">
 									Выбран файл: {avatarFile.name}
 								</Text>
 							) : null}
 							{avatarError ? (
-								<Text fontSize='12px' color='red.500'>
+								<Text fontSize="12px" color="red.500">
 									{avatarError}
 								</Text>
 							) : null}
 						</Flex>
 					</ModalBody>
-					<ModalFooter px='24px' py='16px' borderTop='1px solid' borderColor='blackAlpha.200'>
-						<Button colorScheme='blue' borderRadius='12px' onClick={handleCloseModal}>
+					<ModalFooter px="24px" py="16px" borderTop="1px solid" borderColor="blackAlpha.200">
+						<Button colorScheme="recode" borderRadius="12px" onClick={handleCloseModal}>
 							Готово
 						</Button>
 					</ModalFooter>

@@ -119,7 +119,7 @@ export default function Support() {
             flexDirection={{ base: "column", md: "row" }}
             gap="16px"
           >
-            <Button leftIcon={<FiPlus />} colorScheme="blue" borderRadius="12px" onClick={onOpen}>
+            <Button leftIcon={<FiPlus />} colorScheme="recode" borderRadius="12px" onClick={onOpen}>
               Создать тикет
             </Button>
           </Flex>
@@ -133,7 +133,7 @@ export default function Support() {
               <Text fontWeight="700" color={textColor}>
                 История тикетов
               </Text>
-              <Badge borderRadius="8px" px="10px" py="4px" colorScheme="blue">
+              <Badge borderRadius="8px" px="10px" py="4px" colorScheme="recode">
                 {tickets.length}
               </Badge>
             </Flex>
@@ -250,7 +250,7 @@ export default function Support() {
                   />
                   <Button
                     leftIcon={<FiSend />}
-                    colorScheme="blue"
+                    colorScheme="recode"
                     borderRadius="12px"
                     isLoading={sendingReply}
                     onClick={handleSendReply}

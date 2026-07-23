@@ -195,7 +195,7 @@ export default function CreateSupportTicketModal({ isOpen, onClose, onEmailSent 
 								<Text fontWeight="600" mb="10px" color={titleColor}>
 									Отправляем обращение...
 								</Text>
-								<Progress size="sm" isIndeterminate borderRadius="999px" colorScheme="blue" />
+								<Progress size="sm" isIndeterminate borderRadius="999px" colorScheme="recode" />
 							</Box>
 						) : null}
 

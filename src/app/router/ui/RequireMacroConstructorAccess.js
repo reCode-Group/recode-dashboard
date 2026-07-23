@@ -130,7 +130,7 @@ function AccessModal({ status, onRetry }) {
 						</Button>
 						<Button
 							w={{ base: '100%', sm: 'auto' }}
-							colorScheme="blue"
+							colorScheme="recode"
 							bg="#005DE0"
 							borderRadius="12px"
 							leftIcon={isError ? <RepeatIcon /> : undefined}

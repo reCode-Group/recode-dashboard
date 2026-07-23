@@ -759,7 +759,7 @@ function CompanyRegistration() {
 									Совпадает с владельцем текущего профиля?
 								</FormLabel>
 								<Switch
-									colorScheme="blue"
+									colorScheme="recode"
 									isChecked={sameAsOwner}
 									onChange={(e) => setSameAsOwner(e.target.checked)}
 								/>

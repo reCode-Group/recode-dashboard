@@ -648,13 +648,13 @@ function BillingPay() {
 					</ModalBody>
 					<ModalFooter borderTop="1px solid" borderColor={borderColor} gap="12px">
 						{paymentModalState === 'error' ? (
-							<Button colorScheme="blue" onClick={() => void startOnlinePayment()}>
+							<Button colorScheme="recode" onClick={() => void startOnlinePayment()}>
 								Повторить
 							</Button>
 						) : null}
 						{paymentModalState === 'success' ? (
 							<Button
-								colorScheme="blue"
+								colorScheme="recode"
 								onClick={() => {
 									paymentModal.onClose();
 									navigate('/lk/tariff');
