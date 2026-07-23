@@ -48,13 +48,21 @@ function getRetryDelay(response) {
 
 export async function apiRequest(path, options = {}) {
 	const { retryOnRateLimit = true, ...requestOptions } = options;
+	const headers = { ...(requestOptions.headers || {}) };
+	const hasContentType = Object.keys(headers).some(
+		(header) => header.toLowerCase() === 'content-type',
+	);
+	const isFormData =
+		typeof FormData !== 'undefined' && requestOptions.body instanceof FormData;
+
+	if (!isFormData && !hasContentType) {
+		headers['Content-Type'] = 'application/json';
+	}
+
 	const response = await fetch(buildApiUrl(path), {
 		credentials: 'include',
-		headers: {
-			'Content-Type': 'application/json',
-			...(requestOptions.headers || {}),
-		},
 		...requestOptions,
+		headers,
 	});
 
 	if (response.status === 429 && retryOnRateLimit) {
