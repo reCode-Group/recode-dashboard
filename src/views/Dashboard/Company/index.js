@@ -14,7 +14,7 @@ import {
 import ProfileBgImage from 'assets/img/ProfileBackground.png';
 import ConversionHistory from 'components/Tables/ConversionHistory';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FaCog, FaUsers } from 'react-icons/fa';
+import { FaUsers } from 'react-icons/fa';
 import { IoDocumentsSharp } from 'react-icons/io5';
 import { Navigate, useLocation } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
@@ -25,7 +25,6 @@ import Documents from 'views/Dashboard/Billing/components/Documents';
 import useMonthlySpendingReports from 'views/Dashboard/Billing/useMonthlySpendingReports';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
 import CompanyInformation from './components/CompanyInformation';
-import CompanySettings from './components/CompanySettings';
 
 const emptyValue = 'Не указано';
 
@@ -55,7 +54,7 @@ function Company() {
 		location.search,
 	]);
 	const [activeTab, setActiveTab] = useState(
-		queryTab === 'employees' || queryTab === 'documents' ? queryTab : 'settings'
+		queryTab === 'employees' || queryTab === 'documents' ? queryTab : 'employees'
 	);
 	const [currentUser, setCurrentUser] = useState(null);
 	const [organization, setOrganization] = useState(null);
@@ -64,7 +63,7 @@ function Company() {
 	const [error, setError] = useState('');
 	const [redirectPath, setRedirectPath] = useState('');
 	const showReports = canViewOrganizationReports(currentUser);
-	const effectiveActiveTab = activeTab === 'documents' && !showReports ? 'settings' : activeTab;
+	const effectiveActiveTab = activeTab === 'documents' && !showReports ? 'employees' : activeTab;
 	const {
 		reports,
 		isLoading: isLoadingReports,
@@ -114,13 +113,12 @@ function Company() {
 	}, [loadCompany]);
 
 	useEffect(() => {
-		if (queryTab === 'settings' || queryTab === 'employees' || queryTab === 'documents') {
+		if (queryTab === 'employees' || queryTab === 'documents') {
 			setActiveTab(queryTab);
 		}
 	}, [queryTab]);
 
 	const tabs = [
-		{ id: 'settings', name: 'НАСТРОЙКИ', icon: <FaCog /> },
 		{ id: 'employees', name: 'СОТРУДНИКИ', icon: <FaUsers /> },
 		...(showReports
 			? [{ id: 'documents', name: 'ДОКУМЕНТЫ', icon: <IoDocumentsSharp /> }]
@@ -270,9 +268,7 @@ function Company() {
 								fixedHeight="403px"
 								enforceOrganizationGuard={false}
 							/>
-						) : (
-							<CompanySettings title="Настройки компании" />
-						)}
+						) : null}
 					</Grid>
 				</GridItem>
 
