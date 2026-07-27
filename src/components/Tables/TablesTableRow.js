@@ -65,11 +65,13 @@ function TablesTableRow(props) {
 			{!hiddenColumnsSet.has('actions') && (
 				<Td py="10px">
 					<Flex gap="10px">
-						<Button p="0px" bg="transparent" variant="no-hover" onClick={onEdit}>
-							<Text fontSize="sm" color="recode.300" fontWeight="bold" cursor="pointer">
-								Токены
-							</Text>
-						</Button>
+						{onEdit ? (
+							<Button p="0px" bg="transparent" variant="no-hover" onClick={onEdit}>
+								<Text fontSize="sm" color="recode.300" fontWeight="bold" cursor="pointer">
+									Токены
+								</Text>
+							</Button>
+						) : null}
 						{onActivate ? (
 							<Button p="0px" bg="transparent" variant="no-hover" onClick={onActivate}>
 								<Text fontSize="sm" color="green.400" fontWeight="bold" cursor="pointer">

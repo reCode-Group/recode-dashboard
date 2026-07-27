@@ -76,6 +76,7 @@ function mapEmployee(employee) {
 		email: employee.email,
 		subdomain: `ID ${employee.user_id}`,
 		domain: ROLE_LABELS[employee.role] || employee.role || 'Сотрудник',
+		rawRole: employee.role,
 		status: STATUS_LABELS[employee.status] || employee.status || 'Неизвестно',
 		rawStatus: employee.status,
 		date: formatTokenValue(employee.tokens_remain),
@@ -316,8 +317,25 @@ const EmployeeTable = ({
 		try {
 			await deactivateOrganizationEmployee(row.email);
 			await loadEmployees();
+			toast({
+				title: 'Сотрудник деактивирован',
+				description: 'Остаток токенов сотрудника возвращён на счёт компании.',
+				status: 'success',
+				duration: 3000,
+				isClosable: true,
+				position: 'top-right',
+			});
 		} catch (requestError) {
-			setError(getErrorMessage(requestError));
+			const message = getErrorMessage(requestError);
+			setError(message);
+			toast({
+				title: 'Не удалось деактивировать сотрудника',
+				description: message,
+				status: 'error',
+				duration: 4000,
+				isClosable: true,
+				position: 'top-right',
+			});
 		} finally {
 			setIsSaving(false);
 		}
@@ -329,8 +347,24 @@ const EmployeeTable = ({
 		try {
 			await activateOrganizationEmployee(row.email);
 			await loadEmployees();
+			toast({
+				title: 'Сотрудник активирован',
+				status: 'success',
+				duration: 3000,
+				isClosable: true,
+				position: 'top-right',
+			});
 		} catch (requestError) {
-			setError(getErrorMessage(requestError));
+			const message = getErrorMessage(requestError);
+			setError(message);
+			toast({
+				title: 'Не удалось активировать сотрудника',
+				description: message,
+				status: 'error',
+				duration: 4000,
+				isClosable: true,
+				position: 'top-right',
+			});
 		} finally {
 			setIsSaving(false);
 		}
@@ -350,10 +384,28 @@ const EmployeeTable = ({
 		setFormError('');
 		try {
 			await transferTokensToEmployee(transferTarget.organizationMemberID, tokens);
+			const transferredTokens = tokens;
 			closeTransferModal();
 			await loadEmployees();
+			toast({
+				title: 'Токены переведены',
+				description: `На счёт сотрудника переведено ${formatTokenValue(transferredTokens)} токенов.`,
+				status: 'success',
+				duration: 3000,
+				isClosable: true,
+				position: 'top-right',
+			});
 		} catch (requestError) {
-			setFormError(getErrorMessage(requestError));
+			const message = getErrorMessage(requestError);
+			setFormError(message);
+			toast({
+				title: 'Не удалось перевести токены',
+				description: message,
+				status: 'error',
+				duration: 4000,
+				isClosable: true,
+				position: 'top-right',
+			});
 		} finally {
 			setIsSaving(false);
 		}
@@ -538,10 +590,12 @@ const EmployeeTable = ({
 											status={row.status}
 											date={row.date}
 											hiddenColumns={hiddenColumns}
-											onEdit={() => setTransferTarget(row)}
+											onEdit={row.rawStatus === 'disabled' ? null : () => setTransferTarget(row)}
 											onActivate={row.rawStatus === 'disabled' ? () => handleActivate(row) : null}
 											onDeactivate={
-												row.rawStatus === 'disabled' ? null : () => handleDeactivate(row)
+												row.rawStatus === 'disabled' || row.rawRole === 'director'
+													? null
+													: () => handleDeactivate(row)
 											}
 										/>
 									))
