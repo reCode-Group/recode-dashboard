@@ -183,12 +183,14 @@ function Company() {
 						company={getCompanyName(organization)}
 						email={organization?.email || emptyValue}
 						fullName={organization?.full_name}
-						responsibleFullName={emptyValue}
+						responsibleFullName={organization?.responsible_full_name}
+						responsibleEmail={organization?.responsible_email}
+						responsiblePhone={organization?.responsible_phone}
+						responsiblePosition={organization?.responsible_position}
 						legalAddress={getCompanyAddress(organization)}
 						inn={organization?.inn || emptyValue}
 						kpp={organization?.kpp || emptyValue}
 						ogrn={organization?.ogrn || emptyValue}
-						phone={emptyValue}
 						tokensRemain={organization?.tokens_remain}
 						employeesCount={organization?.employees_count}
 					/>

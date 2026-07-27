@@ -34,11 +34,13 @@ const CompanyInformation = ({
 	company,
 	fullName,
 	responsibleFullName,
+	responsibleEmail,
+	responsiblePhone,
+	responsiblePosition,
 	legalAddress,
 	inn,
 	kpp,
 	ogrn,
-	phone,
 	email,
 	tokensRemain,
 	employeesCount,
@@ -159,7 +161,9 @@ const CompanyInformation = ({
 									<InfoRow label="ЮРИДИЧЕСКИЙ АДРЕС" value={legalAddress} />
 									<InfoRow label="EMAIL КОМПАНИИ" value={email} />
 									<InfoRow label="ФИО ОТВЕТСТВЕННОГО" value={responsibleFullName} />
-									<InfoRow label="ТЕЛЕФОН" value={phone} />
+									<InfoRow label="ДОЛЖНОСТЬ ОТВЕТСТВЕННОГО" value={responsiblePosition} />
+									<InfoRow label="ТЕЛЕФОН ОТВЕТСТВЕННОГО" value={responsiblePhone} />
+									<InfoRow label="EMAIL ОТВЕТСТВЕННОГО" value={responsibleEmail} />
 								</Flex>
 							</AccordionPanel>
 						</AccordionItem>
