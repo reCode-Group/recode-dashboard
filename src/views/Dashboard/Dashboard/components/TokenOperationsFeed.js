@@ -71,7 +71,7 @@ function normalizeHistoryItem(item) {
 	if (item?.type === 'purchase' && operationType === 'organization_deposit') {
 		return {
 			id: item.id,
-			title: 'Пополнение компании',
+			title: 'Пополнение счёта',
 			description: 'Токены зачислены на счёт организации',
 			metaLabel: payload.organization_id
 				? `Организация #${payload.organization_id}`
@@ -92,6 +92,20 @@ function normalizeHistoryItem(item) {
 				: 'Перевод сотруднику',
 			amount,
 			direction: 'out',
+			createdAt: item.created_at,
+		};
+	}
+
+	if (item?.type === 'user' && operationType === 'organization_member_deactivation_refund') {
+		return {
+			id: item.id,
+			title: 'Возврат токенов сотрудника',
+			description: 'Токены возвращены при деактивации',
+			metaLabel: payload.organization_member_id
+				? `Сотрудник #${payload.organization_member_id}`
+				: 'Деактивация сотрудника',
+			amount,
+			direction: 'in',
 			createdAt: item.created_at,
 		};
 	}
