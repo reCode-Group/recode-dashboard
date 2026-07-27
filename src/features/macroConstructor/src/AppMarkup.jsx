@@ -77,7 +77,9 @@ export function AppMarkup({ handlers, isReady, viewerContext, organization }) {
             </div>
             <div id="blocklyDiv" />
             <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox-categories" style={{ display: 'none' }}>
-              <category name="VBA" categorystyle="vba_category"> </category>
+              <category name="VBA" categorystyle="vba_category">
+                <label text="В разработке" web-class="vbaComingSoonLabel" />
+              </category>
               <category name="Перем." categorystyle="variable_category" custom="VARIABLE" />
               <category name="Функции" categorystyle="procedure_category" custom="PROCEDURE" />
               <sep />

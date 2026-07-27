@@ -265,6 +265,12 @@ body {
 	background-size: 24px 24px;
 }
 
+.vbaComingSoonLabel .blocklyFlyoutLabelText {
+	font-size: 14px;
+	font-weight: 600;
+	fill: #6b7280;
+}
+
 .empty-state {
 	position: absolute;
 	max-width: 22rem;
