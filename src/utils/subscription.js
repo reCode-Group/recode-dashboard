@@ -5,11 +5,18 @@ const NO_SUBSCRIPTION_MESSAGES = [
 	'ErrSubscriptionNotActive',
 ];
 
+const INFINITE_TOKEN_THRESHOLD = 1000000;
+
 export function formatTokenValue(value) {
 	return new Intl.NumberFormat('ru-RU').format(Number(value) || 0).replace(/,/g, ' ');
 }
 
-export function formatTariffPrice(value, suffix = '₽/мес.') {
+export function formatSubscriptionTokenValue(value) {
+	const amount = Number(value) || 0;
+	return amount > INFINITE_TOKEN_THRESHOLD ? '∞' : formatTokenValue(amount);
+}
+
+export function formatTariffPrice(value, suffix = '₽') {
 	const amount = Number(value);
 	if (!Number.isFinite(amount) || amount <= 0) {
 		return '—';
@@ -59,7 +66,9 @@ export function buildCurrentTariffCardData(subscription) {
 
 	return {
 		title: 'Ваш тариф',
-		tariffName: hasSubscription ? String(subscription?.package_name || 'Тариф не указан').toUpperCase() : 'НЕТ ТАРИФА',
+		tariffName: hasSubscription
+			? String(subscription?.package_name || 'Тариф не указан').toUpperCase()
+			: 'НЕТ ТАРИФА',
 		statusLabel: hasSubscription ? (isActive ? 'Активен' : 'Не активен') : 'Не подключен',
 		statusColor: hasSubscription && isActive ? '#48BB78' : '#A0AEC0',
 		validUntil: {
@@ -68,7 +77,9 @@ export function buildCurrentTariffCardData(subscription) {
 		},
 		tokenBalance: {
 			name: 'ОСТАТОК ТОКЕНОВ',
-			code: `${formatTokenValue(tokensRemain)} / ${formatTokenValue(packageTokens)}`,
+			code: `${formatSubscriptionTokenValue(tokensRemain)} / ${formatSubscriptionTokenValue(
+				packageTokens
+			)}`,
 		},
 		monthlyCost: {
 			name: 'СТОИМОСТЬ',

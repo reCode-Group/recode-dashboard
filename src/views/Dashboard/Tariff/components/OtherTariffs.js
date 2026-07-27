@@ -30,7 +30,7 @@ function OtherTariffs({
 	const renderedTariffs = tariffs.map((tariff) => ({
 		id: tariff.id,
 		name: String(tariff.name || 'Тариф').toUpperCase(),
-		tokensLabel: `${formatTokenValue(tariff.amount)}/мес.`,
+		tokensLabel: `${formatTokenValue(tariff.amount)}`,
 		priceLabel: formatTariffPrice(tariff.price),
 		paymentPath: `/lk/billing/pay?package=${encodeURIComponent(tariff.id)}`,
 	}));
@@ -94,8 +94,16 @@ function OtherTariffs({
 								w="100%"
 								flex="1"
 							>
-								<Flex justify="space-between" align="center" gap="4px" mb="12px">
-									<Text fontSize="24px" lineHeight="1.4" fontWeight="bold" color={titleColor}>
+								<Flex justify="space-between" align="flex-start" gap="8px" mb="12px" minW="0">
+									<Text
+										fontSize={{ base: '22px', md: '18px', lg: '20px', xl: '22px' }}
+										lineHeight="1.25"
+										fontWeight="bold"
+										color={titleColor}
+										minW="0"
+										noOfLines={2}
+										overflowWrap="anywhere"
+									>
 										{tariff.name}
 									</Text>
 									{Number(tariff.id) === 2 ? (
@@ -108,6 +116,7 @@ function OtherTariffs({
 											align="center"
 											fontSize="10px"
 											fontWeight="bold"
+											flexShrink={0}
 										>
 											Хит
 										</Flex>

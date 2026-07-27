@@ -1,4 +1,13 @@
-import { Alert, AlertIcon, Button, Flex, Grid, Spinner, Text, useColorModeValue } from '@chakra-ui/react';
+import {
+	Alert,
+	AlertIcon,
+	Button,
+	Flex,
+	Grid,
+	Spinner,
+	Text,
+	useColorModeValue,
+} from '@chakra-ui/react';
 import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
@@ -45,7 +54,13 @@ function PeriodSwitcher({ value, onChange }) {
 	);
 }
 
-function OtherTariffs({ title = 'Другие тарифы', tariffs = [], isLoading = false, error = '', onRetry }) {
+function OtherTariffs({
+	title = 'Другие тарифы',
+	tariffs = [],
+	isLoading = false,
+	error = '',
+	onRetry,
+}) {
 	const [period, setPeriod] = useState('month');
 	const titleColor = useColorModeValue('#2D3748', 'white');
 	const mutedColor = useColorModeValue('#A0AEC0', 'gray.400');
@@ -56,7 +71,7 @@ function OtherTariffs({ title = 'Другие тарифы', tariffs = [], isLoa
 	const renderedTariffs = tariffs.map((tariff) => ({
 		id: tariff.id,
 		name: String(tariff.name || 'Тариф').toUpperCase(),
-		tokensLabel: `${formatTokenValue(tariff.amount)}/мес.`,
+		tokensLabel: `${formatTokenValue(tariff.amount)}`,
 		priceLabel:
 			period === 'year'
 				? formatTariffPrice(Number(tariff.price) * 12, '₽/год')
@@ -96,7 +111,11 @@ function OtherTariffs({ title = 'Другие тарифы', tariffs = [], isLoa
 					</Flex>
 				) : (
 					<Grid
-						templateColumns={{ base: '1fr', md: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(3, minmax(0, 1fr))' }}
+						templateColumns={{
+							base: '1fr',
+							md: 'repeat(2, minmax(0, 1fr))',
+							xl: 'repeat(3, minmax(0, 1fr))',
+						}}
 						gap="12px"
 						w="100%"
 						h="100%"
@@ -113,8 +132,16 @@ function OtherTariffs({ title = 'Другие тарифы', tariffs = [], isLoa
 								w="100%"
 								flex="1"
 							>
-								<Flex justify="space-between" align="center" gap="4px" mb="12px">
-									<Text fontSize="18px" lineHeight="1.4" fontWeight="bold" color={titleColor}>
+								<Flex justify="space-between" align="flex-start" gap="8px" mb="12px" minW="0">
+									<Text
+										fontSize={{ base: '18px', md: '16px', lg: '17px', xl: '18px' }}
+										lineHeight="1.25"
+										fontWeight="bold"
+										color={titleColor}
+										minW="0"
+										noOfLines={2}
+										overflowWrap="anywhere"
+									>
 										{tariff.name}
 									</Text>
 									{Number(tariff.id) === 2 ? (
@@ -127,6 +154,7 @@ function OtherTariffs({ title = 'Другие тарифы', tariffs = [], isLoa
 											align="center"
 											fontSize="10px"
 											fontWeight="bold"
+											flexShrink={0}
 										>
 											Хит
 										</Flex>

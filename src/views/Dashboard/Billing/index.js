@@ -1,24 +1,57 @@
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
 import BackgroundCard1 from 'assets/img/BackgroundCard1.png';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getCurrentUser } from 'services/auth';
 import { newestTransactions, olderTransactions } from 'variables/general';
 import Documents from './components/Documents';
 import OtherTariffs from './components/OtherTariffs';
-import PaymentMethod from './components/PaymentMethod';
+import PaymentMethod, { AccountFundingSwitcher, PAYMENT_METHODS } from './components/PaymentMethod';
 import TariffCard from './components/TariffCard';
 import Transactions from './components/Transactions';
 import useMonthlySpendingReports from './useMonthlySpendingReports';
 import useTariffData from './useTariffData';
 
+const ACCOUNT_TYPES = {
+	PERSONAL: 'personal',
+	ORGANIZATION: 'organization',
+};
+
 function canViewOrganizationReports(user) {
 	return user?.has_organization === true && user?.organization_role === 'director';
+}
+
+function canUseStatementPayment(user) {
+	return (
+		user?.has_organization === true &&
+		user?.organization_role === 'director' &&
+		user?.organization_status === 'active'
+	);
 }
 
 function Billing() {
 	const { currentTariff, otherTariffs, isLoading, error, reload } = useTariffData();
 	const [currentUser, setCurrentUser] = useState(null);
+	const [accountType, setAccountType] = useState(ACCOUNT_TYPES.PERSONAL);
+	const canUseOrganizationAccount = canUseStatementPayment(currentUser);
+	const isOrganizationAccount = accountType === ACCOUNT_TYPES.ORGANIZATION;
 	const showReports = canViewOrganizationReports(currentUser);
+	const paymentMethods = useMemo(
+		() =>
+			canUseOrganizationAccount && isOrganizationAccount
+				? [PAYMENT_METHODS.statement]
+				: [PAYMENT_METHODS.tbank],
+		[canUseOrganizationAccount, isOrganizationAccount]
+	);
+	const accountOptions = useMemo(
+		() =>
+			canUseOrganizationAccount
+				? [
+						{ id: ACCOUNT_TYPES.PERSONAL, label: 'Личный' },
+						{ id: ACCOUNT_TYPES.ORGANIZATION, label: 'Организация' },
+				  ]
+				: [],
+		[canUseOrganizationAccount]
+	);
 	const {
 		reports,
 		isLoading: isLoadingReports,
@@ -46,9 +79,23 @@ function Billing() {
 		};
 	}, []);
 
+	useEffect(() => {
+		if (!canUseOrganizationAccount && accountType !== ACCOUNT_TYPES.PERSONAL) {
+			setAccountType(ACCOUNT_TYPES.PERSONAL);
+		}
+	}, [accountType, canUseOrganizationAccount]);
+
 	return (
 		<Flex direction="column" pt={{ base: '120px', md: '75px' }} mb="100px">
+			<AccountFundingSwitcher
+				options={accountOptions}
+				value={accountType}
+				onChange={setAccountType}
+				title="Счёт для пополнения"
+				description="Выберите, на какой баланс будут зачисляться купленные токены"
+			/>
 			<Grid
+				mt={accountOptions.length > 1 ? '20px' : '0'}
 				templateColumns={{ base: '1fr', xl: showReports ? '2fr 1fr' : '1fr' }}
 				templateRows="auto"
 				alignItems="stretch"
@@ -101,7 +148,12 @@ function Billing() {
 							/>
 						</GridItem>
 					</Grid>
-					<PaymentMethod title="Способ оплаты" />
+					<PaymentMethod
+						title="Способ оплаты"
+						methods={paymentMethods}
+						defaultValue="tbank"
+						accountType={accountType}
+					/>
 				</GridItem>
 
 				{showReports ? (

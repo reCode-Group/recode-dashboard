@@ -28,6 +28,7 @@ import {
 } from '@chakra-ui/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { getCurrentUser } from 'services/auth';
 import { createOrganizationBill } from 'services/organization';
 import {
 	getTokenPackages,
@@ -40,17 +41,57 @@ import {
 	isNoSubscriptionError,
 	normalizeTokenPackages,
 } from 'utils/subscription';
-import PaymentMethod from 'views/Dashboard/Billing/components/PaymentMethod';
+import PaymentMethod, {
+	AccountFundingSwitcher,
+	PAYMENT_METHODS,
+} from 'views/Dashboard/Billing/components/PaymentMethod';
+
+const ACCOUNT_TYPES = {
+	PERSONAL: 'personal',
+	ORGANIZATION: 'organization',
+};
 
 const PAYMENT_INTEGRATION_NAME = 'recode-subscription-payment';
 const PENDING_PAYMENT_STORAGE_KEY = 'recode.pending-subscription-payment';
+const SELECTED_ACCOUNT_STORAGE_KEY = 'recode.billing-pay.account-type';
+const SELECTED_TARIFF_STORAGE_KEY = 'recode.billing-pay.tariff-id';
 const PENDING_PAYMENT_TTL_MS = 30 * 60 * 1000;
+const PAYMENT_SUCCESS_CLOSE_SECONDS = 5;
 const RECONCILIATION_DELAYS_MS = [0, 1000, 2000, 3000, 5000, 8000, 13000, 13000];
 
 function wait(ms) {
 	return new Promise((resolve) => {
 		window.setTimeout(resolve, ms);
 	});
+}
+
+function readStorageValue(key) {
+	try {
+		return window.localStorage.getItem(key) || '';
+	} catch (error) {
+		return '';
+	}
+}
+
+function saveStorageValue(key, value) {
+	try {
+		window.localStorage.setItem(key, value);
+	} catch (error) {
+		// Пользовательские настройки не критичны для оплаты.
+	}
+}
+
+function readStoredAccountType() {
+	const storedAccountType = readStorageValue(SELECTED_ACCOUNT_STORAGE_KEY);
+	return storedAccountType === ACCOUNT_TYPES.ORGANIZATION
+		? ACCOUNT_TYPES.ORGANIZATION
+		: ACCOUNT_TYPES.PERSONAL;
+}
+
+function getInitialPaymentMethodId() {
+	return readStoredAccountType() === ACCOUNT_TYPES.ORGANIZATION
+		? PAYMENT_METHODS.statement.id
+		: PAYMENT_METHODS.tbank.id;
 }
 
 function getSubscriptionFingerprint(subscription) {
@@ -95,14 +136,29 @@ async function getSubscriptionSnapshot() {
 	}
 }
 
+function isActiveOrganizationDirector(user) {
+	return (
+		user?.has_organization === true &&
+		user?.organization_role === 'director' &&
+		user?.organization_status === 'active'
+	);
+}
+
+function isOrganizationEmployee(user) {
+	return user?.has_organization === true && user?.organization_role !== 'director';
+}
+
 function BillingPay() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const toast = useToast();
 	const paymentModal = useDisclosure();
 	const [tariffs, setTariffs] = useState([]);
-	const [tariffId, setTariffId] = useState('');
-	const [paymentMethodId, setPaymentMethodId] = useState('tbank');
+	const [tariffId, setTariffId] = useState(() => readStorageValue(SELECTED_TARIFF_STORAGE_KEY));
+	const [accountType, setAccountType] = useState(() => readStoredAccountType());
+	const [paymentMethodId, setPaymentMethodId] = useState(() => getInitialPaymentMethodId());
+	const [currentUser, setCurrentUser] = useState(null);
+	const [isLoadingUser, setIsLoadingUser] = useState(true);
 	const [isLoadingTariffs, setIsLoadingTariffs] = useState(true);
 	const [tariffsError, setTariffsError] = useState('');
 	const [submitError, setSubmitError] = useState('');
@@ -111,6 +167,9 @@ function BillingPay() {
 	const [paymentData, setPaymentData] = useState(null);
 	const [paymentModalState, setPaymentModalState] = useState('idle');
 	const [paymentModalError, setPaymentModalError] = useState('');
+	const [paymentSuccessCloseSeconds, setPaymentSuccessCloseSeconds] = useState(
+		PAYMENT_SUCCESS_CLOSE_SECONDS
+	);
 	const [pendingPayment, setPendingPayment] = useState(() => readPendingPayment());
 	const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
 	const paymentContainerRef = useRef(null);
@@ -137,6 +196,32 @@ function BillingPay() {
 		() => new URLSearchParams(location.search).get('payment') || '',
 		[location.search]
 	);
+	const canUseOrganizationAccount = isActiveOrganizationDirector(currentUser);
+	const shouldShowEmployeeHint = isOrganizationEmployee(currentUser);
+	const isOrganizationAccount = accountType === ACCOUNT_TYPES.ORGANIZATION;
+	const isStatementMethod = paymentMethodId === PAYMENT_METHODS.statement.id;
+	const selectedTariff = useMemo(
+		() => tariffs.find((item) => String(item.id) === tariffId) || tariffs[0],
+		[tariffs, tariffId]
+	);
+	const availablePaymentMethods = useMemo(
+		() => (isOrganizationAccount ? [PAYMENT_METHODS.statement] : [PAYMENT_METHODS.tbank]),
+		[isOrganizationAccount]
+	);
+	const accountOptions = useMemo(
+		() =>
+			canUseOrganizationAccount
+				? [
+						{ id: ACCOUNT_TYPES.PERSONAL, label: 'Личный' },
+						{ id: ACCOUNT_TYPES.ORGANIZATION, label: 'Организация' },
+				  ]
+				: [],
+		[canUseOrganizationAccount]
+	);
+	const submitButtonLabel = isStatementMethod ? 'Выписать счёт' : 'Оплатить';
+	const paymentAmount = useMemo(() => formatPaymentAmount(Number(selectedTariff?.price) || 0), [
+		selectedTariff?.price,
+	]);
 
 	useEffect(() => {
 		return () => {
@@ -145,8 +230,79 @@ function BillingPay() {
 	}, []);
 
 	useEffect(() => {
+		let isMounted = true;
+
+		async function loadCurrentUser() {
+			setIsLoadingUser(true);
+
+			try {
+				const user = await getCurrentUser();
+				if (!isMounted) return;
+				setCurrentUser(user);
+			} catch (error) {
+				if (!isMounted) return;
+				setCurrentUser(null);
+			} finally {
+				if (isMounted) {
+					setIsLoadingUser(false);
+				}
+			}
+		}
+
+		loadCurrentUser();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
+	useEffect(() => {
 		isPaymentModalOpenRef.current = paymentModal.isOpen;
 	}, [paymentModal.isOpen]);
+
+	useEffect(() => {
+		if (!paymentModal.isOpen || paymentModalState !== 'success') {
+			setPaymentSuccessCloseSeconds(PAYMENT_SUCCESS_CLOSE_SECONDS);
+			return undefined;
+		}
+
+		setPaymentSuccessCloseSeconds(PAYMENT_SUCCESS_CLOSE_SECONDS);
+
+		const timerId = window.setInterval(() => {
+			setPaymentSuccessCloseSeconds((currentSeconds) => {
+				if (currentSeconds <= 1) {
+					window.clearInterval(timerId);
+					paymentModal.onClose();
+					return 0;
+				}
+
+				return currentSeconds - 1;
+			});
+		}, 1000);
+
+		return () => {
+			window.clearInterval(timerId);
+		};
+	}, [paymentModal.isOpen, paymentModal.onClose, paymentModalState]);
+
+	useEffect(() => {
+		if (isLoadingUser || canUseOrganizationAccount || accountType !== ACCOUNT_TYPES.ORGANIZATION) {
+			return;
+		}
+
+		setAccountType(ACCOUNT_TYPES.PERSONAL);
+		setPaymentMethodId(PAYMENT_METHODS.tbank.id);
+	}, [accountType, canUseOrganizationAccount, isLoadingUser]);
+
+	useEffect(() => {
+		saveStorageValue(SELECTED_ACCOUNT_STORAGE_KEY, accountType);
+	}, [accountType]);
+
+	useEffect(() => {
+		if (tariffId) {
+			saveStorageValue(SELECTED_TARIFF_STORAGE_KEY, tariffId);
+		}
+	}, [tariffId]);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -162,17 +318,17 @@ function BillingPay() {
 				const tokenPackages = normalizeTokenPackages(payload);
 				setTariffs(tokenPackages);
 				setTariffId((currentTariffId) => {
-					if (
-						requestedTariffId &&
-						tokenPackages.some((item) => String(item.id) === requestedTariffId)
-					) {
-						return requestedTariffId;
-					}
-					if (tokenPackages.some((item) => String(item.id) === currentTariffId)) {
-						return currentTariffId;
-					}
+					const storedTariffId = readStorageValue(SELECTED_TARIFF_STORAGE_KEY);
+					const nextTariffId = [requestedTariffId, storedTariffId, currentTariffId].find(
+						(candidate) =>
+							candidate && tokenPackages.some((item) => String(item.id) === String(candidate))
+					);
 
-					return tokenPackages[0] ? String(tokenPackages[0].id) : '';
+					return nextTariffId
+						? String(nextTariffId)
+						: tokenPackages[0]
+						? String(tokenPackages[0].id)
+						: '';
 				});
 			} catch (error) {
 				if (!isMounted) return;
@@ -192,16 +348,6 @@ function BillingPay() {
 			isMounted = false;
 		};
 	}, [requestedTariffId]);
-
-	const selectedTariff = useMemo(
-		() => tariffs.find((item) => String(item.id) === tariffId) || tariffs[0],
-		[tariffs, tariffId]
-	);
-	const isStatementMethod = paymentMethodId === 'statement';
-	const submitButtonLabel = isStatementMethod ? 'ВЫПИСАТЬ СЧЕТ' : 'ОПЛАТИТЬ';
-	const paymentAmount = useMemo(() => formatPaymentAmount(Number(selectedTariff?.price) || 0), [
-		selectedTariff?.price,
-	]);
 
 	const reconcilePayment = useCallback(
 		(attempt, { showTimeoutToast = true } = {}) => {
@@ -246,7 +392,7 @@ function BillingPay() {
 							return true;
 						}
 					} catch (error) {
-						// Временная ошибка сверки не означает, что банк отклонил платеж.
+						// Временная ошибка сверки не означает, что банк отклонил платёж.
 					}
 				}
 
@@ -341,6 +487,11 @@ function BillingPay() {
 		};
 	}, [paymentData, paymentModal.isOpen, reconcilePayment]);
 
+	const resetPaymentState = () => {
+		setSubmitError('');
+		setBillResult(null);
+	};
+
 	const startOnlinePayment = async () => {
 		setSubmitError('');
 		setBillResult(null);
@@ -416,14 +567,26 @@ function BillingPay() {
 
 	const handlePaymentMethodChange = (methodId) => {
 		setPaymentMethodId(methodId);
-		setSubmitError('');
-		setBillResult(null);
+		resetPaymentState();
 	};
 
 	const handleTariffChange = (event) => {
 		setTariffId(event.target.value);
-		setSubmitError('');
-		setBillResult(null);
+		resetPaymentState();
+	};
+
+	const handleAccountTypeChange = (nextAccountType) => {
+		if (nextAccountType === ACCOUNT_TYPES.ORGANIZATION && !canUseOrganizationAccount) {
+			return;
+		}
+
+		setAccountType(nextAccountType);
+		setPaymentMethodId(
+			nextAccountType === ACCOUNT_TYPES.ORGANIZATION
+				? PAYMENT_METHODS.statement.id
+				: PAYMENT_METHODS.tbank.id
+		);
+		resetPaymentState();
 	};
 
 	const inputStyles = {
@@ -439,9 +602,9 @@ function BillingPay() {
 			<Flex direction="column" pt={{ base: '120px', md: '75px' }} minH="100vh">
 				<Grid templateColumns={{ base: '1fr', xl: '1fr 1.5fr' }} gap="12px" alignItems="start">
 					<GridItem>
-						<Box maxW="500px">
+						<Box w="100%" maxW={{ base: '100%', lg: '500px' }}>
 							<Text fontSize="32px" lineHeight="1.3" fontWeight="bold" color={titleColor}>
-								Оплата услуг
+								Покупка пакета
 							</Text>
 							<Text
 								mt="4px"
@@ -452,6 +615,19 @@ function BillingPay() {
 							>
 								Принимаются платежи только из Российской Федерации
 							</Text>
+
+							{accountOptions.length > 1 ? (
+								<Box mt="18px">
+									<AccountFundingSwitcher
+										options={accountOptions}
+										value={accountType}
+										onChange={handleAccountTypeChange}
+										title="Куда зачислить токены"
+										description="Выберите личный баланс или счёт организации перед выбором тарифа"
+										variant="compact"
+									/>
+								</Box>
+							) : null}
 
 							<Flex mt="22px" direction="column" gap="16px">
 								{tariffsError ? (
@@ -514,6 +690,19 @@ function BillingPay() {
 									</Alert>
 								) : null}
 
+								{shouldShowEmployeeHint ? (
+									<Alert status="info" borderRadius="12px" alignItems="flex-start">
+										<AlertIcon mt="2px" />
+										<Box>
+											<AlertTitle fontSize="sm">Рабочий счёт пополняет директор</AlertTitle>
+											<AlertDescription fontSize="sm">
+												Вы не можете пополнить счёт сотрудника самостоятельно. Обратитесь к
+												руководителю или пополните личный счёт.
+											</AlertDescription>
+										</Box>
+									</Alert>
+								) : null}
+
 								<FormControl>
 									<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
 										Тариф
@@ -541,13 +730,6 @@ function BillingPay() {
 									<Input value={paymentAmount} readOnly bg={readonlyBg} {...inputStyles} />
 								</FormControl>
 
-								<FormControl>
-									<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
-										Заплатить за
-									</FormLabel>
-									<Input value="1 месяц" readOnly bg={readonlyBg} {...inputStyles} />
-								</FormControl>
-
 								{!isStatementMethod && !tbankTerminalKey ? (
 									<Alert status="warning" borderRadius="12px">
 										<AlertIcon />
@@ -568,6 +750,7 @@ function BillingPay() {
 									_active={{ bg: '#0A54BE' }}
 									isDisabled={
 										isLoadingTariffs ||
+										isLoadingUser ||
 										tariffs.length === 0 ||
 										isCreatingBill ||
 										(!isStatementMethod && !tbankTerminalKey)
@@ -588,6 +771,8 @@ function BillingPay() {
 							showExplanations
 							value={paymentMethodId}
 							onChange={handlePaymentMethodChange}
+							methods={availablePaymentMethods}
+							accountType={accountType}
 						/>
 					</GridItem>
 				</Grid>
@@ -623,6 +808,9 @@ function BillingPay() {
 								<Text mt="8px" color={subtitleColor}>
 									Тариф и личный баланс успешно обновлены.
 								</Text>
+								<Text mt="6px" fontSize="sm" color={subtitleColor}>
+									Окно оплаты закроется через {paymentSuccessCloseSeconds} сек.
+								</Text>
 							</Flex>
 						) : (
 							<Box position="relative" minH="420px">
@@ -638,7 +826,7 @@ function BillingPay() {
 									>
 										<Spinner color="#005DE0" size="lg" />
 										<Text mt="12px" color={subtitleColor}>
-											Загружаем защищённую форму оплаты…
+											Загружаем защищённую форму оплаты...
 										</Text>
 									</Flex>
 								) : null}

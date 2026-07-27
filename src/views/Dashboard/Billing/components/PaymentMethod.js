@@ -1,59 +1,226 @@
-import { Box, Flex, Image, Text, Tooltip, useColorModeValue } from '@chakra-ui/react';
+import {
+	Box,
+	Button,
+	Divider,
+	Flex,
+	Image,
+	Text,
+	Tooltip,
+	useColorModeValue,
+	useToast,
+} from '@chakra-ui/react';
 import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
-import { useEffect, useMemo, useState } from 'react';
-import { getCurrentUser } from 'services/auth';
+import { useMemo, useState } from 'react';
 
 import statementLogo from 'assets/img/payment-methods/statement.png';
 import tbankLogo from 'assets/img/payment-methods/tbank.png';
 
-const DEFAULT_METHODS = [
-	{
+export const PAYMENT_METHODS = {
+	tbank: {
 		id: 'tbank',
 		title: 'Онлайн через Т-Банк',
 		icon: tbankLogo,
 		iconW: '69px',
 		iconH: '25px',
 	},
-	{
+	statement: {
 		id: 'statement',
-		title: 'Выписка счета',
+		title: 'Выписка счёта',
 		icon: statementLogo,
 		iconW: '24px',
 		iconH: '22px',
 	},
-];
+};
+
+const DEFAULT_METHODS = [PAYMENT_METHODS.tbank, PAYMENT_METHODS.statement];
 
 const EXPLANATIONS = {
-	statement: {
-		commissionText: '0%',
-		commissionLabel: 'определяется банком',
-		processingText: '3-4',
-		processingLabel: 'рабочих дня',
-		bullets: [
-			'При оплате от юридического лица, не являющегося владельцем аккаунта, укажите в назначении платежа номер счета и логин аккаунта, за который производится оплата.',
-			'Данные в счете должны полностью совпадать с данными владельца пополняемого аккаунта, указанными в личной карточке плательщика.',
-			'При формировании платежного поручения и назначении платежа обязательно укажите номер счета и логин аккаунта.',
-			'При совершении оплаты из-за границы может потребоваться код валютной операции: [20100].',
-			'Зачисление средств на баланс аккаунта производится в будние дни после поступления средств на расчетный счет.',
-		],
+	personal: {
+		tbank: {
+			commissionText: 'Безопасно',
+			commissionLabel: 'на защищённой форме Т-Банка',
+			processingText: 'онлайн',
+			processingLabel: 'после подтверждения банком',
+			bullets: [
+				'Доступные способы оплаты будут показаны на форме Т-Банка.',
+				'Онлайн-покупка пополняет ваш личный баланс.',
+				'После подтверждения банком тариф и личный баланс обновятся автоматически.',
+			],
+		},
+		statement: {
+			commissionText: '0%',
+			commissionLabel: 'определяется банком',
+			processingText: '3-4',
+			processingLabel: 'рабочих дня',
+			bullets: [
+				'Счёт выставляется на данные плательщика, указанные в личной карточке аккаунта.',
+				'При формировании платёжного поручения обязательно укажите номер счёта и логин аккаунта.',
+				'Зачисление средств на личный баланс производится в будние дни после поступления средств на расчётный счёт.',
+			],
+		},
 	},
-	tbank: {
-		commissionText: 'Безопасно',
-		commissionLabel: 'на защищенной форме Т-Банка',
-		processingText: 'онлайн',
-		processingLabel: 'после подтверждения банком',
-		bullets: [
-			'Доступные способы оплаты будут показаны на форме Т-Банка.',
-			'Онлайн-покупка пополняет ваш личный баланс, даже если вы директор организации.',
-			'После подтверждения банком тариф и баланс обновятся автоматически.',
-		],
+	organization: {
+		statement: {
+			commissionText: '0%',
+			commissionLabel: 'определяется банком',
+			processingText: '3-4',
+			processingLabel: 'рабочих дня',
+			bullets: [
+				'Счёт выставляется на организацию и пополняет баланс организации.',
+				'После зачисления директор сможет распределить токены между сотрудниками.',
+				'При формировании платёжного поручения обязательно укажите номер счёта и логин аккаунта.',
+				'Зачисление средств производится в будние дни после поступления оплаты на расчётный счёт.',
+			],
+		},
+		tbank: {
+			commissionText: 'Безопасно',
+			commissionLabel: 'на защищённой форме Т-Банка',
+			processingText: 'онлайн',
+			processingLabel: 'после подтверждения банком',
+			bullets: [
+				'Онлайн-оплата доступна для личного счёта.',
+				'Для пополнения счёта организации выберите выписку счёта.',
+			],
+		},
 	},
 };
 
 const TEMPORARILY_UNAVAILABLE_METHOD_IDS = new Set();
-const STATEMENT_METHOD_ID = 'statement';
+
+export const AccountFundingSwitcher = ({
+	options = [],
+	value,
+	onChange,
+	title = 'Счёт пополнения',
+	description = 'Выберите, куда зачислить купленные токены',
+	variant = 'expanded',
+}) => {
+	const visibleOptions = useMemo(() => options.filter(Boolean), [options]);
+	const toast = useToast();
+	const textColor = useColorModeValue('#2D3748', 'white');
+	const mutedColor = useColorModeValue('gray.500', 'gray.300');
+	const borderColor = useColorModeValue('gray.200', 'whiteAlpha.300');
+	const cardBg = useColorModeValue('white', 'gray.700');
+	const accentBg = useColorModeValue('blue.50', 'whiteAlpha.100');
+	const segmentBg = useColorModeValue('white', 'whiteAlpha.100');
+	const activeSegmentBg = useColorModeValue('#005DE0', '#3182CE');
+	const inactiveHoverBg = useColorModeValue('gray.50', 'whiteAlpha.200');
+	const compactSummaryBg = useColorModeValue('gray.50', 'whiteAlpha.100');
+
+	if (visibleOptions.length <= 1) {
+		return null;
+	}
+
+	const isCompact = variant === 'compact';
+	const isOrganizationAccount = value === 'organization';
+
+	return (
+		<Box
+			p={isCompact ? '4px' : '0'}
+			bg={isCompact ? cardBg : 'transparent'}
+			border={isCompact ? '1px solid' : '0'}
+			borderColor={borderColor}
+			borderRadius={isCompact ? '14px' : '0'}
+			w="100%"
+		>
+			<Flex
+				align={isCompact ? 'stretch' : { base: 'stretch', md: 'center' }}
+				gap={isCompact ? '0' : '32px'}
+				direction={isCompact ? 'column' : { base: 'column', md: 'row' }}
+				p={isCompact ? '0' : { base: '16px', md: '18px 20px' }}
+				bg={isCompact ? 'transparent' : cardBg}
+				borderRadius={isCompact ? '14px' : '16px'}
+				w="100%"
+			>
+				<Flex
+					p="4px"
+					gap="4px"
+					bg={compactSummaryBg}
+					borderColor={borderColor}
+					borderRadius={isCompact ? '10px' : '14px'}
+					w={isCompact ? '100%' : { base: '100%', md: 'auto' }}
+					flexShrink={0}
+				>
+					{visibleOptions.map((option) => {
+						const isActive = value === option.id;
+
+						return (
+							<Button
+								key={option.id}
+								h={'44px'}
+								minW={isCompact ? '0' : { base: '0', md: '132px' }}
+								flex={isCompact ? '1' : { base: '1', md: '0 0 auto' }}
+								px="14px"
+								borderRadius="10px"
+								border="1px solid"
+								borderColor={borderColor}
+								bg={isActive ? activeSegmentBg : segmentBg}
+								color={isActive ? 'white' : textColor}
+								boxShadow={isActive ? 'md' : 'none'}
+								fontSize="sm"
+								fontWeight="medium"
+								_hover={{ bg: isActive ? activeSegmentBg : inactiveHoverBg }}
+								_active={{ bg: isActive ? activeSegmentBg : inactiveHoverBg }}
+								onClick={() => {
+									if (isActive) {
+										return;
+									}
+
+									onChange?.(option.id);
+									toast({
+										id: 'payment-account-select-tariff',
+										title: 'Теперь выберите тариф',
+										description: 'Нажмите на подходящий пакет токенов, чтобы перейти к оплате.',
+										status: 'info',
+										position: 'bottom-right',
+										duration: 4500,
+										isClosable: true,
+									});
+								}}
+							>
+								{option.label}
+							</Button>
+						);
+					})}
+				</Flex>
+
+				{isCompact ? null : (
+					<>
+						<Divider
+							display={{ base: 'none', md: 'block' }}
+							orientation="vertical"
+							h="46px"
+							borderColor={borderColor}
+						/>
+						<Box minW="0">
+							<Text color={textColor} fontSize="md" fontWeight="bold" lineHeight="1.25">
+								{title}
+							</Text>
+							<Text mt="4px" color={mutedColor} fontSize="sm" lineHeight="1.45" noOfLines={1}>
+								{description}
+							</Text>
+						</Box>
+					</>
+				)}
+			</Flex>
+
+			{isCompact ? (
+				<Box mt="8px" p="12px" borderRadius="10px" bg={compactSummaryBg}>
+					<Text fontSize="sm" color={textColor} fontWeight="bold">
+						{isOrganizationAccount ? 'Выбран: Счёт организации' : 'Выбран: Личный счёт'}
+					</Text>
+					<Text mt="4px" fontSize="sm" lineHeight="1.5" color={mutedColor}>
+						{isOrganizationAccount
+							? 'Токены будут зачислены на баланс организации и станут доступны для распределения сотрудникам.'
+							: 'Токены будут зачислены на ваш личный баланс.'}
+					</Text>
+				</Box>
+			) : null}
+		</Box>
+	);
+};
 
 const PaymentMethod = ({
 	title = 'Способ оплаты',
@@ -63,9 +230,10 @@ const PaymentMethod = ({
 	defaultValue = 'statement',
 	onChange,
 	methods = DEFAULT_METHODS,
+	accountType = 'personal',
 }) => {
 	const [internalValue, setInternalValue] = useState(defaultValue);
-	const [currentUser, setCurrentUser] = useState(null);
+	const toast = useToast();
 	const selectedMethod = value ?? internalValue;
 	const textColor = useColorModeValue('#2D3748', 'white');
 	const mutedColor = useColorModeValue('gray.500', 'gray.300');
@@ -75,58 +243,15 @@ const PaymentMethod = ({
 	const summaryColor = useColorModeValue('#38A169', 'green.300');
 	const bulletColor = useColorModeValue('#4A5568', 'gray.200');
 	const iconSurface = useColorModeValue('transparent', 'whiteAlpha.700');
-	const canUseStatementPayment =
-		currentUser?.has_organization === true &&
-		currentUser?.organization_role === 'director' &&
-		currentUser?.organization_status === 'active';
-	const availableMethods = useMemo(() => {
-		if (canUseStatementPayment) {
-			return methods;
-		}
 
-		return methods.filter((method) => method.id !== STATEMENT_METHOD_ID);
-	}, [canUseStatementPayment, methods]);
-	const effectiveSelectedMethod =
-		!canUseStatementPayment && selectedMethod === STATEMENT_METHOD_ID ? 'tbank' : selectedMethod;
-
-	useEffect(() => {
-		let isMounted = true;
-
-		async function loadCurrentUser() {
-			try {
-				const user = await getCurrentUser();
-				if (!isMounted) return;
-				setCurrentUser(user);
-			} catch (error) {
-				if (!isMounted) return;
-				setCurrentUser(null);
-			}
-		}
-
-		loadCurrentUser();
-
-		return () => {
-			isMounted = false;
-		};
-	}, []);
-
-	useEffect(() => {
-		if (canUseStatementPayment || selectedMethod !== STATEMENT_METHOD_ID) {
-			return;
-		}
-
-		if (value === undefined) {
-			setInternalValue('tbank');
-		}
-		if (onChange) {
-			onChange('tbank');
-		}
-	}, [canUseStatementPayment, onChange, selectedMethod, value]);
-
-	const explanation = useMemo(
-		() => EXPLANATIONS[effectiveSelectedMethod] ?? EXPLANATIONS.statement,
-		[effectiveSelectedMethod]
-	);
+	const availableMethods = useMemo(() => methods.filter(Boolean), [methods]);
+	const effectiveSelectedMethod = availableMethods.some((method) => method.id === selectedMethod)
+		? selectedMethod
+		: availableMethods[0]?.id;
+	const explanation = useMemo(() => {
+		const accountExplanations = EXPLANATIONS[accountType] ?? EXPLANATIONS.personal;
+		return accountExplanations[effectiveSelectedMethod] ?? accountExplanations.statement;
+	}, [accountType, effectiveSelectedMethod]);
 
 	const handleSelect = (id) => {
 		if (TEMPORARILY_UNAVAILABLE_METHOD_IDS.has(id)) {
@@ -138,6 +263,17 @@ const PaymentMethod = ({
 		}
 		if (onChange) {
 			onChange(id);
+		}
+		if (!showExplanations) {
+			toast({
+				id: 'payment-method-select-tariff',
+				title: 'Теперь выберите тариф',
+				description: 'Нажмите на подходящий пакет токенов, чтобы перейти к оплате.',
+				status: 'info',
+				position: 'bottom-right',
+				duration: 4500,
+				isClosable: true,
+			});
 		}
 	};
 
@@ -203,7 +339,7 @@ const PaymentMethod = ({
 
 						if (isTemporarilyUnavailable) {
 							return (
-								<Tooltip key={method.id} label="Временно не доступно" hasArrow>
+								<Tooltip key={method.id} label="Временно недоступно" hasArrow>
 									<Box>{methodCard}</Box>
 								</Tooltip>
 							);
