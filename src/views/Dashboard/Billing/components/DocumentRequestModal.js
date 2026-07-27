@@ -26,7 +26,7 @@ function buildSupportMessage({ documentType, date, code, price }, accountEmail) 
 		`Тип документа: ${documentType}`,
 		`Отчётный период: ${date}`,
 		`Код отчёта: ${code}`,
-		`Сумма: ${price} ₽`,
+		`Сумма: ${price}`,
 		`Email для ответа: ${accountEmail || 'email аккаунта пользователя'}`,
 		'Источник запроса: раздел «Отчёты» личного кабинета.',
 		'Пожалуйста, подготовьте PDF-документ и отправьте его на указанный email.',
@@ -166,7 +166,7 @@ export default function DocumentRequestModal({ request, onClose }) {
 									<strong>Код:</strong> {request?.code}
 								</Text>
 								<Text color={titleColor}>
-									<strong>Сумма:</strong> {request?.price} ₽
+									<strong>Сумма:</strong> {request?.price}
 								</Text>
 							</Stack>
 

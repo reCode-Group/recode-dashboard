@@ -1,22 +1,55 @@
-// Chakra imports
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
-// Assets
 import BackgroundCard1 from 'assets/img/BackgroundCard1.png';
-import { invoicesData, newestTransactions, olderTransactions } from 'variables/general';
+import { useEffect, useState } from 'react';
+import { getCurrentUser } from 'services/auth';
+import { newestTransactions, olderTransactions } from 'variables/general';
 import Documents from './components/Documents';
 import OtherTariffs from './components/OtherTariffs';
 import PaymentMethod from './components/PaymentMethod';
 import TariffCard from './components/TariffCard';
 import Transactions from './components/Transactions';
+import useMonthlySpendingReports from './useMonthlySpendingReports';
 import useTariffData from './useTariffData';
+
+function canViewOrganizationReports(user) {
+	return user?.has_organization === true && user?.organization_role === 'director';
+}
 
 function Billing() {
 	const { currentTariff, otherTariffs, isLoading, error, reload } = useTariffData();
+	const [currentUser, setCurrentUser] = useState(null);
+	const showReports = canViewOrganizationReports(currentUser);
+	const {
+		reports,
+		isLoading: isLoadingReports,
+		error: reportsError,
+		reload: reloadReports,
+	} = useMonthlySpendingReports(showReports);
+
+	useEffect(() => {
+		let isMounted = true;
+
+		getCurrentUser()
+			.then((user) => {
+				if (isMounted) {
+					setCurrentUser(user);
+				}
+			})
+			.catch(() => {
+				if (isMounted) {
+					setCurrentUser(null);
+				}
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
 
 	return (
 		<Flex direction="column" pt={{ base: '120px', md: '75px' }} mb="100px">
 			<Grid
-				templateColumns={{ base: '1fr', xl: '2fr 1fr' }}
+				templateColumns={{ base: '1fr', xl: showReports ? '2fr 1fr' : '1fr' }}
 				templateRows="auto"
 				alignItems="stretch"
 				gap="24px"
@@ -61,19 +94,27 @@ function Billing() {
 						</GridItem>
 						<GridItem area="transactions" minH="0" h={{ base: 'auto', xl: '100%' }}>
 							<Transactions
-								title={'Транзакции'}
-								date={'23 - 30 Марта'}
+								title="Транзакции"
+								date="23 - 30 Марта"
 								newestTransactions={newestTransactions}
 								olderTransactions={olderTransactions}
 							/>
 						</GridItem>
 					</Grid>
-					<PaymentMethod title={'Способ оплаты'} />
+					<PaymentMethod title="Способ оплаты" />
 				</GridItem>
 
-				<GridItem minH="0" display="flex">
-					<Documents title={'Отчеты'} data={invoicesData} />
-				</GridItem>
+				{showReports ? (
+					<GridItem minH="0" display="flex">
+						<Documents
+							title="Отчеты"
+							data={reports}
+							isLoading={isLoadingReports}
+							error={reportsError}
+							onRetry={reloadReports}
+						/>
+					</GridItem>
+				) : null}
 			</Grid>
 		</Flex>
 	);

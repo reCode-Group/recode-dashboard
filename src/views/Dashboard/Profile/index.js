@@ -1,4 +1,3 @@
-// Chakra imports
 import {
 	Alert,
 	AlertIcon,
@@ -19,13 +18,17 @@ import { getCurrentUser } from 'services/auth';
 import { getUserConversions } from 'services/conversions';
 import { getOrganizationDetails } from 'services/organization';
 import { mapConversion } from 'utils/conversions';
-import { invoicesData } from 'variables/general';
 import DocumentsFull from 'views/Dashboard/Billing/components/DocumentsFull';
+import useMonthlySpendingReports from 'views/Dashboard/Billing/useMonthlySpendingReports';
 import Header from './components/Header';
 import PlatformSettings from './components/PlatformSettings';
 import ProfileInformation from './components/ProfileInformation';
 
 const emptyValue = 'Не указано';
+
+function canViewOrganizationReports(user) {
+	return user?.has_organization === true && user?.organization_role === 'director';
+}
 
 function getFullName(user) {
 	const parts = [user?.surname, user?.name, user?.lastname].filter(Boolean);
@@ -81,6 +84,14 @@ function Profile() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState('');
 	const [redirectPath, setRedirectPath] = useState('');
+	const showReports = canViewOrganizationReports(user);
+	const effectiveActiveTab = activeTab === 'documents' && !showReports ? 'overview' : activeTab;
+	const {
+		reports,
+		isLoading: isLoadingReports,
+		error: reportsError,
+		reload: reloadReports,
+	} = useMonthlySpendingReports(showReports);
 
 	useEffect(() => {
 		if (queryTab === 'documents' || queryTab === 'overview') {
@@ -91,7 +102,7 @@ function Profile() {
 	}, [location.hash, queryTab]);
 
 	useEffect(() => {
-		if (isLoading || activeTab !== 'overview' || location.hash !== '#settings') {
+		if (isLoading || effectiveActiveTab !== 'overview' || location.hash !== '#settings') {
 			return undefined;
 		}
 
@@ -100,7 +111,7 @@ function Profile() {
 		});
 
 		return () => window.cancelAnimationFrame(animationFrame);
-	}, [activeTab, isLoading, location.hash]);
+	}, [effectiveActiveTab, isLoading, location.hash]);
 
 	useEffect(() => {
 		if (!hasCompletedRegistration) {
@@ -153,11 +164,15 @@ function Profile() {
 			name: 'ОБЗОР',
 			icon: <FaCube w="100%" h="100%" />,
 		},
-		{
-			id: 'documents',
-			name: 'ДОКУМЕНТЫ',
-			icon: <IoDocumentsSharp w="100%" h="100%" />,
-		},
+		...(showReports
+			? [
+					{
+						id: 'documents',
+						name: 'ДОКУМЕНТЫ',
+						icon: <IoDocumentsSharp w="100%" h="100%" />,
+					},
+			  ]
+			: []),
 	];
 
 	if (isLoading) {
@@ -202,12 +217,20 @@ function Profile() {
 				name={displayName}
 				email={user?.email || emptyValue}
 				tabs={tabs}
-				activeTab={activeTab}
+				activeTab={effectiveActiveTab}
 				onTabChange={setActiveTab}
 			/>
 
-			{activeTab === 'documents' ? (
-				<DocumentsFull title="Отчеты" data={invoicesData} user={user} organization={organization} />
+			{effectiveActiveTab === 'documents' ? (
+				<DocumentsFull
+					title="Отчеты"
+					data={reports}
+					user={user}
+					organization={organization}
+					isLoading={isLoadingReports}
+					error={reportsError}
+					onRetry={reloadReports}
+				/>
 			) : (
 				<>
 					<Grid templateColumns={{ sm: '1fr', xl: 'repeat(2, 1fr)' }} gap="22px">
@@ -234,7 +257,14 @@ function Profile() {
 						<ConversionHistory
 							title="Последние конвертации"
 							amount={conversions.length}
-							captions={['ID', 'Тип', 'Статус', 'Результат перевода', 'Затраченные токены', 'Дата']}
+							captions={[
+								'ID',
+								'Тип',
+								'Статус',
+								'Результат перевода',
+								'Затраченные токены',
+								'Дата',
+							]}
 							data={conversions}
 							enablePagination={true}
 							showFullHistoryButton={true}

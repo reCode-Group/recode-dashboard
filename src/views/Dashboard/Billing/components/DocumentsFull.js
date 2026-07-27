@@ -1,9 +1,12 @@
-// Chakra imports
 import {
+	Alert,
+	AlertIcon,
 	Box,
 	Button,
+	Center,
 	Flex,
 	Link,
+	Spinner,
 	Table,
 	Tbody,
 	Text,
@@ -13,7 +16,6 @@ import {
 	useColorModeValue,
 	useDisclosure,
 } from '@chakra-ui/react';
-// Custom components
 import Card from 'components/Card/Card.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardHeader from 'components/Card/CardHeader.js';
@@ -23,10 +25,20 @@ import CreateSupportTicketModal from 'views/Dashboard/Support/components/CreateS
 import DocumentRequestModal from './DocumentRequestModal';
 import ReconciliationRequestModal from './ReconciliationRequestModal';
 
-const DocumentsFull = ({ title, data, user, organization, fixedHeight = '560px' }) => {
+function DocumentsFull({
+	title,
+	data = [],
+	user,
+	organization,
+	fixedHeight = '560px',
+	isLoading = false,
+	error = '',
+	onRetry,
+}) {
 	const textColor = useColorModeValue('gray.700', 'white');
 	const mutedColor = useColorModeValue('gray.400', 'gray.400');
 	const cardBg = useColorModeValue('white', 'gray.700');
+	const emptyColor = useColorModeValue('gray.500', 'gray.400');
 	const captions = ['Дата', 'Сумма, ₽', 'Акты', 'Счета-фактуры'];
 	const scrollRef = useRef(null);
 	const [hasScrollbar, setHasScrollbar] = useState(false);
@@ -70,7 +82,7 @@ const DocumentsFull = ({ title, data, user, organization, fixedHeight = '560px' 
 			resizeObserver.disconnect();
 			window.removeEventListener('resize', updateScrollbarState);
 		};
-	}, [data]);
+	}, [data, error, isLoading]);
 
 	return (
 		<>
@@ -103,7 +115,7 @@ const DocumentsFull = ({ title, data, user, organization, fixedHeight = '560px' 
 								{title}
 							</Text>
 							<Text mt="4px" fontSize="sm" color={mutedColor}>
-								Подробнее о получения оригиналов документов{' '}
+								Подробнее о получении оригиналов документов{' '}
 								<Link
 									as="button"
 									type="button"
@@ -134,60 +146,80 @@ const DocumentsFull = ({ title, data, user, organization, fixedHeight = '560px' 
 					</Flex>
 				</CardHeader>
 				<CardBody flex="1" minH="0" p="0" pt="8px">
-					<Box
-						ref={scrollRef}
-						width="100%"
-						h="100%"
-						overflow="auto"
-						pr={{ base: '0px', lg: hasScrollbar ? '14px' : '0px' }}
-						sx={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y' }}
-					>
-						<Table variant="simple" color={textColor} minW={{ base: '640px', md: '100%' }}>
-							<Thead position="sticky" top="0" zIndex="1" bg={cardBg}>
-								<Tr my=".8rem" pl="0px" color="gray.400">
-									{captions.map((caption, idx) => (
-										<Th
-											color="gray.400"
-											key={caption}
-											ps={idx === 0 ? '0px' : null}
-											verticalAlign="top"
-											position="sticky"
-											_after={{
-												content: '""',
-												position: 'absolute',
-												left: 0,
-												right: 0,
-												bottom: 0,
-												height: '0.5px',
-												bg: 'blackAlpha.100',
-												pointerEvents: 'none',
-											}}
-											top="0"
-											zIndex="1"
-											bg={cardBg}
-										>
-											{caption}
-										</Th>
+					{isLoading ? (
+						<Center h="100%">
+							<Spinner color="recode.300" />
+						</Center>
+					) : error ? (
+						<Flex direction="column" align="flex-start" gap="12px">
+							<Alert status="error" borderRadius="12px">
+								<AlertIcon />
+								{error}
+							</Alert>
+							{onRetry ? (
+								<Button size="sm" onClick={onRetry}>
+									Повторить
+								</Button>
+							) : null}
+						</Flex>
+					) : data.length === 0 ? (
+						<Center h="100%">
+							<Text color={emptyColor} fontSize="sm">
+								Отчеты пока не сформированы
+							</Text>
+						</Center>
+					) : (
+						<Box
+							ref={scrollRef}
+							width="100%"
+							h="100%"
+							overflow="auto"
+							pr={{ base: '0px', lg: hasScrollbar ? '14px' : '0px' }}
+							sx={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y' }}
+						>
+							<Table variant="simple" color={textColor} minW={{ base: '640px', md: '100%' }}>
+								<Thead position="sticky" top="0" zIndex="1" bg={cardBg}>
+									<Tr my=".8rem" pl="0px" color="gray.400">
+										{captions.map((caption, idx) => (
+											<Th
+												color="gray.400"
+												key={caption}
+												ps={idx === 0 ? '0px' : null}
+												verticalAlign="top"
+												position="sticky"
+												_after={{
+													content: '""',
+													position: 'absolute',
+													left: 0,
+													right: 0,
+													bottom: 0,
+													height: '0.5px',
+													bg: 'blackAlpha.100',
+													pointerEvents: 'none',
+												}}
+												top="0"
+												zIndex="1"
+												bg={cardBg}
+											>
+												{caption}
+											</Th>
+										))}
+									</Tr>
+								</Thead>
+								<Tbody>
+									{data.map((row) => (
+										<InvoicesRow
+											key={row.id}
+											date={row.period}
+											code={row.id}
+											price={row.amount}
+											onDocumentRequest={setDocumentRequest}
+										/>
 									))}
-								</Tr>
-							</Thead>
-							<Tbody>
-								{data.map((row) => (
-									<InvoicesRow
-										key={`${row.code}-${row.date}`}
-										date={row.date}
-										code={row.code}
-										price={row.price}
-										actLogo={row.actLogo ?? row.logo}
-										actFormat={row.actFormat ?? row.format}
-										invoiceLogo={row.invoiceLogo ?? row.logo}
-										invoiceFormat={row.invoiceFormat ?? row.format}
-										onDocumentRequest={setDocumentRequest}
-									/>
-								))}
-							</Tbody>
-						</Table>
-					</Box>
+								</Tbody>
+							</Table>
+						</Box>
+					)}
 				</CardBody>
 			</Card>
 			<CreateSupportTicketModal
@@ -204,6 +236,6 @@ const DocumentsFull = ({ title, data, user, organization, fixedHeight = '560px' 
 			/>
 		</>
 	);
-};
+}
 
 export default DocumentsFull;

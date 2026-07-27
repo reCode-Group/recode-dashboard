@@ -63,3 +63,9 @@ export function createOrganizationBill(tokenPackageId) {
 		body: JSON.stringify({ token_package_id: Number(tokenPackageId) }),
 	});
 }
+
+export function getOrganizationMonthlySpending() {
+	return apiRequest('/api/organization/monthly-spending', {
+		method: 'GET',
+	});
+}

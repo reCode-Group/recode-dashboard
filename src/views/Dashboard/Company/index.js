@@ -21,8 +21,8 @@ import { getCurrentUser } from 'services/auth';
 import { getOrganizationConversions } from 'services/conversions';
 import { getOrganizationDetails } from 'services/organization';
 import { mapConversion } from 'utils/conversions';
-import { invoicesData } from 'variables/general';
 import Documents from 'views/Dashboard/Billing/components/Documents';
+import useMonthlySpendingReports from 'views/Dashboard/Billing/useMonthlySpendingReports';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
 import CompanyInformation from './components/CompanyInformation';
 import CompanySettings from './components/CompanySettings';
@@ -36,6 +36,10 @@ const conversionDateFormat = {
 	hour: '2-digit',
 	minute: '2-digit',
 };
+
+function canViewOrganizationReports(user) {
+	return user?.has_organization === true && user?.organization_role === 'director';
+}
 
 function getCompanyName(organization) {
 	return organization?.short_name || organization?.full_name || emptyValue;
@@ -53,11 +57,20 @@ function Company() {
 	const [activeTab, setActiveTab] = useState(
 		queryTab === 'employees' || queryTab === 'documents' ? queryTab : 'settings'
 	);
+	const [currentUser, setCurrentUser] = useState(null);
 	const [organization, setOrganization] = useState(null);
 	const [conversions, setConversions] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState('');
 	const [redirectPath, setRedirectPath] = useState('');
+	const showReports = canViewOrganizationReports(currentUser);
+	const effectiveActiveTab = activeTab === 'documents' && !showReports ? 'settings' : activeTab;
+	const {
+		reports,
+		isLoading: isLoadingReports,
+		error: reportsError,
+		reload: reloadReports,
+	} = useMonthlySpendingReports(showReports);
 
 	const textColor = useColorModeValue('gray.700', 'white');
 	const borderProfileColor = useColorModeValue('white', 'rgba(255, 255, 255, 0.31)');
@@ -71,8 +84,9 @@ function Company() {
 		setError('');
 
 		try {
-			const currentUser = await getCurrentUser();
-			if (!currentUser.has_organization) {
+			const user = await getCurrentUser();
+			setCurrentUser(user);
+			if (!user.has_organization) {
 				setRedirectPath('/lk/company/reg');
 				return;
 			}
@@ -108,7 +122,9 @@ function Company() {
 	const tabs = [
 		{ id: 'settings', name: 'НАСТРОЙКИ', icon: <FaCog /> },
 		{ id: 'employees', name: 'СОТРУДНИКИ', icon: <FaUsers /> },
-		{ id: 'documents', name: 'ДОКУМЕНТЫ', icon: <IoDocumentsSharp /> },
+		...(showReports
+			? [{ id: 'documents', name: 'ДОКУМЕНТЫ', icon: <IoDocumentsSharp /> }]
+			: []),
 	];
 
 	if (isLoading) {
@@ -199,7 +215,7 @@ function Company() {
 							w={{ base: '100%', xl: 'none' }}
 						>
 							{tabs.map((tab) => {
-								const isActive = activeTab === tab.id;
+								const isActive = effectiveActiveTab === tab.id;
 								return (
 									<Button
 										key={tab.id}
@@ -235,9 +251,17 @@ function Company() {
 					</Box>
 
 					<Grid mt="24px" flex="1" minH="0">
-						{activeTab === 'documents' ? (
-							<Documents title="Документы компании" data={invoicesData} fixedHeight="403px" />
-						) : activeTab === 'employees' ? (
+						{effectiveActiveTab === 'documents' ? (
+							<Documents
+								title="Документы компании"
+								data={reports}
+								fixedHeight="403px"
+								isLoading={isLoadingReports}
+								error={reportsError}
+								onRetry={reloadReports}
+								showAllLink={false}
+							/>
+						) : effectiveActiveTab === 'employees' ? (
 							<EmployeeTable
 								withPageContainer={false}
 								showFullListButton={true}
@@ -257,7 +281,14 @@ function Company() {
 						<ConversionHistory
 							title="Последние конвертации"
 							amount={conversions.length}
-							captions={['ID', 'Тип', 'Статус', 'Результат перевода', 'Затраченные токены', 'Дата']}
+							captions={[
+								'ID',
+								'Тип',
+								'Статус',
+								'Результат перевода',
+								'Затраченные токены',
+								'Дата',
+							]}
 							data={conversions}
 							enablePagination={true}
 							showFullHistoryButton={true}
