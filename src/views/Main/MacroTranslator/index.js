@@ -22,6 +22,7 @@ import {
 	Text,
 	Textarea,
 	useColorModeValue,
+	useToast,
 } from '@chakra-ui/react';
 import BannerConstructor from 'assets/img/banner_constructor.png';
 import ConversionHistory from 'components/Tables/ConversionHistory';
@@ -63,6 +64,7 @@ const FREE_TRANSLATION_CHAR_LIMIT = 600;
 const FREE_TRANSLATION_LIMIT_MESSAGE = `В бесплатном переводе можно ввести не более ${FREE_TRANSLATION_CHAR_LIMIT} символов`;
 const CYRILLIC_PATTERN = /[\u0400-\u04FF]/;
 const VBA_PROCEDURE_PATTERN = /\b(?:Public|Private|Friend|Static)?\s*(Sub|Function)\s+[A-Za-z_][A-Za-z0-9_]*\b[\s\S]*?\bEnd\s+\1\b/i;
+const EMPTY_TRANSLATION_MESSAGE = 'Не удалось перевести макрос. Токены не списаны.';
 
 const conversionDateFormat = {
 	day: '2-digit',
@@ -101,6 +103,7 @@ function getTariffLabel(subscriptionName) {
 
 export default function MacroTranslatorPage() {
 	const navigate = useNavigate();
+	const toast = useToast();
 	const [source, setSource] = useState('');
 	const [translated, setTranslated] = useState('');
 	const [targetLanguage, setTargetLanguage] = useState('JS');
@@ -144,6 +147,8 @@ export default function MacroTranslatorPage() {
 	const activeTokenBalance =
 		isEmployeeTokenSource ? employeeTokens : personalTokens;
 	const isFreeTranslation = translationMode === TRANSLATION_MODE.FREE;
+	const hasTranslatedCode =
+		Boolean(translated.trim()) && translated !== EMPTY_TRANSLATION_MESSAGE;
 
 	const loadData = useCallback(async ({ showLoader = true } = {}) => {
 		if (showLoader) {
@@ -215,7 +220,7 @@ export default function MacroTranslatorPage() {
 	}, []);
 
 	const handleCopyResult = async () => {
-		if (!translated) return;
+		if (!hasTranslatedCode) return;
 		try {
 			await navigator.clipboard.writeText(translated);
 			setCopied(true);
@@ -231,7 +236,7 @@ export default function MacroTranslatorPage() {
 	};
 
 	const handleOpenIncorrectMacroModal = () => {
-		if (!translated.trim()) return;
+		if (!hasTranslatedCode) return;
 		setIncorrectMacroSnapshot(
 			lastConversion || { conversionId: '', source, translated, targetLanguage }
 		);
@@ -302,6 +307,20 @@ export default function MacroTranslatorPage() {
 				: await convertPaidMacro(paidRequestPayload);
 
 			const translatedCode = result?.target_code || '';
+			if (!translatedCode.trim()) {
+				setTranslated(EMPTY_TRANSLATION_MESSAGE);
+				setLastConversion(null);
+				toast({
+					title: 'Перевод не выполнен',
+					description: 'Сервис не вернул переведенный код. Токены не списаны.',
+					status: 'warning',
+					duration: 6000,
+					isClosable: true,
+				});
+				await loadData({ showLoader: false });
+				return;
+			}
+
 			setTranslated(translatedCode);
 			const refreshedHistory = await loadData({ showLoader: false });
 			const matchingConversion = refreshedHistory.find(
@@ -584,7 +603,7 @@ export default function MacroTranslatorPage() {
 									<Text fontSize="sm" color={textColor}>
 										Переведенный макрос
 									</Text>
-									{translated.trim() ? (
+									{hasTranslatedCode ? (
 										<Button
 											size="xs"
 											variant="link"
@@ -614,7 +633,7 @@ export default function MacroTranslatorPage() {
 										right="10px"
 										zIndex={2}
 										_hover={{ bg: 'gray.300' }}
-										// isDisabled={!translated}
+										isDisabled={!hasTranslatedCode}
 									>
 										{copied ? 'Скопировано.' : 'Копировать'}
 									</Button>
