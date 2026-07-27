@@ -8,7 +8,7 @@ import {
 	FormControl,
 	FormLabel,
 	Heading,
-	HStack,
+	// HStack,
 	Input,
 	InputGroup,
 	InputRightElement,
@@ -25,7 +25,7 @@ import {
 	useDisclosure,
 } from '@chakra-ui/react';
 import signInImage from 'assets/img/signInImage.png';
-import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
+// import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
 import { useRef, useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { confirmPasswordReset, login, requestPasswordReset } from 'services/auth';
@@ -75,8 +75,8 @@ function SignIn() {
 	const titleColor = useColorModeValue('recode.300', 'recode.200');
 	const textColor = useColorModeValue('gray.400', 'white');
 	const forgotPasswordColor = useColorModeValue('gray.500', 'gray.300');
-	const bgIcons = useColorModeValue('gray.50', 'rgba(255, 255, 255, 0.1)');
-	const iconColor = useColorModeValue('black', 'lightgray');
+	// const bgIcons = useColorModeValue('gray.50', 'rgba(255, 255, 255, 0.1)');
+	// const iconColor = useColorModeValue('black', 'lightgray');
 	const modalBg = useColorModeValue('rgba(255, 255, 255, 0.9)', 'rgba(26, 32, 44, 0.94)');
 	const modalSectionBg = useColorModeValue('rgba(255, 255, 255, 0.6)', 'rgba(23, 25, 35, 0.72)');
 	const modalBodyBg = useColorModeValue('white', 'gray.800');
@@ -398,7 +398,7 @@ function SignIn() {
 						>
 							Войти
 						</Button>
-						<Flex align="center" gap="12px" mb="18px" mt="4px">
+						{/* <Flex align="center" gap="12px" mb="18px" mt="4px">
 							<Box flex="1" h="1px" bg="gray.200" />
 							<Text
 								color="gray.400"
@@ -450,7 +450,7 @@ function SignIn() {
 									<YandexIdIcon color={iconColor} w="100px" h="23px" />
 								</Flex>
 							</HStack>
-						</Box>
+						</Box> */}
 						<Flex flexDirection="column" justifyContent="center" maxW="100%" mt="0px">
 							<Text color={textColor} fontWeight="medium">
 								Нет аккаунта?

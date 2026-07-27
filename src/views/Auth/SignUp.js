@@ -7,7 +7,7 @@ import {
 	Flex,
 	FormControl,
 	FormLabel,
-	HStack,
+	// HStack,
 	Input,
 	InputGroup,
 	InputRightElement,
@@ -16,7 +16,7 @@ import {
 	useColorModeValue,
 } from '@chakra-ui/react';
 import BgSignUp from 'assets/img/BgSignUp.png';
-import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
+// import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
 import AuthNavbar from 'components/Navbars/AuthNavbar.js';
 import { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
@@ -51,8 +51,8 @@ function SignUp() {
 	const textColor = useColorModeValue('gray.700', 'white');
 	const secondTextColor = useColorModeValue('gray.400', 'white');
 	const bgColor = useColorModeValue('white', 'gray.700');
-	const bgIcons = useColorModeValue('gray.50', 'rgba(255, 255, 255, 0.1)');
-	const iconColor = useColorModeValue('black', 'lightgray');
+	// const bgIcons = useColorModeValue('gray.50', 'rgba(255, 255, 255, 0.1)');
+	// const iconColor = useColorModeValue('black', 'lightgray');
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -204,7 +204,7 @@ function SignUp() {
 					<Text fontSize="xl" color={textColor} fontWeight="bold" textAlign="center" mb="22px">
 						{step === 'account' ? 'Регистрация' : 'Подтверждение почты'}
 					</Text>
-					{step === 'account' ? (
+					{/* {step === 'account' ? (
 						<HStack spacing="15px" justify="center" mb="25px">
 							<Flex
 								justify="center"
@@ -235,7 +235,7 @@ function SignUp() {
 								<YandexIdIcon color={iconColor} w="100px" h="23px" />
 							</Flex>
 						</HStack>
-					) : null}
+					) : null} */}
 					{error ? (
 						<Alert status="error" borderRadius="12px" mb="20px" fontSize="sm">
 							<AlertIcon />
