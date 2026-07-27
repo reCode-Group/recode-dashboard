@@ -177,6 +177,8 @@ export function Modals({ handlers }) {
 								</button>
 								<button
 									className="btn-create"
+									id="projectSettingsSaveButton"
+									type="button"
 									onClick={handlers.saveProjectName}
 									style={{ flex: 1 }}
 								>

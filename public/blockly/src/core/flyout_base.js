@@ -413,6 +413,8 @@ export class Flyout extends DeleteArea {
      * Hide and empty the flyout.
      */
     hide() {
+        const scrollbar = this.workspace_.scrollbar;
+        scrollbar?.setContainerVisible(false);
         if (!this.isVisible()) {
             return;
         }
@@ -594,6 +596,7 @@ export class Flyout extends DeleteArea {
         }
         // Close the flyout.
         this.targetWorkspace.hideChaff();
+        this.targetWorkspace.getToolbox()?.clearSelection();
         const newVariables = Variables.getAddedVariables(this.targetWorkspace, variablesBeforeCreation);
         if (eventUtils.isEnabled()) {
             eventUtils.setGroup(true);

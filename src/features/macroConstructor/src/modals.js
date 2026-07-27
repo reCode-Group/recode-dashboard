@@ -3,6 +3,8 @@ import {
   deleteActiveProject,
   getActiveProject,
   getProjects,
+  isActiveProjectDirty,
+  isActiveProjectDraft,
   openProject as openRemoteProject,
   patchActiveProjectData,
   refreshProjects,
@@ -22,6 +24,13 @@ function addListener(target, event, handler) {
   listeners.push(() => target.removeEventListener(event, handler));
 }
 
+function notifyModalStateChanged() {
+  const hasOpenModal = [...document.querySelectorAll('.modal-overlay')].some(
+    (overlay) => overlay.style.display === 'flex',
+  );
+  document.dispatchEvent(new CustomEvent('constructor:modal-state-changed', { detail: { hasOpenModal } }));
+}
+
 function closeOverlay(modalId) {
   const modal = document.getElementById(modalId);
   if (!modal) return;
@@ -32,6 +41,7 @@ function closeOverlay(modalId) {
       (overlay) => overlay.style.display === 'flex',
     );
     if (!hasOpenModal) document.body.style.overflow = 'auto';
+    notifyModalStateChanged();
   }, 300);
 }
 
@@ -41,6 +51,7 @@ function openOverlay(modalId) {
 
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  notifyModalStateChanged();
   setTimeout(() => {
     modal.style.opacity = '1';
   }, 10);
@@ -107,6 +118,14 @@ function selectProject(projectId) {
 }
 
 async function openProject(projectId) {
+  if (
+    isActiveProjectDraft() &&
+    isActiveProjectDirty() &&
+    !window.confirm('Несохраненные изменения в новом проекте будут потеряны. Открыть выбранный проект?')
+  ) {
+    return;
+  }
+
   try {
     await openRemoteProject(projectId);
     selectProject(projectId);
@@ -160,11 +179,15 @@ function loadProjects() {
     `;
 
     row.addEventListener('click', (e) => {
-      if (!e.target.closest('.action-btn')) selectProject(project.id);
+      if (e.target.closest('.action-btn')) return;
+      openProject(project.id);
     });
 
     const actionButton = row.querySelector('[data-open-project]');
-    actionButton?.addEventListener('click', () => openProject(project.id));
+    actionButton?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openProject(project.id);
+    });
 
     tableBody.appendChild(row);
   });
@@ -196,9 +219,18 @@ export async function confirmProjectCreation() {
     return;
   }
 
+  if (
+    isActiveProjectDraft() &&
+    isActiveProjectDirty() &&
+    !window.confirm('Несохраненные изменения в новом проекте будут потеряны. Создать новый проект?')
+  ) {
+    return;
+  }
+
   try {
     await createProject(name);
     closeProjectCreateModal();
+    closeModal();
     loadProjects();
     showToast('Проект создан.', 'success');
   } catch (error) {
@@ -266,23 +298,41 @@ export async function confirmProjectDeletion() {
 }
 
 export async function saveProjectName() {
-  const input = document.getElementById('projectNameInput');
-  const newName = input?.value.trim();
+	const input = document.getElementById('projectNameInput');
+	const saveButton = document.getElementById('projectSettingsSaveButton');
+	const newName = input?.value.trim();
 
-  if (!newName) {
-    showToast('Введите название проекта.', 'warning');
-    input?.focus();
-    return;
-  }
+	if (saveButton?.disabled) {
+		return;
+	}
 
-  try {
-    await renameActiveProject(newName);
-    closeProjectEditModal();
-    showToast('Настройки проекта сохранены.', 'success');
-  } catch (error) {
-    console.error('Project rename error:', error);
-    showToast('Не удалось сохранить настройки проекта.', 'error');
-  }
+	if (!newName) {
+		showToast('Введите название проекта.', 'warning');
+		input?.focus();
+		return;
+	}
+
+	try {
+		if (saveButton) {
+			saveButton.disabled = true;
+			saveButton.classList.add('is-loading');
+			saveButton.textContent = 'Сохраняем...';
+		}
+		await renameActiveProject(newName);
+		await refreshProjects();
+		loadProjects();
+		closeProjectEditModal();
+		showToast('Настройки проекта сохранены.', 'success');
+	} catch (error) {
+		console.error('Project rename error:', error);
+		showToast('Не удалось сохранить настройки проекта.', 'error');
+	} finally {
+		if (saveButton) {
+			saveButton.disabled = false;
+			saveButton.classList.remove('is-loading');
+			saveButton.textContent = 'Сохранить';
+		}
+	}
 }
 
 function getSelectedLanguage() {
@@ -308,6 +358,7 @@ export function openCodeFullModal() {
 
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  notifyModalStateChanged();
 
   setTimeout(() => {
     modal.style.opacity = '1';

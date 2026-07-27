@@ -10,6 +10,9 @@ export function Sidebar({handlers}) {
           <div className="autosave-badge">
             <span className="autosave-dot" />
             <span className="autosave">Автосохранение</span>
+            <button className="manual-save-btn" id="manual-save-project" type="button">
+              Сохранить
+            </button>
           </div>
         </div>
         <div className="actions-section">

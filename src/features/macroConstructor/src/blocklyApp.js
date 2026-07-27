@@ -5,7 +5,18 @@ import {luaGenerator} from '../blockly/lua.loader.mjs';
 import {javascriptGenerator} from '../blockly/javascript.loader.mjs';
 import {pythonGenerator} from '../blockly/python.loader.mjs';
 import {downloadScreenshot} from './screenshot.js';
-import {getActiveProject, initializeProjects, saveActiveProject} from './projectStore.js';
+import {
+  getActiveProject,
+  getProjects,
+  initializeProjects,
+  isActiveProjectDraft,
+  isActiveProjectDirty,
+  markActiveProjectDirty,
+  openProject as openRemoteProject,
+  registerProjectDataProvider,
+  saveActiveProject,
+} from './projectStore.js';
+import {openModal} from './modals.js';
 import {showToast} from './notifications.js';
 
 const DEFAULT_AUTOSAVE_INTERVAL = 180000;
@@ -20,9 +31,13 @@ export async function initBlocklyApp() {
   await loadScript('/blockly/msg/ru.js');
 
   let workspace = null;
-  let autosaveTimeout = null;
+  let autosaveTimer = null;
+  let activeAutosaveInterval = null;
   let isResettingProject = false;
   let isWorkspaceDirty = false;
+  let isAutosaving = false;
+  let unregisterProjectDataProvider = null;
+  let ignoreWorkspaceChangesUntil = 0;
 
   function updateEmptyState() {
     const emptyState = document.querySelector('.empty-state');
@@ -45,16 +60,70 @@ export async function initBlocklyApp() {
 
   async function persistWorkspace() {
     if (!workspace || isResettingProject) return;
-    if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
-    autosaveTimeout = null;
+    if (isActiveProjectDraft()) return null;
     const project = await saveActiveProject(getProjectData());
     isWorkspaceDirty = false;
     return project;
   }
 
+  async function saveProjectManually() {
+    if (!workspace || isResettingProject) return;
+
+    try {
+      if (isActiveProjectDraft()) {
+        await saveActiveProject(getProjectData(), { createIfDraft: true });
+      } else {
+        await saveActiveProject(getProjectData());
+      }
+      isWorkspaceDirty = false;
+      updateAutosaveTimer();
+      if (getAutosaveInterval() === 0) {
+        document.dispatchEvent(new CustomEvent('constructor:autosave-status', { detail: 'disabled' }));
+      }
+      showToast('Проект сохранен.', 'success');
+    } catch (error) {
+      console.error('Manual save error:', error);
+      showToast('Не удалось сохранить проект.', 'error');
+    }
+  }
+
   function getAutosaveInterval() {
     const interval = Number(getActiveProject()?.data?.autosave_interval_ms);
     return AUTOSAVE_INTERVALS.has(interval) ? interval : DEFAULT_AUTOSAVE_INTERVAL;
+  }
+
+  function stopAutosaveTimer() {
+    if (autosaveTimer) window.clearInterval(autosaveTimer);
+    autosaveTimer = null;
+    activeAutosaveInterval = null;
+  }
+
+  function updateAutosaveTimer() {
+    const autosaveInterval = getAutosaveInterval();
+    if (isActiveProjectDraft() || autosaveInterval === 0) {
+      stopAutosaveTimer();
+      document.dispatchEvent(new CustomEvent('constructor:autosave-status', {detail: 'disabled'}));
+      return;
+    }
+
+    if (autosaveTimer && activeAutosaveInterval === autosaveInterval) return;
+
+    stopAutosaveTimer();
+    activeAutosaveInterval = autosaveInterval;
+    autosaveTimer = window.setInterval(async () => {
+      if (!isWorkspaceDirty || isAutosaving || isResettingProject || hasOpenModal()) return;
+
+      isAutosaving = true;
+      try {
+        document.dispatchEvent(new CustomEvent('constructor:autosave-status', {detail: 'saving'}));
+        await persistWorkspace();
+      } catch (error) {
+        console.error('Autosave error:', error);
+        showToast('Не удалось сохранить проект. Повторим по таймеру.', 'error');
+      } finally {
+        isAutosaving = false;
+      }
+    }, autosaveInterval);
   }
 
   function formatLastSaved(value) {
@@ -73,34 +142,26 @@ export async function initBlocklyApp() {
     return formatter.format(date);
   }
 
-  function scheduleWorkspacePersistence() {
+  function isWorkspaceMutationEvent(event) {
+    if (!event) return true;
+    if (event.isUiEvent) return false;
+
+    return ['change', 'create', 'delete', 'move', 'var_create', 'var_delete', 'var_rename'].includes(event.type);
+  }
+
+  function scheduleWorkspacePersistence(event) {
     if (isResettingProject) return;
+    if (Date.now() < ignoreWorkspaceChangesUntil) return;
+    if (!isWorkspaceMutationEvent(event)) return;
+
     isWorkspaceDirty = true;
-    if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
-
-    const autosaveInterval = getAutosaveInterval();
-    if (autosaveInterval === 0) {
-      document.dispatchEvent(new CustomEvent('constructor:autosave-status', { detail: 'disabled' }));
-      return;
-    }
-
-    document.dispatchEvent(new CustomEvent('constructor:autosave-status', { detail: 'saving' }));
-
-    autosaveTimeout = window.setTimeout(async () => {
-      autosaveTimeout = null;
-      try {
-        await persistWorkspace();
-      } catch (error) {
-        console.error('Autosave error:', error);
-        showToast('Не удалось сохранить проект. Повторим при следующем изменении.', 'error');
-      }
-    }, autosaveInterval);
+    markActiveProjectDirty();
+    updateAutosaveTimer();
   }
 
   function resetProject() {
     if (!workspace) return;
-    if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
-    autosaveTimeout = null;
+    stopAutosaveTimer();
     isWorkspaceDirty = false;
     isResettingProject = true;
     workspace.clear();
@@ -113,23 +174,9 @@ export async function initBlocklyApp() {
   }
 
   function handleAutosaveIntervalChange() {
-    if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
-    autosaveTimeout = null;
-    persistWorkspace()
-      .then((project) => {
-        document.dispatchEvent(
-          new CustomEvent('constructor:autosave-status', {
-            detail:
-              getAutosaveInterval() === 0
-                ? {status: 'disabled'}
-                : {status: 'saved', savedAt: project?.updated_at || project?.updatedAt},
-          }),
-        );
-      })
-      .catch((error) => {
-        console.error('Autosave settings error:', error);
-        showToast('Не удалось сохранить настройки автосохранения.', 'error');
-      });
+    isWorkspaceDirty = true;
+    markActiveProjectDirty();
+    updateAutosaveTimer();
   }
 
   function loadProject(project) {
@@ -148,16 +195,46 @@ export async function initBlocklyApp() {
     const autosaveSelect = document.getElementById('autosaveIntervalSelect');
     if (autosaveSelect) autosaveSelect.value = String(getAutosaveInterval());
     isWorkspaceDirty = false;
+    ignoreWorkspaceChangesUntil = Date.now() + 500;
     updateEmptyState();
     isResettingProject = false;
+    updateAutosaveTimer();
     document.dispatchEvent(
       new CustomEvent('constructor:autosave-status', {
         detail:
-          getAutosaveInterval() === 0
+          isActiveProjectDraft() || getAutosaveInterval() === 0
             ? {status: 'disabled'}
             : {status: 'saved', savedAt: project.updated_at || project.updatedAt},
       }),
     );
+  }
+
+  function hasOpenModal() {
+    return [...document.querySelectorAll('.modal-overlay')].some((overlay) => overlay.style.display === 'flex');
+  }
+
+  function handleModalStateChanged() {
+    if (!hasOpenModal()) updateAutosaveTimer();
+  }
+
+  function handleBeforeUnload(event) {
+    if (!isActiveProjectDraft() || (!isWorkspaceDirty && !isActiveProjectDirty())) return;
+    event.preventDefault();
+    event.returnValue = '';
+  }
+
+  async function openInitialProjectFromQuery() {
+    const projectId = new URLSearchParams(window.location.search).get('project')?.trim();
+    if (!projectId) return false;
+
+    try {
+      await openRemoteProject(projectId);
+      return true;
+    } catch (error) {
+      console.error('Project query open error:', error);
+      showToast('Не удалось открыть проект.', 'error');
+      return false;
+    }
   }
 
   function showImportNotification(message, type) {
@@ -167,6 +244,10 @@ export async function initBlocklyApp() {
   function updateAutosaveStatus(event) {
     const detail = typeof event.detail === 'object' && event.detail !== null ? event.detail : {status: event.detail || 'saved'};
     const status = detail.status || 'saved';
+    if (status === 'saved') {
+      isWorkspaceDirty = false;
+    }
+
     const labels = {
       saved: `Всё сохранено · ${formatLastSaved(detail.savedAt || new Date())}`,
       saving: 'Сохранение...',
@@ -174,13 +255,17 @@ export async function initBlocklyApp() {
     };
     const className = `autosave-state-${status}`;
 
-    document.querySelectorAll('.project-info .status-dot, .autosave-dot').forEach((node) => {
+    document.querySelectorAll('.project-info .status-dot, .autosave-dot, .autosave-badge').forEach((node) => {
       node.classList.remove('autosave-state-saved', 'autosave-state-saving', 'autosave-state-disabled');
       node.classList.add(className);
     });
 
     document.querySelectorAll('.autosave').forEach((node) => {
       node.textContent = labels[status] || labels.saved;
+    });
+
+    document.querySelectorAll('.manual-save-btn').forEach((node) => {
+      node.disabled = status === 'saving';
     });
   }
 
@@ -361,12 +446,24 @@ export async function initBlocklyApp() {
     document.getElementById('save-json').addEventListener('click', saveJson);
     document.getElementById('import').addEventListener('click', load);
     document.getElementById('importExport').addEventListener('input', taChange);
+    document.getElementById('manual-save-project')?.addEventListener('click', saveProjectManually);
+    document.addEventListener('keydown', handleSaveShortcut, true);
   }
 
   function removeEventHandlers() {
     document.getElementById('save-json')?.removeEventListener('click', saveJson);
     document.getElementById('import')?.removeEventListener('click', load);
     document.getElementById('importExport')?.removeEventListener('input', taChange);
+    document.getElementById('manual-save-project')?.removeEventListener('click', saveProjectManually);
+    document.removeEventListener('keydown', handleSaveShortcut, true);
+  }
+
+  function handleSaveShortcut(event) {
+    if (!(event.ctrlKey || event.metaKey)) return;
+    if (event.code !== 'KeyS' && event.key?.toLowerCase() !== 's') return;
+    event.preventDefault();
+    event.stopPropagation();
+    saveProjectManually();
   }
 
   function setupFirstBlockMechanism() {
@@ -450,10 +547,13 @@ export async function initBlocklyApp() {
     workspace.configureContextMenu = configureContextMenu;
     Blockly.ContextMenuItems.registerCommentOptions();
 
+    unregisterProjectDataProvider = registerProjectDataProvider(getProjectData);
     workspace.addChangeListener(scheduleWorkspacePersistence);
     document.addEventListener('constructor:project-loaded', onProjectLoaded);
     document.addEventListener('constructor:autosave-interval-changed', handleAutosaveIntervalChange);
     document.addEventListener('constructor:autosave-status', updateAutosaveStatus);
+    document.addEventListener('constructor:modal-state-changed', handleModalStateChanged);
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     if (sessionStorage) {
       const text = sessionStorage.getItem('textarea');
@@ -486,6 +586,10 @@ export async function initBlocklyApp() {
 
     try {
       await initializeProjects();
+      const isQueryProjectOpen = await openInitialProjectFromQuery();
+      if (!isQueryProjectOpen && getProjects().length > 0) {
+        openModal();
+      }
     } catch (error) {
       console.error('Project initialization error:', error);
       showToast('Не удалось загрузить проекты.', 'error');
@@ -500,10 +604,13 @@ export async function initBlocklyApp() {
 
   return () => {
     removeEventHandlers();
-    if (autosaveTimeout) window.clearTimeout(autosaveTimeout);
+    stopAutosaveTimer();
+    unregisterProjectDataProvider?.();
     document.removeEventListener('constructor:project-loaded', onProjectLoaded);
     document.removeEventListener('constructor:autosave-interval-changed', handleAutosaveIntervalChange);
     document.removeEventListener('constructor:autosave-status', updateAutosaveStatus);
+    document.removeEventListener('constructor:modal-state-changed', handleModalStateChanged);
+    window.removeEventListener('beforeunload', handleBeforeUnload);
     workspace?.removeChangeListener(scheduleWorkspacePersistence);
     workspace?.dispose();
   };

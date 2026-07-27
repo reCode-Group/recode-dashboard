@@ -305,8 +305,17 @@ input[type=number] {
 }
 
 .blocklyFlyoutScrollbar {
-  padding: -2rem !important;
   z-index: 30;
+}
+
+.blocklyToolboxFlyout[style*="display: none"] ~ .blocklyFlyoutScrollbar,
+.blocklyToolboxFlyout[display="none"] ~ .blocklyFlyoutScrollbar {
+  display: none !important;
+}
+
+.blocklyScrollbarHorizontal[display="none"],
+.blocklyScrollbarVertical[display="none"] {
+  display: none !important;
 }
 
 .blocklyScrollbarHorizontal,
