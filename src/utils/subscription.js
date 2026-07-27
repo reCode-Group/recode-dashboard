@@ -65,10 +65,10 @@ export function buildCurrentTariffCardData(subscription) {
 	const isActive = Boolean(subscription?.is_active);
 
 	return {
-		title: 'Ваш тариф',
+		title: 'Ваш пакет',
 		tariffName: hasSubscription
-			? String(subscription?.package_name || 'Тариф не указан').toUpperCase()
-			: 'НЕТ ТАРИФА',
+			? String(subscription?.package_name || 'Пакет не указан').toUpperCase()
+			: 'НЕТ ПАКЕТА',
 		statusLabel: hasSubscription ? (isActive ? 'Активен' : 'Не активен') : 'Не подключен',
 		statusColor: hasSubscription && isActive ? '#48BB78' : '#A0AEC0',
 		validUntil: {

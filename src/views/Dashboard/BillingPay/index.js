@@ -334,7 +334,7 @@ function BillingPay() {
 				if (!isMounted) return;
 
 				setTariffs([]);
-				setTariffsError(error.message || 'Не удалось загрузить тарифы');
+				setTariffsError(error.message || 'Не удалось загрузить пакеты');
 			} finally {
 				if (isMounted) {
 					setIsLoadingTariffs(false);
@@ -384,7 +384,7 @@ function BillingPay() {
 							toast({
 								id: `payment-success-${attempt.paymentId}`,
 								title: 'Оплата подтверждена',
-								description: 'Тариф и личный баланс обновлены.',
+								description: 'Пакет и личный баланс обновлены.',
 								status: 'success',
 								duration: 6000,
 								isClosable: true,
@@ -623,7 +623,7 @@ function BillingPay() {
 										value={accountType}
 										onChange={handleAccountTypeChange}
 										title="Куда зачислить токены"
-										description="Выберите личный баланс или счёт организации перед выбором тарифа"
+										description="Выберите личный баланс или счёт организации перед выбором пакета"
 										variant="compact"
 									/>
 								</Box>
@@ -643,7 +643,7 @@ function BillingPay() {
 										<Box>
 											<AlertTitle fontSize="sm">Проверяем предыдущий платёж</AlertTitle>
 											<AlertDescription fontSize="sm">
-												Тариф обновится автоматически после подтверждения банка.
+												Пакет токенов зачислится автоматически после подтверждения банка.
 											</AlertDescription>
 										</Box>
 									</Alert>
@@ -652,7 +652,7 @@ function BillingPay() {
 								{paymentReturnStatus === 'success' && !pendingPayment && !isPaymentConfirmed ? (
 									<Alert status="info" borderRadius="12px">
 										<AlertIcon />
-										Платёж принят банком и ожидает подтверждения. Тариф обновится автоматически.
+										Платёж принят банком и ожидает подтверждения. Пакет обновится автоматически.
 									</Alert>
 								) : null}
 
@@ -705,13 +705,13 @@ function BillingPay() {
 
 								<FormControl>
 									<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
-										Тариф
+										Пакет
 									</FormLabel>
 									<Select
 										value={tariffId}
 										onChange={handleTariffChange}
 										bg={inputBg}
-										placeholder={isLoadingTariffs ? 'Загрузка...' : 'Выберите тариф'}
+										placeholder={isLoadingTariffs ? 'Загрузка...' : 'Выберите пакет'}
 										isDisabled={isLoadingTariffs || tariffs.length === 0}
 										{...inputStyles}
 									>
@@ -806,7 +806,7 @@ function BillingPay() {
 									Оплата подтверждена
 								</Text>
 								<Text mt="8px" color={subtitleColor}>
-									Тариф и личный баланс успешно обновлены.
+									Пакет токенов успешно зачислен на счет.
 								</Text>
 								<Text mt="6px" fontSize="sm" color={subtitleColor}>
 									Окно оплаты закроется через {paymentSuccessCloseSeconds} сек.
@@ -848,7 +848,7 @@ function BillingPay() {
 									navigate('/lk/tariff');
 								}}
 							>
-								Перейти к тарифам
+								Перейти к пакетам
 							</Button>
 						) : (
 							<Button variant="ghost" onClick={handlePaymentModalClose}>

@@ -55,7 +55,7 @@ function PeriodSwitcher({ value, onChange }) {
 }
 
 function OtherTariffs({
-	title = 'Другие тарифы',
+	title = 'Другие пакеты',
 	tariffs = [],
 	isLoading = false,
 	error = '',
@@ -70,7 +70,7 @@ function OtherTariffs({
 
 	const renderedTariffs = tariffs.map((tariff) => ({
 		id: tariff.id,
-		name: String(tariff.name || 'Тариф').toUpperCase(),
+		name: String(tariff.name || 'Пакет').toUpperCase(),
 		tokensLabel: `${formatTokenValue(tariff.amount)}`,
 		priceLabel:
 			period === 'year'
@@ -106,7 +106,7 @@ function OtherTariffs({
 				) : renderedTariffs.length === 0 ? (
 					<Flex flex="1" minH="220px" align="center" justify="center">
 						<Text color={subtitleColor} textAlign="center">
-							Другие тарифы пока недоступны
+							Другие пакеты пока недоступны
 						</Text>
 					</Flex>
 				) : (

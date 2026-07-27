@@ -15,7 +15,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { formatTariffPrice, formatTokenValue } from 'utils/subscription';
 
 function OtherTariffs({
-	title = 'Другие тарифы',
+	title = 'Другие пакеты',
 	tariffs = [],
 	isLoading = false,
 	error = '',
@@ -29,7 +29,7 @@ function OtherTariffs({
 
 	const renderedTariffs = tariffs.map((tariff) => ({
 		id: tariff.id,
-		name: String(tariff.name || 'Тариф').toUpperCase(),
+		name: String(tariff.name || 'Пакет').toUpperCase(),
 		tokensLabel: `${formatTokenValue(tariff.amount)}`,
 		priceLabel: formatTariffPrice(tariff.price),
 		paymentPath: `/lk/billing/pay?package=${encodeURIComponent(tariff.id)}`,
@@ -68,7 +68,7 @@ function OtherTariffs({
 				) : renderedTariffs.length === 0 ? (
 					<Flex flex="1" minH="220px" align="center" justify="center">
 						<Text color={subtitleColor} textAlign="center">
-							Другие тарифы пока недоступны
+							Другие пакеты пока недоступны
 						</Text>
 					</Flex>
 				) : (

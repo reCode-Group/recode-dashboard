@@ -27,13 +27,13 @@ const ROUTE_METADATA = {
 	[routePaths.public.macroConstructor()]: {
 		title: `Конструктор макросов — ${BRAND_NAME}`,
 		description:
-			'Создание и редактирование макросов в конструкторе Рекод для пользователей расширенных тарифов.',
+			'Создание и редактирование макросов в конструкторе Рекод для пользователей расширенных пакетных тарифах.',
 		robots: 'noindex, nofollow',
 	},
 	[routePaths.auth.login()]: {
 		title: `Вход в личный кабинет — ${BRAND_NAME}`,
 		description:
-			'Вход в личный кабинет платформы Рекод для работы с макросами, компанией и тарифами.',
+			'Вход в личный кабинет платформы Рекод для работы с макросами, компанией и пакетами.',
 		robots: 'noindex, nofollow',
 	},
 	[routePaths.auth.signUp()]: {
@@ -45,7 +45,7 @@ const ROUTE_METADATA = {
 	[routePaths.dashboard.home()]: {
 		title: `Личный кабинет — ${BRAND_NAME}`,
 		description:
-			'Обзор аккаунта, тарифа, токенов, сотрудников и последних конвертаций в личном кабинете Рекод.',
+			'Обзор аккаунта, пакета, токенов, сотрудников и последних конвертаций в личном кабинете Рекод.',
 		robots: 'noindex, nofollow',
 	},
 	[routePaths.dashboard.profile()]: {
@@ -76,13 +76,13 @@ const ROUTE_METADATA = {
 		robots: 'noindex, nofollow',
 	},
 	[routePaths.dashboard.tariff()]: {
-		title: `Тарифы и пакеты токенов — ${BRAND_NAME}`,
-		description: 'Информация о текущем тарифе, доступных пакетах токенов и способах оплаты.',
+		title: `Пакеты токенов — ${BRAND_NAME}`,
+		description: 'Информация о текущем пакете, доступных пакетах токенов и способах оплаты.',
 		robots: 'noindex, nofollow',
 	},
 	[routePaths.dashboard.billingPay()]: {
 		title: `Оплата услуг — ${BRAND_NAME}`,
-		description: 'Выбор тарифа и способа оплаты услуг платформы Рекод.',
+		description: 'Выбор пакета и способа оплаты услуг платформы Рекод.',
 		robots: 'noindex, nofollow',
 	},
 	[routePaths.dashboard.support()]: {

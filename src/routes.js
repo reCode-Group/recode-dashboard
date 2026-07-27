@@ -89,7 +89,7 @@ const dashRoutes = [
 	},
 	{
 		path: '/tariff',
-		name: 'Тариф',
+		name: 'Пакеты',
 		icon: <RocketIcon color="inherit" />,
 		component: Tariff,
 		layout: '/lk',

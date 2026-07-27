@@ -4,6 +4,7 @@ import {
 	AlertIcon,
 	Box,
 	Button,
+	Checkbox,
 	Flex,
 	FormControl,
 	FormLabel,
@@ -24,6 +25,12 @@ import { login, register, sendVerificationCode, verifyCode } from 'services/auth
 import { markAuthenticated, setPendingProfileEmail, setPendingProfileName } from 'services/session';
 import PasswordStrength, { getPasswordStrength } from './components/PasswordStrength';
 import useResendCooldown from './hooks/useResendCooldown';
+
+const getDocumentHref = (fileName) =>
+	`${import.meta.env.BASE_URL}docs/${encodeURIComponent(fileName)}`;
+
+const PERSONAL_DATA_CONSENT_HREF = getDocumentHref('Согласие_на_обработку_персональных_данных.pdf');
+const PRIVACY_POLICY_HREF = getDocumentHref('Политика_конфиденциальности.pdf');
 
 function getFriendlyError(error) {
 	const message = error.message || '';
@@ -59,6 +66,7 @@ function SignUp() {
 	const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [code, setCode] = useState('');
+	const [isLegalAccepted, setIsLegalAccepted] = useState(false);
 	const [step, setStep] = useState('account');
 	const [error, setError] = useState('');
 	const [notice, setNotice] = useState('');
@@ -78,6 +86,10 @@ function SignUp() {
 		}
 		if (!getPasswordStrength(password).isValid) {
 			setError('Пароль пока слишком простой');
+			return;
+		}
+		if (!isLegalAccepted) {
+			setError('Подтвердите согласие на обработку персональных данных и принятие Политики конфиденциальности');
 			return;
 		}
 
@@ -323,6 +335,37 @@ function SignUp() {
 								</InputGroup>
 								<PasswordStrength password={password} isActive={isPasswordFocused} mb="24px" />
 							</FormControl>
+							<Checkbox
+								isChecked={isLegalAccepted}
+								onChange={(event) => setIsLegalAccepted(event.target.checked)}
+								isDisabled={isSubmitting}
+								alignItems="flex-start"
+								colorScheme="blue"
+								mb="24px"
+							>
+								<Text as="span" color={secondTextColor} fontSize="sm" lineHeight="1.45">
+									Даю согласие на{' '}
+									<Link
+										href={PERSONAL_DATA_CONSENT_HREF}
+										target="_blank"
+										rel="noreferrer"
+										color={titleColor}
+										fontWeight="600"
+									>
+										обработку персональных данных
+									</Link>{' '}
+									и принимаю{' '}
+									<Link
+										href={PRIVACY_POLICY_HREF}
+										target="_blank"
+										rel="noreferrer"
+										color={titleColor}
+										fontWeight="600"
+									>
+										Политику конфиденциальности
+									</Link>
+								</Text>
+							</Checkbox>
 						</>
 					) : (
 						<>

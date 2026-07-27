@@ -46,7 +46,7 @@ const EXPLANATIONS = {
 			bullets: [
 				'Доступные способы оплаты будут показаны на форме Т-Банка.',
 				'Онлайн-покупка пополняет ваш личный баланс.',
-				'После подтверждения банком тариф и личный баланс обновятся автоматически.',
+				'После подтверждения банком пакет токенов зачислится автоматически.',
 			],
 		},
 		statement: {
@@ -171,7 +171,7 @@ export const AccountFundingSwitcher = ({
 									onChange?.(option.id);
 									toast({
 										id: 'payment-account-select-tariff',
-										title: 'Теперь выберите тариф',
+										title: 'Теперь выберите пакет',
 										description: 'Нажмите на подходящий пакет токенов, чтобы перейти к оплате.',
 										status: 'info',
 										position: 'bottom-right',
@@ -267,7 +267,7 @@ const PaymentMethod = ({
 		if (!showExplanations) {
 			toast({
 				id: 'payment-method-select-tariff',
-				title: 'Теперь выберите тариф',
+				title: 'Теперь выберите пакет',
 				description: 'Нажмите на подходящий пакет токенов, чтобы перейти к оплате.',
 				status: 'info',
 				position: 'bottom-right',

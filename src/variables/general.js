@@ -284,7 +284,7 @@ export const billingData = [
 
 export const newestTransactions = [
 	{
-		name: 'Оплата тарифа',
+		name: 'Оплата пакета',
 		date: '27 Март 2021, в 12:30 (МСК)',
 		price: '- 2 500 руб.',
 		logo: FaArrowDown,
@@ -317,7 +317,7 @@ export const olderTransactions = [
 		logo: AiOutlineExclamation,
 	},
 	{
-		name: 'Оплата тарифа',
+		name: 'Оплата пакета',
 		date: '25 Март 2021, в 16:30 (МСК)',
 		price: '- 987 руб.',
 		logo: FaArrowDown,

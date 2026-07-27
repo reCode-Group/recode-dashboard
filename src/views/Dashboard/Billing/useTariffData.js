@@ -14,7 +14,7 @@ const defaultTariffState = {
 };
 
 function getErrorMessage(error) {
-	return error?.message || 'Не удалось загрузить тарифы';
+	return error?.message || 'Не удалось загрузить пакеты';
 }
 
 export default function useTariffData() {

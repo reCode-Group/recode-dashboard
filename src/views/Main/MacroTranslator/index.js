@@ -98,7 +98,7 @@ function getTokenPanelLabel(tokenSource) {
 }
 
 function getTariffLabel(subscriptionName) {
-	return subscriptionName || 'Нет тарифа';
+	return subscriptionName || 'Нет пакета';
 }
 
 export default function MacroTranslatorPage() {
@@ -121,7 +121,7 @@ export default function MacroTranslatorPage() {
 	const [isConverting, setIsConverting] = useState(false);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [user, setUser] = useState(null);
-	const [subscriptionName, setSubscriptionName] = useState('Нет тарифа');
+	const [subscriptionName, setSubscriptionName] = useState('Нет пакета');
 	const [translationMode, setTranslationMode] = useState(TRANSLATION_MODE.FREE);
 	const [selectedTokenSource, setSelectedTokenSource] = useState(TOKEN_SOURCE.PERSONAL);
 	const [historyItems, setHistoryItems] = useState([]);
@@ -181,7 +181,7 @@ export default function MacroTranslatorPage() {
 			if (isUnauthorizedError(error)) {
 				setIsAuthenticated(false);
 				setUser(null);
-				setSubscriptionName('Нет тарифа');
+				setSubscriptionName('Нет пакета');
 				setHistoryItems([]);
 				setSelectedTokenSource(TOKEN_SOURCE.PERSONAL);
 			} else {
@@ -676,7 +676,7 @@ export default function MacroTranslatorPage() {
 										</Text>
 									</Text>
 									<Text fontSize="xs" fontWeight="500" color={mutedColor}>
-										ТАРИФ:{' '}
+										ПАКЕТ:{' '}
 										<Link color={textColor} textDecor="underline">
 											{getTariffLabel(subscriptionName)}
 										</Link>
@@ -694,7 +694,7 @@ export default function MacroTranslatorPage() {
 									onClick={() => navigate('/lk/tariff')}
 									_hover={{ bg: 'gray.300' }}
 								>
-									ТАРИФЫ
+									ПАКЕТЫ
 								</Button>
 							</Flex>
 

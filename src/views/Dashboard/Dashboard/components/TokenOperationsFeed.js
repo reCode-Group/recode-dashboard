@@ -59,7 +59,7 @@ function normalizeHistoryItem(item) {
 	if (item?.type === 'purchase' && operationType === 'subscription_purchase') {
 		return {
 			id: item.id,
-			title: 'Покупка тарифа',
+			title: 'Покупка пакета',
 			description: 'Пакет токенов пополнен',
 			metaLabel: payload.payment_id ? `Платёж #${payload.payment_id}` : 'Пополнение баланса',
 			amount,

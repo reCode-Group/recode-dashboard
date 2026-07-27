@@ -191,7 +191,7 @@ export default function Dashboard() {
 			) : (
 				<SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing="24px">
 					<MiniStatistics
-						title={'Тариф'}
+						title={'Пакет'}
 						amount={subscriptionStats.packageName}
 						icon={<WalletIcon h={'24px'} w={'24px'} color={iconBoxInside} />}
 					/>
@@ -210,7 +210,7 @@ export default function Dashboard() {
 								? () => setRedirectPath('/lk/tariff')
 								: undefined
 						}
-						inlineActionLabel="Перейти к тарифам"
+						inlineActionLabel="Перейти к пакетам"
 					/>
 					{showEmployeesStats ? (
 						<MiniStatistics
@@ -245,8 +245,8 @@ export default function Dashboard() {
 						<>
 							Управляйте компанией, добавляйте сотрудников и распределяйте токены.
 							<br />
-							Покупайте тарифы, переводите макросы и отслеживайте статистику: история переводов,
-							расход токенов.
+							Покупайте пакеты токенов, переводите макросы и отслеживайте статистику: история
+							переводов, расход токенов.
 						</>
 					}
 					image={
