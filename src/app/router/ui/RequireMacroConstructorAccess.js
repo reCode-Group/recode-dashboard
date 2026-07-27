@@ -18,13 +18,9 @@ import {
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
+import { getMacroConstructorAccess } from 'services/macroConstructor';
 import { clearAuthState, hasAuthState } from 'services/session';
-import { getUserSubscription } from 'services/subscription';
-import { isNoSubscriptionError } from 'utils/subscription';
 import { routePaths } from '../routePaths';
-
-const MINIMUM_TOKEN_PACKAGE_ID = 2;
-const IS_DEVELOPMENT = import.meta.env.DEV;
 
 function AccessLoadingScreen() {
 	const background = useColorModeValue('gray.50', 'gray.900');
@@ -179,20 +175,14 @@ export function RequireMacroConstructorAccess() {
 			if (!isMounted) return;
 			setCurrentUser(user);
 
-			if (IS_DEVELOPMENT) {
-				setStatus('authorized');
-				return;
-			}
-
 			try {
-				const subscription = await getUserSubscription();
+				const access = await getMacroConstructorAccess();
 				if (!isMounted) return;
 
-				const tokenPackageId = Number(subscription?.token_package_id);
-				setStatus(tokenPackageId >= MINIMUM_TOKEN_PACKAGE_ID ? 'authorized' : 'blocked');
-			} catch (error) {
+				setStatus(access?.has_access ? 'authorized' : 'blocked');
+			} catch {
 				if (!isMounted) return;
-				setStatus(isNoSubscriptionError(error) ? 'blocked' : 'error');
+				setStatus('error');
 			}
 		}
 

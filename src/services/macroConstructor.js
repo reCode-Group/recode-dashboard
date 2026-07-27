@@ -1,6 +1,11 @@
 import { apiRequest } from './apiClient';
 
 const PROJECTS_PATH = '/api/macro-constructor/projects';
+const ACCESS_PATH = '/api/macro-constructor/access';
+
+export function getMacroConstructorAccess() {
+	return apiRequest(ACCESS_PATH, { method: 'GET' });
+}
 
 export function listMacroConstructorProjects() {
 	return apiRequest(PROJECTS_PATH, { method: 'GET' });
