@@ -2,6 +2,7 @@ import { lazy } from 'react';
 
 import {
 	CompanyIcon,
+	ConstructorIcon,
 	ConverterIcon,
 	EmployersIcon,
 	HistoryIcon,
@@ -121,13 +122,6 @@ const dashRoutes = [
 				hiddenInSidebar: true,
 			},
 			{
-				path: '/constructor',
-				name: 'Конструктор макросов',
-				component: MacroConstructorPage,
-				layout: '',
-				hiddenInSidebar: true,
-			},
-			{
 				path: '/translator',
 				name: 'Перейти в переводчик',
 				icon: <ConverterIcon color="inherit" />,
@@ -137,7 +131,7 @@ const dashRoutes = [
 			{
 				path: '/constructor',
 				name: 'Конструктор макросов',
-				icon: <ConverterIcon color="inherit" />,
+				icon: <ConstructorIcon color="inherit" />,
 				component: MacroConstructorPage,
 				layout: '',
 			},
