@@ -61,6 +61,8 @@ const TRANSLATION_MODE = {
 const FREE_TRANSLATIONS_PER_DAY = 4;
 const FREE_TRANSLATION_CHAR_LIMIT = 600;
 const FREE_TRANSLATION_LIMIT_MESSAGE = `В бесплатном переводе можно ввести не более ${FREE_TRANSLATION_CHAR_LIMIT} символов`;
+const CYRILLIC_PATTERN = /[\u0400-\u04FF]/;
+const VBA_PROCEDURE_PATTERN = /\b(?:Public|Private|Friend|Static)?\s*(Sub|Function)\s+[A-Za-z_][A-Za-z0-9_]*\b[\s\S]*?\bEnd\s+\1\b/i;
 
 const conversionDateFormat = {
 	day: '2-digit',
@@ -82,6 +84,11 @@ function isUnauthorizedError(error) {
 function isNoSubscriptionError(error) {
 	const message = error?.message || '';
 	return NO_SUBSCRIPTION_MESSAGES.some((knownMessage) => message.includes(knownMessage));
+}
+
+function isValidVbaMacro(value) {
+	const code = String(value || '').trim();
+	return Boolean(code) && !CYRILLIC_PATTERN.test(code) && VBA_PROCEDURE_PATTERN.test(code);
 }
 
 function getTokenPanelLabel(tokenSource) {
@@ -133,8 +140,9 @@ export default function MacroTranslatorPage() {
 		user?.has_organization === true && user?.organization_status === 'active';
 	const personalTokens = Number(user?.personal_tokens_remain) || 0;
 	const employeeTokens = Number(user?.organization_tokens_remain) || 0;
+	const isEmployeeTokenSource = selectedTokenSource === TOKEN_SOURCE.EMPLOYEE;
 	const activeTokenBalance =
-		selectedTokenSource === TOKEN_SOURCE.EMPLOYEE ? employeeTokens : personalTokens;
+		isEmployeeTokenSource ? employeeTokens : personalTokens;
 	const isFreeTranslation = translationMode === TRANSLATION_MODE.FREE;
 
 	const loadData = useCallback(async ({ showLoader = true } = {}) => {
@@ -263,6 +271,13 @@ export default function MacroTranslatorPage() {
 			return;
 		}
 
+		if (!isValidVbaMacro(source)) {
+			setErrorMessage('Введенный код некорректный или не найдена конструкция макроса');
+			setTranslated('');
+			setLastConversion(null);
+			return;
+		}
+
 		if (!isAuthenticated) {
 			navigate('/auth/login-page');
 			return;
@@ -278,12 +293,13 @@ export default function MacroTranslatorPage() {
 				origin_language: 'VBA',
 				target_language: targetLanguage,
 			};
+			const paidRequestPayload = {
+				...requestPayload,
+				as_employee: isEmployeeTokenSource,
+			};
 			const result = isFreeTranslation
 				? await convertFreeMacro(requestPayload)
-				: await convertPaidMacro({
-						...requestPayload,
-						as_employee: selectedTokenSource === TOKEN_SOURCE.EMPLOYEE,
-				  });
+				: await convertPaidMacro(paidRequestPayload);
 
 			const translatedCode = result?.target_code || '';
 			setTranslated(translatedCode);
@@ -310,7 +326,9 @@ export default function MacroTranslatorPage() {
 			}
 
 			if (String(error?.message || '').includes('not enough tokens')) {
-				setErrorMessage('Недостаточно токенов на выбранном счете');
+				setErrorMessage(
+					'Превышен дневной лимит на бесплатные переводы. Чтобы продолжить, необходимо приобрести пакет токенов.'
+				);
 				return;
 			}
 
