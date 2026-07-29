@@ -157,7 +157,7 @@ export function Modals({ handlers }) {
 							<div className="danger-zone">
 								<div>
 									<h3>Удаление проекта</h3>
-									<p>Проект будет удалён на сервере вместе с блоками и настройками.</p>
+									<p>Проект будет удалён вместе с блоками и настройками.</p>
 								</div>
 								<button
 									className="btn-danger"
