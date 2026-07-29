@@ -56,6 +56,13 @@ function scrollToPageTop() {
 	window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+function getUserFullName(user) {
+	return [user?.surname, user?.name, user?.lastname]
+		.map((part) => part?.trim())
+		.filter(Boolean)
+		.join(' ');
+}
+
 function getErrorMessage(error) {
 	const message = error.message || '';
 	if (message.includes('user already in organization')) {
@@ -191,7 +198,8 @@ function CompanyRegistration() {
 	}, [dadataEnabled, searchQuery, selectedSuggestion]);
 
 	const finalOrganizationEmail = form.orgEmail.trim();
-	const finalResponsibleName = sameAsOwner ? currentUser?.name || form.contactFio : form.contactFio;
+	const ownerFullName = getUserFullName(currentUser);
+	const finalResponsibleName = sameAsOwner ? ownerFullName || form.contactFio : form.contactFio;
 	const finalResponsiblePosition = sameAsOwner ? 'Владелец текущего профиля' : form.contactPosition;
 	const finalResponsiblePhone = sameAsOwner
 		? currentUser?.phone || form.contactPhone
