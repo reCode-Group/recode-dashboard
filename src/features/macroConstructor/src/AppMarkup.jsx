@@ -7,7 +7,7 @@ import { Sidebar } from './components/Sidebar.jsx';
 
 export function AppMarkup({ handlers, isReady, viewerContext, organization }) {
   return (
-    <div>
+    <div className="macro-constructor-page">
       <LoaderOverlay visible={!isReady} />
       <div style={{ visibility: isReady ? 'visible' : 'hidden' }}>
         <Header handlers={handlers} viewerContext={viewerContext} organization={organization} />

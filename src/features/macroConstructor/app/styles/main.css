@@ -18,6 +18,31 @@ body {
 	color: var(--text-dark);
 }
 
+.macro-constructor-page :is(button, a, input, textarea, select, [tabindex], [role='button']):focus,
+.macro-constructor-page :is(button, a, input, textarea, select, [tabindex], [role='button']):focus-visible,
+.macro-constructor-page #blocklyDiv *:focus,
+.macro-constructor-page #blocklyDiv *:focus-visible,
+.macro-constructor-page .blocklyToolbox:focus,
+.macro-constructor-page .blocklyToolbox:focus-visible,
+.macro-constructor-page .blocklyToolboxCategory:focus,
+.macro-constructor-page .blocklyToolboxCategory:focus-visible,
+.macro-constructor-page .blocklyFlyout:focus,
+.macro-constructor-page .blocklyFlyout:focus-visible,
+.macro-constructor-page .blocklyFlyoutButton:focus,
+.macro-constructor-page .blocklyFlyoutButton:focus-visible,
+.macro-constructor-page .blocklySvg:focus,
+.macro-constructor-page .blocklySvg:focus-visible,
+.macro-constructor-page .injectionDiv:focus,
+.macro-constructor-page .injectionDiv:focus-visible {
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+.macro-constructor-page,
+.macro-constructor-page * {
+	-webkit-tap-highlight-color: transparent;
+}
+
 .glass {
 	backdrop-filter: blur(12px);
 	background: rgba(255, 255, 255, 0.75);
