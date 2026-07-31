@@ -62,8 +62,7 @@ const TRANSLATION_MODE = {
 const FREE_TRANSLATIONS_PER_DAY = 4;
 const FREE_TRANSLATION_CHAR_LIMIT = 600;
 const FREE_TRANSLATION_LIMIT_MESSAGE = `В бесплатном переводе можно ввести не более ${FREE_TRANSLATION_CHAR_LIMIT} символов`;
-const CYRILLIC_PATTERN = /[\u0400-\u04FF]/;
-const VBA_PROCEDURE_PATTERN = /\b(?:Public|Private|Friend|Static)?\s*(Sub|Function)\s+[A-Za-z_][A-Za-z0-9_]*\b[\s\S]*?\bEnd\s+\1\b/i;
+const VBA_PROCEDURE_PATTERN = /^\s*(?:Public\s+|Private\s+|Friend\s+|Static\s+)*(?:Sub|Function)\s+[A-Za-z_][A-Za-z0-9_]*\b/im;
 const EMPTY_TRANSLATION_MESSAGE = 'Не удалось перевести макрос. Токены не списаны.';
 
 const conversionDateFormat = {
@@ -90,7 +89,7 @@ function isNoSubscriptionError(error) {
 
 function isValidVbaMacro(value) {
 	const code = String(value || '').trim();
-	return Boolean(code) && !CYRILLIC_PATTERN.test(code) && VBA_PROCEDURE_PATTERN.test(code);
+	return Boolean(code) && VBA_PROCEDURE_PATTERN.test(code);
 }
 
 function getTokenPanelLabel(tokenSource) {
