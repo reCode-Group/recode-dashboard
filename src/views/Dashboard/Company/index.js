@@ -165,6 +165,7 @@ function Company() {
 				h={{ base: '95px', md: '300px' }}
 				borderRadius="25px"
 				bgPosition="50%"
+				bgSize="cover"
 				bgRepeat="no-repeat"
 			/>
 

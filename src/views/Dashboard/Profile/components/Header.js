@@ -136,6 +136,7 @@ const Header = ({
 					h="300px"
 					borderRadius="25px"
 					bgPosition="50%"
+					bgSize="cover"
 					bgRepeat="no-repeat"
 					position="relative"
 					display="flex"
