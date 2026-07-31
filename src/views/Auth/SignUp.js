@@ -19,6 +19,7 @@ import {
 import BgSignUp from 'assets/img/BgSignUp.png';
 // import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
 import AuthNavbar from 'components/Navbars/AuthNavbar.js';
+import { PUBLIC_SITE_URLS } from 'constants/publicSite';
 import { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { login, register, sendVerificationCode, verifyCode } from 'services/auth';
@@ -26,11 +27,10 @@ import { markAuthenticated, setPendingProfileEmail, setPendingProfileName } from
 import PasswordStrength, { getPasswordStrength } from './components/PasswordStrength';
 import useResendCooldown from './hooks/useResendCooldown';
 
-const getDocumentHref = (fileName) =>
-	`${import.meta.env.BASE_URL}docs/${encodeURIComponent(fileName)}`;
+const getLegalHref = (anchor) => `${PUBLIC_SITE_URLS.legal}#${anchor}`;
 
-const PERSONAL_DATA_CONSENT_HREF = getDocumentHref('Согласие_на_обработку_персональных_данных.pdf');
-const PRIVACY_POLICY_HREF = getDocumentHref('Политика_конфиденциальности.pdf');
+const PERSONAL_DATA_CONSENT_HREF = getLegalHref('personal-data-consent');
+const PRIVACY_POLICY_HREF = getLegalHref('privacy');
 
 function getFriendlyError(error) {
 	const message = error.message || '';
