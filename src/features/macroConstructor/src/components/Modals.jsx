@@ -241,7 +241,6 @@ export function Modals({ handlers }) {
 							type="button"
 							id="projectDeleteConfirmButton"
 							onClick={handlers.confirmProjectDeletion}
-							disabled
 						>
 							Удалить проект
 						</button>

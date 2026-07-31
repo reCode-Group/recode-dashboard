@@ -60,8 +60,10 @@ export async function initBlocklyApp() {
 
   async function persistWorkspace() {
     if (!workspace || isResettingProject) return;
-    if (isActiveProjectDraft()) return null;
-    const project = await saveActiveProject(getProjectData());
+    const project = await saveActiveProject(
+      getProjectData(),
+      isActiveProjectDraft() ? { createIfDraft: true } : {},
+    );
     isWorkspaceDirty = false;
     return project;
   }
@@ -100,7 +102,7 @@ export async function initBlocklyApp() {
 
   function updateAutosaveTimer() {
     const autosaveInterval = getAutosaveInterval();
-    if (isActiveProjectDraft() || autosaveInterval === 0) {
+    if (autosaveInterval === 0) {
       stopAutosaveTimer();
       document.dispatchEvent(new CustomEvent('constructor:autosave-status', {detail: 'disabled'}));
       return;
@@ -111,7 +113,7 @@ export async function initBlocklyApp() {
     stopAutosaveTimer();
     activeAutosaveInterval = autosaveInterval;
     autosaveTimer = window.setInterval(async () => {
-      if (!isWorkspaceDirty || isAutosaving || isResettingProject || hasOpenModal()) return;
+      if (isAutosaving || isResettingProject || hasOpenProjectsModal()) return;
 
       isAutosaving = true;
       try {
@@ -156,6 +158,7 @@ export async function initBlocklyApp() {
 
     isWorkspaceDirty = true;
     markActiveProjectDirty();
+    document.dispatchEvent(new CustomEvent('constructor:autosave-status', {detail: 'unsaved'}));
     updateAutosaveTimer();
   }
 
@@ -176,6 +179,7 @@ export async function initBlocklyApp() {
   function handleAutosaveIntervalChange() {
     isWorkspaceDirty = true;
     markActiveProjectDirty();
+    document.dispatchEvent(new CustomEvent('constructor:autosave-status', {detail: 'unsaved'}));
     updateAutosaveTimer();
   }
 
@@ -203,22 +207,22 @@ export async function initBlocklyApp() {
       new CustomEvent('constructor:autosave-status', {
         detail:
           isActiveProjectDraft() || getAutosaveInterval() === 0
-            ? {status: 'disabled'}
+            ? {status: getAutosaveInterval() === 0 ? 'disabled' : 'unsaved'}
             : {status: 'saved', savedAt: project.updated_at || project.updatedAt},
       }),
     );
   }
 
-  function hasOpenModal() {
-    return [...document.querySelectorAll('.modal-overlay')].some((overlay) => overlay.style.display === 'flex');
+  function hasOpenProjectsModal() {
+    return document.getElementById('projectsModal')?.style.display === 'flex';
   }
 
   function handleModalStateChanged() {
-    if (!hasOpenModal()) updateAutosaveTimer();
+    if (!hasOpenProjectsModal()) updateAutosaveTimer();
   }
 
   function handleBeforeUnload(event) {
-    if (!isActiveProjectDraft() || (!isWorkspaceDirty && !isActiveProjectDirty())) return;
+    if (!isWorkspaceDirty && !isActiveProjectDirty()) return;
     event.preventDefault();
     event.returnValue = '';
   }
@@ -249,14 +253,20 @@ export async function initBlocklyApp() {
     }
 
     const labels = {
-      saved: `Всё сохранено · ${formatLastSaved(detail.savedAt || new Date())}`,
+      unsaved: 'Не сохранено',
+      saved: `Сохранено · ${formatLastSaved(detail.savedAt || new Date())}`,
       saving: 'Сохранение...',
       disabled: 'Автосохранение выключено',
     };
     const className = `autosave-state-${status}`;
 
     document.querySelectorAll('.project-info .status-dot, .autosave-dot, .autosave-badge').forEach((node) => {
-      node.classList.remove('autosave-state-saved', 'autosave-state-saving', 'autosave-state-disabled');
+      node.classList.remove(
+        'autosave-state-saved',
+        'autosave-state-saving',
+        'autosave-state-unsaved',
+        'autosave-state-disabled',
+      );
       node.classList.add(className);
     });
 

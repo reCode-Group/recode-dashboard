@@ -161,6 +161,7 @@ export async function saveActiveProject(data, options = {}) {
     projects = projects.map((item) => (item.id === project.id ? project : item));
     activeProject = project;
     activeProjectDirty = false;
+    updateProjectName();
     emit('constructor:autosave-status', {status: 'saved', savedAt: project.updated_at || project.updatedAt});
     return project;
   } catch (error) {
@@ -182,11 +183,12 @@ export async function renameActiveProject(name) {
 
 export async function deleteActiveProject() {
   if (!activeProject) return null;
+  if (isActiveProjectDraft()) return setActiveProject(createDraftProject(), { syncUrl: true });
+
   const deletedId = activeProject.id;
   await deleteMacroConstructorProject(deletedId);
   projects = projects.filter((project) => project.id !== deletedId);
-  if (projects.length === 0) return setActiveProject(createDraftProject(), { syncUrl: true });
-  return openProject(projects[0].id);
+  return setActiveProject(createDraftProject(), { syncUrl: true });
 }
 
 export function getProjects() {

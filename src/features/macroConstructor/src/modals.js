@@ -88,10 +88,9 @@ function getProjectName() {
 }
 
 function updateDeleteConfirmationState() {
-  const input = document.getElementById('projectDeleteConfirmInput');
   const button = document.getElementById('projectDeleteConfirmButton');
-  if (!input || !button) return;
-  button.disabled = input.value.trim() !== getProjectName();
+  if (!button) return;
+  button.disabled = false;
 }
 
 export async function openModal() {
@@ -278,18 +277,16 @@ export function closeProjectDeleteModal() {
 }
 
 export async function confirmProjectDeletion() {
-  const input = document.getElementById('projectDeleteConfirmInput');
-  if (input?.value.trim() !== getProjectName()) {
-    showToast('Введите точное название проекта для подтверждения.', 'warning');
-    input?.focus();
-    return;
-  }
-
   try {
     const deletedName = getProjectName();
     await deleteActiveProject();
     closeProjectDeleteModal();
     closeProjectEditModal();
+    if (getProjects().length > 0) {
+      window.setTimeout(() => {
+        openModal();
+      }, 320);
+    }
     showToast(`Проект «${deletedName}» удалён.`, 'info');
   } catch (error) {
     console.error('Project delete error:', error);
