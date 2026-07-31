@@ -479,8 +479,7 @@ body {
 	opacity: 0.65;
 }
 
-.autosave-badge.autosave-state-disabled .manual-save-btn,
-.autosave-badge.autosave-state-unsaved .manual-save-btn {
+.autosave-badge.autosave-state-disabled .manual-save-btn {
 	display: inline-flex;
 }
 
