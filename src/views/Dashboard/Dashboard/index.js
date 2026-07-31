@@ -260,7 +260,7 @@ export default function Dashboard() {
 				/>
 				<WorkWithTheRockets
 					backgroundImage={peopleImage}
-					title={'Сайт для бизнеса за 1 день'}
+					title={'Сайт для бизнеса за 3 дня'}
 					description={
 						'Современный адаптивный сайт с готовым набором инструментов под ваш бизнес и поддержка 24/7 от 750 руб./мес.'
 					}
