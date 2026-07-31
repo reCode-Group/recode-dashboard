@@ -47,7 +47,14 @@ const WorkWithTheRockets = ({ title, description, backgroundImage }) => {
 						{description}
 					</Text>
 					<Flex align="center" mt="auto">
-						<Button as="a" href={PUBLIC_SITE_URLS.home} p="0px" variant="no-hover" bg="transparent">
+						<Button
+							as="a"
+							href={PUBLIC_SITE_URLS.reklama}
+							target="_blank"
+							p="0px"
+							variant="no-hover"
+							bg="transparent"
+						>
 							<Text
 								fontSize="sm"
 								fontWeight="bold"
