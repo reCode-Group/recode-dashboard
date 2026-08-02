@@ -600,12 +600,15 @@ export default function MacroTranslatorPage() {
 										bg={inputBg}
 										color={textColor}
 										borderColor={tableBorder}
+										focusBorderColor="recode.300"
 										borderRadius="15px"
 										resize="none"
 										fontSize="sm"
 										pb={isFreeTranslation ? '34px' : undefined}
 										position="relative"
 										zIndex={1}
+										_hover={{ borderColor: 'recode.200' }}
+										_focus={{ borderColor: 'recode.300', boxShadow: '0 0 0 1px var(--chakra-colors-recode-300)' }}
 									/>
 									{isFreeTranslation ? (
 										<Text
@@ -702,6 +705,7 @@ export default function MacroTranslatorPage() {
 										bg={inputBg}
 										color={textColor}
 										borderColor={tableBorder}
+										focusBorderColor="recode.300"
 										borderRadius="15px"
 										resize="none"
 										fontSize="sm"
@@ -709,6 +713,8 @@ export default function MacroTranslatorPage() {
 										position="relative"
 										zIndex={1}
 										opacity={isConverting ? 0.35 : 1}
+										_hover={{ borderColor: 'recode.200' }}
+										_focus={{ borderColor: 'recode.300', boxShadow: '0 0 0 1px var(--chakra-colors-recode-300)' }}
 										readOnly
 									/>
 								</Box>
