@@ -137,6 +137,7 @@ function Billing() {
 								isLoading={isLoading}
 								error={error}
 								onRetry={reload}
+								accountType={accountType}
 							/>
 						</GridItem>
 						<GridItem area="transactions" minH="0" h={{ base: 'auto', xl: '100%' }}>

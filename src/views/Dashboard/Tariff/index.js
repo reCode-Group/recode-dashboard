@@ -113,6 +113,7 @@ function Tariff() {
 							isLoading={isLoading}
 							error={error}
 							onRetry={reload}
+							accountType={accountType}
 						/>
 					</GridItem>
 					<GridItem area="payment" minW="0" w="100%">

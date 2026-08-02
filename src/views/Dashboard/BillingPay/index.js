@@ -88,8 +88,15 @@ function readStoredAccountType() {
 		: ACCOUNT_TYPES.PERSONAL;
 }
 
-function getInitialPaymentMethodId() {
-	return readStoredAccountType() === ACCOUNT_TYPES.ORGANIZATION
+function readRequestedAccountType(search) {
+	const accountType = new URLSearchParams(search).get('account');
+	return accountType === ACCOUNT_TYPES.ORGANIZATION || accountType === ACCOUNT_TYPES.PERSONAL
+		? accountType
+		: '';
+}
+
+function getInitialPaymentMethodId(accountType) {
+	return accountType === ACCOUNT_TYPES.ORGANIZATION
 		? PAYMENT_METHODS.statement.id
 		: PAYMENT_METHODS.tbank.id;
 }
@@ -153,10 +160,13 @@ function BillingPay() {
 	const navigate = useNavigate();
 	const toast = useToast();
 	const paymentModal = useDisclosure();
+	const initialAccountType = readRequestedAccountType(location.search) || readStoredAccountType();
 	const [tariffs, setTariffs] = useState([]);
 	const [tariffId, setTariffId] = useState(() => readStorageValue(SELECTED_TARIFF_STORAGE_KEY));
-	const [accountType, setAccountType] = useState(() => readStoredAccountType());
-	const [paymentMethodId, setPaymentMethodId] = useState(() => getInitialPaymentMethodId());
+	const [accountType, setAccountType] = useState(() => initialAccountType);
+	const [paymentMethodId, setPaymentMethodId] = useState(() =>
+		getInitialPaymentMethodId(initialAccountType)
+	);
 	const [currentUser, setCurrentUser] = useState(null);
 	const [isLoadingUser, setIsLoadingUser] = useState(true);
 	const [isLoadingTariffs, setIsLoadingTariffs] = useState(true);
@@ -190,6 +200,10 @@ function BillingPay() {
 	const tbankTerminalKey = getTBankTerminalKey();
 	const requestedTariffId = useMemo(
 		() => new URLSearchParams(location.search).get('package') || '',
+		[location.search]
+	);
+	const requestedAccountType = useMemo(
+		() => readRequestedAccountType(location.search),
 		[location.search]
 	);
 	const paymentReturnStatus = useMemo(
@@ -293,6 +307,21 @@ function BillingPay() {
 		setAccountType(ACCOUNT_TYPES.PERSONAL);
 		setPaymentMethodId(PAYMENT_METHODS.tbank.id);
 	}, [accountType, canUseOrganizationAccount, isLoadingUser]);
+
+	useEffect(() => {
+		if (!requestedAccountType || requestedAccountType === accountType) {
+			return;
+		}
+
+		if (requestedAccountType === ACCOUNT_TYPES.ORGANIZATION && !canUseOrganizationAccount) {
+			return;
+		}
+
+		setAccountType(requestedAccountType);
+		setPaymentMethodId(getInitialPaymentMethodId(requestedAccountType));
+		setSubmitError('');
+		setBillResult(null);
+	}, [accountType, canUseOrganizationAccount, requestedAccountType]);
 
 	useEffect(() => {
 		saveStorageValue(SELECTED_ACCOUNT_STORAGE_KEY, accountType);

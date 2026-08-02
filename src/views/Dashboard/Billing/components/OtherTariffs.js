@@ -60,6 +60,7 @@ function OtherTariffs({
 	isLoading = false,
 	error = '',
 	onRetry,
+	accountType = 'personal',
 }) {
 	const [period, setPeriod] = useState('month');
 	const titleColor = useColorModeValue('#2D3748', 'white');
@@ -76,6 +77,9 @@ function OtherTariffs({
 			period === 'year'
 				? formatTariffPrice(Number(tariff.price) * 12, '₽/год')
 				: formatTariffPrice(tariff.price),
+		paymentPath: `/lk/billing/pay?package=${encodeURIComponent(
+			tariff.id
+		)}&account=${encodeURIComponent(accountType)}`,
 	}));
 
 	return (
@@ -177,7 +181,7 @@ function OtherTariffs({
 
 								<Button
 									as={RouterLink}
-									to="/lk/billing/pay"
+									to={tariff.paymentPath}
 									variant="outline"
 									alignSelf="flex-start"
 									mt="auto"

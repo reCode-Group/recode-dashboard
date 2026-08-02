@@ -20,6 +20,7 @@ function OtherTariffs({
 	isLoading = false,
 	error = '',
 	onRetry,
+	accountType = 'personal',
 }) {
 	const titleColor = useColorModeValue('#2D3748', 'white');
 	const mutedColor = useColorModeValue('#A0AEC0', 'gray.400');
@@ -32,7 +33,9 @@ function OtherTariffs({
 		name: String(tariff.name || 'Пакет').toUpperCase(),
 		tokensLabel: `${formatTokenValue(tariff.amount)}`,
 		priceLabel: formatTariffPrice(tariff.price),
-		paymentPath: `/lk/billing/pay?package=${encodeURIComponent(tariff.id)}`,
+		paymentPath: `/lk/billing/pay?package=${encodeURIComponent(
+			tariff.id
+		)}&account=${encodeURIComponent(accountType)}`,
 	}));
 
 	return (
