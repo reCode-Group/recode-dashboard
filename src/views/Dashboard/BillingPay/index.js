@@ -733,10 +733,10 @@ function BillingPay() {
 									<Alert status="info" borderRadius="12px" alignItems="flex-start">
 										<AlertIcon mt="2px" />
 										<Box>
-											<AlertTitle fontSize="sm">Рабочий счёт пополняет директор</AlertTitle>
+											<AlertTitle fontSize="sm">Вы пополняете личный счёт</AlertTitle>
 											<AlertDescription fontSize="sm">
-												Вы не можете пополнить счёт сотрудника самостоятельно. Обратитесь к
-												руководителю или пополните личный счёт.
+												Оплаченный пакет будет зачислен на ваш личный баланс. Рабочий счёт
+												сотрудника пополняет директор или руководитель организации.
 											</AlertDescription>
 										</Box>
 									</Alert>

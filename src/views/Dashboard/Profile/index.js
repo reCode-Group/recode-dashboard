@@ -65,6 +65,14 @@ function getRoleLabel(role) {
 	return emptyValue;
 }
 
+function getProfileRoleLabel(user) {
+	const roleLabel = getRoleLabel(user?.organization_role);
+	const isDeactivatedEmployee =
+		user?.organization_role === 'employee' && user?.organization_status === 'disabled';
+
+	return isDeactivatedEmployee ? `${roleLabel} (деактивирован)` : roleLabel;
+}
+
 function Profile() {
 	const location = useLocation();
 	const toast = useToast();
@@ -213,7 +221,7 @@ function Profile() {
 	const displayName = getHeaderDisplayName(user);
 	const fullName = getFullName(user);
 	const companyName = organization?.short_name || organization?.full_name || emptyValue;
-	const roleName = getRoleLabel(user?.organization_role);
+	const roleName = getProfileRoleLabel(user);
 	const mobile = user?.phone || emptyValue;
 	const avatarImage = user?.avatar_url || user?.avatar || user?.photo_url || user?.photo || null;
 
