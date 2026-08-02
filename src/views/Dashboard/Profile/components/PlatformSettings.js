@@ -7,7 +7,6 @@ import {
 	useColorMode,
 	useColorModeValue,
 } from '@chakra-ui/react';
-import { useEffect, useMemo, useState } from 'react';
 // Custom components
 import Card from 'components/Card/Card';
 import CardBody from 'components/Card/CardBody';
@@ -17,13 +16,12 @@ const ACCOUNT_SETTINGS = [
 	{
 		id: 'conversionEmails',
 		label: 'Получать письма о новой конвертации макроса',
-		defaultValue: true,
+		defaultValue: false,
 	},
 	{
 		id: 'twoFactorAuth',
 		label: 'Двух-факторная аутентификация',
 		defaultValue: false,
-		disabled: true,
 	},
 ];
 
@@ -35,7 +33,7 @@ const PERSONALIZATION_SETTINGS = [
 	{
 		id: 'platformNews',
 		label: 'Получать рассылку о новостях платформы',
-		defaultValue: true,
+		defaultValue: false,
 	},
 ];
 
@@ -45,26 +43,33 @@ function SettingRow({
 	isDisabled = false,
 	onChange,
 }) {
+	const switchElement = (
+		<Switch
+			colorScheme='recode'
+			me='10px'
+			isChecked={isChecked}
+			isDisabled={isDisabled}
+			onChange={onChange}
+		/>
+	);
+
 	return (
 		<Flex align='center' mb='20px'>
-			<Switch
-				colorScheme='recode'
-				me='10px'
-				isChecked={isChecked}
-				isDisabled={isDisabled}
-				onChange={onChange}
-			/>
-			<Tooltip label={label} hasArrow placement='top-start' openDelay={250}>
-				<Text
-					noOfLines={1}
-					fontSize='md'
-					color='gray.500'
-					fontWeight='400'
-					cursor={isDisabled ? 'not-allowed' : 'pointer'}
-				>
-					{label}
-				</Text>
-			</Tooltip>
+			{isDisabled ? (
+				<Tooltip label='Недоступно' hasArrow placement='top' openDelay={250}>
+					<span>{switchElement}</span>
+				</Tooltip>
+			) : (
+				switchElement
+			)}
+			<Text
+				noOfLines={1}
+				fontSize='md'
+				color='gray.500'
+				fontWeight='400'
+			>
+				{label}
+			</Text>
 		</Flex>
 	);
 }
@@ -72,28 +77,6 @@ function SettingRow({
 const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
 	const { colorMode, toggleColorMode } = useColorMode();
 	const textColor = useColorModeValue('gray.700', 'white');
-
-	const initialSettings = useMemo(
-		() => ({
-			conversionEmails: true,
-			twoFactorAuth: false,
-			platformNews: true,
-		}),
-		[]
-	);
-
-	const [settings, setSettings] = useState(initialSettings);
-
-	useEffect(() => {
-		setSettings(initialSettings);
-	}, [initialSettings]);
-
-	const handleToggleSetting = (settingId) => {
-		setSettings((prev) => ({
-			...prev,
-			[settingId]: !prev[settingId],
-		}));
-	};
 
 	return (
 		<Card id='settings' scrollMarginTop='110px' p='16px'>
@@ -111,9 +94,9 @@ const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
 						<SettingRow
 							key={setting.id}
 							label={setting.label}
-							isChecked={settings[setting.id]}
-							isDisabled={setting.disabled}
-							onChange={() => handleToggleSetting(setting.id)}
+							isChecked={setting.defaultValue}
+							isDisabled={setting.id !== 'darkTheme'}
+							onChange={setting.id === 'darkTheme' ? toggleColorMode : undefined}
 						/>
 					))}
 					<Text fontSize='sm' color='gray.500' fontWeight='600' m='6px 0px 20px 0px'>
@@ -123,11 +106,12 @@ const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
 						<SettingRow
 							key={setting.id}
 							label={setting.label}
-							isChecked={setting.id === 'darkTheme' ? colorMode === 'dark' : settings[setting.id]}
+							isChecked={setting.id === 'darkTheme' ? colorMode === 'dark' : setting.defaultValue}
+							isDisabled={setting.id !== 'darkTheme'}
 							onChange={
 								setting.id === 'darkTheme'
 									? toggleColorMode
-									: () => handleToggleSetting(setting.id)
+									: undefined
 							}
 						/>
 					))}
