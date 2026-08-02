@@ -34,6 +34,7 @@ const PRIVACY_POLICY_HREF = getLegalHref('privacy');
 
 function getFriendlyError(error) {
 	const message = error.message || '';
+	const normalizedMessage = message.toLowerCase();
 	if (message.includes('wrong verification code')) {
 		return 'Неверный код подтверждения';
 	}
@@ -43,13 +44,20 @@ function getFriendlyError(error) {
 	if (message.includes('Invalid input')) {
 		return 'Проверьте имя, почту и пароль';
 	}
+	if (
+		normalizedMessage.includes('mailbox does not exist') ||
+		normalizedMessage.includes('could not send email') ||
+		normalizedMessage.includes('550 5.1.2')
+	) {
+		return 'Почтовый ящик не найден. Проверьте email или укажите другой адрес';
+	}
 	if (message.includes('Cannot send verification code')) {
 		return 'Не удалось отправить код подтверждения';
 	}
 	if (message.includes('Too Many Requests')) {
 		return 'Слишком много запросов. Подождите пару секунд и попробуйте снова';
 	}
-	return message || 'Не удалось завершить регистрацию';
+	return 'Не удалось завершить регистрацию. Проверьте данные и попробуйте снова';
 }
 
 function SignUp() {
@@ -340,8 +348,13 @@ function SignUp() {
 								onChange={(event) => setIsLegalAccepted(event.target.checked)}
 								isDisabled={isSubmitting}
 								alignItems="flex-start"
-								colorScheme="blue"
+								colorScheme="recode"
 								mb="24px"
+								sx={{
+									'.chakra-checkbox__control': {
+										mt: '2px',
+									},
+								}}
 							>
 								<Text as="span" color={secondTextColor} fontSize="sm" lineHeight="1.45">
 									Даю согласие на{' '}
