@@ -62,18 +62,17 @@ export function buildCurrentTariffCardData(subscription) {
 	const packageTokens = Number(subscription?.package_tokens) || 0;
 	const tokensRemain = Number(subscription?.tokens_remain) || 0;
 	const hasSubscription = Boolean(subscription);
-	const isActive = Boolean(subscription?.is_active);
 
 	return {
 		title: 'Ваш пакет',
 		tariffName: hasSubscription
 			? String(subscription?.package_name || 'Пакет не указан').toUpperCase()
 			: 'НЕТ ПАКЕТА',
-		statusLabel: hasSubscription ? (isActive ? 'Активен' : 'Не активен') : 'Не подключен',
-		statusColor: hasSubscription && isActive ? '#48BB78' : '#A0AEC0',
+		statusLabel: hasSubscription ? 'Активен' : 'Не активен',
+		statusColor: hasSubscription ? '#48BB78' : '#A0AEC0',
 		validUntil: {
 			name: 'ДЕЙСТВИТЕЛЕН ДО',
-			data: hasSubscription ? formatSubscriptionDate(subscription?.expires_at) : '—',
+			data: hasSubscription ? 'Навсегда' : '—',
 		},
 		tokenBalance: {
 			name: 'ОСТАТОК ТОКЕНОВ',
