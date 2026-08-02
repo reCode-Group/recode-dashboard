@@ -144,6 +144,12 @@ export default function AuthNavbar(props) {
 		'linear-gradient(81.62deg, #313860 2.25%, #151928 79.87%)',
 		'gray.800'
 	);
+	const drawerBg = useColorModeValue('white', 'gray.800');
+	const drawerBorderColor = useColorModeValue('gray.100', 'whiteAlpha.200');
+	const drawerTextColor = useColorModeValue('gray.700', 'gray.100');
+	const drawerHoverBg = useColorModeValue('gray.50', 'whiteAlpha.100');
+	const drawerActiveBg = useColorModeValue('gray.100', 'whiteAlpha.200');
+	const drawerBetaColor = useColorModeValue('recode.300', 'recode.200');
 	let navbarPosition = 'fixed';
 	let colorButton = 'white';
 	const colorModeLogo = useColorModeValue(recode_logo_colored, recode_logo_white);
@@ -261,10 +267,21 @@ export default function AuthNavbar(props) {
 			/>
 			<Drawer isOpen={isOpen} onClose={onClose} placement="right" finalFocusRef={drawerButtonRef}>
 				<DrawerOverlay />
-				<DrawerContent w="250px" maxW="250px" borderRadius="16px 0 0 16px">
-					<DrawerCloseButton _focus={{ boxShadow: 'none' }} _hover={{ boxShadow: 'none' }} />
+				<DrawerContent
+					w="250px"
+					maxW="250px"
+					borderRadius="16px 0 0 16px"
+					bg={drawerBg}
+					borderLeft="1px solid"
+					borderColor={drawerBorderColor}
+				>
+					<DrawerCloseButton
+						color={drawerTextColor}
+						_focus={{ boxShadow: 'none' }}
+						_hover={{ bg: drawerHoverBg, boxShadow: 'none' }}
+					/>
 					<DrawerBody px="1rem" py="24px">
-						<Stack direction="column" spacing="6px" mt="36px">
+						<Stack direction="column" spacing="10px" mt="36px">
 							{PUBLIC_NAV_ITEMS_BEFORE_RESOURCES.map((item) => (
 								<PublicNavLink
 									item={item}
@@ -277,10 +294,10 @@ export default function AuthNavbar(props) {
 									py="12px"
 									px="12px"
 									borderRadius="15px"
-									_hover={{ bg: 'gray.50', textDecoration: 'none' }}
+									_hover={{ bg: drawerHoverBg, textDecoration: 'none' }}
 								>
-									<Text color="gray.700" fontSize="sm" fontWeight="medium" textAlign="left">
-										<NavItemLabel beta={item.beta} betaColor="recode.300" label={item.label} />
+									<Text color={drawerTextColor} fontSize="sm" fontWeight="medium" textAlign="left">
+										<NavItemLabel beta={item.beta} betaColor={drawerBetaColor} label={item.label} />
 									</Text>
 								</PublicNavLink>
 							))}
@@ -294,14 +311,15 @@ export default function AuthNavbar(props) {
 								px="12px"
 								borderRadius="15px"
 								bg="transparent"
-								_hover={{ bg: 'gray.50' }}
-								_active={{ bg: 'gray.50' }}
+								color={drawerTextColor}
+								_hover={{ bg: drawerHoverBg }}
+								_active={{ bg: drawerActiveBg }}
 								_focus={{ boxShadow: 'none' }}
 							>
-								<Text color={resourceItemColor} fontSize="sm" fontWeight="medium" textAlign="left">
+								<Text color={drawerTextColor} fontSize="sm" fontWeight="medium" textAlign="left">
 									РЕСУРСЫ
 								</Text>
-								<Text color={resourceItemColor} fontSize="10px">
+								<Text color={drawerTextColor} fontSize="10px">
 									{isResourcesOpen ? '▲' : '▼'}
 								</Text>
 							</Button>
@@ -319,9 +337,9 @@ export default function AuthNavbar(props) {
 											py="10px"
 											px="12px"
 											borderRadius="12px"
-											_hover={{ bg: 'gray.50', textDecoration: 'none' }}
+											_hover={{ bg: drawerHoverBg, textDecoration: 'none' }}
 										>
-											<Text color={resourceItemColor} fontSize="sm" fontWeight="medium" textAlign="left">
+											<Text color={drawerTextColor} fontSize="sm" fontWeight="medium" textAlign="left">
 												{item.label}
 											</Text>
 										</PublicNavLink>
@@ -340,10 +358,10 @@ export default function AuthNavbar(props) {
 									py="12px"
 									px="12px"
 									borderRadius="15px"
-									_hover={{ bg: 'gray.50', textDecoration: 'none' }}
+									_hover={{ bg: drawerHoverBg, textDecoration: 'none' }}
 								>
-									<Text color="gray.700" fontSize="sm" fontWeight="medium" textAlign="left">
-										<NavItemLabel beta={item.beta} betaColor="recode.300" label={item.label} />
+									<Text color={drawerTextColor} fontSize="sm" fontWeight="medium" textAlign="left">
+										<NavItemLabel beta={item.beta} betaColor={drawerBetaColor} label={item.label} />
 									</Text>
 								</PublicNavLink>
 							))}
