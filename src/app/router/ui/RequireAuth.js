@@ -65,7 +65,7 @@ export function RequireAuth() {
 		return () => {
 			isMounted = false;
 		};
-	}, []);
+	}, [location.pathname]);
 
 	const redirectTo = useMemo(() => {
 		if (status !== 'authorized') {
