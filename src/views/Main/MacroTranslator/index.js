@@ -34,6 +34,7 @@ import { getCurrentUser } from 'services/auth';
 import { getUserConversions } from 'services/conversions';
 import { convertFreeMacro, convertPaidMacro } from 'services/macroTranslator';
 import { getUserSubscription } from 'services/subscription';
+import { AUTH_STATE_CHANGED_EVENT, clearAuthState, hasAuthState } from 'services/session';
 import { mapConversion } from 'utils/conversions';
 import IncorrectMacroModal from './components/IncorrectMacroModal';
 
@@ -125,7 +126,6 @@ export default function MacroTranslatorPage() {
 	const [isPageLoading, setIsPageLoading] = useState(true);
 	const [isConverting, setIsConverting] = useState(false);
 	const [translationProgressStep, setTranslationProgressStep] = useState(0);
-	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [user, setUser] = useState(null);
 	const [subscriptionName, setSubscriptionName] = useState('Нет пакета');
 	const [translationMode, setTranslationMode] = useState(TRANSLATION_MODE.FREE);
@@ -158,15 +158,33 @@ export default function MacroTranslatorPage() {
 		Boolean(translated.trim()) && translated !== EMPTY_TRANSLATION_MESSAGE;
 	const currentTranslationProgress = TRANSLATION_PROGRESS_STEPS[translationProgressStep];
 
+	const resetAuthDependentState = useCallback(() => {
+		setUser(null);
+		setSubscriptionName('Нет пакета');
+		setSelectedTokenSource(TOKEN_SOURCE.PERSONAL);
+		setHistoryItems([]);
+		setTranslated('');
+		setLastConversion(null);
+		setCopied(false);
+		setIsConverting(false);
+	}, []);
+
 	const loadData = useCallback(async ({ showLoader = true } = {}) => {
 		if (showLoader) {
 			setIsPageLoading(true);
 		}
 		setErrorMessage('');
 
+		if (!hasAuthState()) {
+			resetAuthDependentState();
+			if (showLoader) {
+				setIsPageLoading(false);
+			}
+			return [];
+		}
+
 		try {
 			const currentUser = await getCurrentUser();
-			setIsAuthenticated(true);
 			setUser(currentUser);
 
 			const [subscriptionResult, conversionsResult] = await Promise.all([
@@ -187,11 +205,8 @@ export default function MacroTranslatorPage() {
 			return mappedConversions;
 		} catch (error) {
 			if (isUnauthorizedError(error)) {
-				setIsAuthenticated(false);
-				setUser(null);
-				setSubscriptionName('Нет пакета');
-				setHistoryItems([]);
-				setSelectedTokenSource(TOKEN_SOURCE.PERSONAL);
+				clearAuthState();
+				resetAuthDependentState();
 			} else {
 				setErrorMessage(error.message || 'Не удалось загрузить данные переводчика');
 			}
@@ -206,6 +221,29 @@ export default function MacroTranslatorPage() {
 	useEffect(() => {
 		loadData();
 	}, [loadData]);
+
+	useEffect(() => {
+		const handleAuthStateChange = (event) => {
+			if (event?.type === 'storage' && event.key !== 'recode_auth_state') {
+				return;
+			}
+
+			if (!hasAuthState()) {
+				resetAuthDependentState();
+				return;
+			}
+
+			loadData({ showLoader: false });
+		};
+
+		window.addEventListener(AUTH_STATE_CHANGED_EVENT, handleAuthStateChange);
+		window.addEventListener('storage', handleAuthStateChange);
+
+		return () => {
+			window.removeEventListener(AUTH_STATE_CHANGED_EVENT, handleAuthStateChange);
+			window.removeEventListener('storage', handleAuthStateChange);
+		};
+	}, [loadData, resetAuthDependentState]);
 
 	useEffect(() => {
 		if (errorMessage) {
@@ -306,8 +344,24 @@ export default function MacroTranslatorPage() {
 			return;
 		}
 
-		if (!isAuthenticated) {
+		if (!hasAuthState()) {
+			resetAuthDependentState();
 			navigate('/auth/login-page');
+			return;
+		}
+
+		try {
+			const currentUser = await getCurrentUser();
+			setUser(currentUser);
+		} catch (error) {
+			if (isUnauthorizedError(error)) {
+				clearAuthState();
+				resetAuthDependentState();
+				navigate('/auth/login-page');
+				return;
+			}
+
+			setErrorMessage(error.message || 'Не удалось проверить авторизацию');
 			return;
 		}
 
@@ -330,6 +384,12 @@ export default function MacroTranslatorPage() {
 			const result = isFreeTranslation
 				? await convertFreeMacro(requestPayload)
 				: await convertPaidMacro(paidRequestPayload);
+
+			if (!hasAuthState()) {
+				resetAuthDependentState();
+				navigate('/auth/login-page');
+				return;
+			}
 
 			const translatedCode = result?.target_code || '';
 			if (!translatedCode.trim()) {

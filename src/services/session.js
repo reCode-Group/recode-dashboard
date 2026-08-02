@@ -1,15 +1,18 @@
 const AUTH_STATE_KEY = 'recode_auth_state';
 const PENDING_PROFILE_EMAIL_KEY = 'recode_pending_profile_email';
 const PENDING_PROFILE_NAME_KEY = 'recode_pending_profile_name';
+export const AUTH_STATE_CHANGED_EVENT = 'recode-auth-state-changed';
 
 export function markAuthenticated() {
 	window.localStorage.setItem(AUTH_STATE_KEY, 'authenticated');
+	window.dispatchEvent(new Event(AUTH_STATE_CHANGED_EVENT));
 }
 
 export function clearAuthState() {
 	window.localStorage.removeItem(AUTH_STATE_KEY);
 	window.localStorage.removeItem(PENDING_PROFILE_EMAIL_KEY);
 	window.localStorage.removeItem(PENDING_PROFILE_NAME_KEY);
+	window.dispatchEvent(new Event(AUTH_STATE_CHANGED_EVENT));
 }
 
 export function hasAuthState() {
