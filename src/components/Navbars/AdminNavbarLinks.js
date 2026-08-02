@@ -46,11 +46,14 @@ export default function HeaderLinks(props) {
 	// Chakra Color Mode
 	let mainRecode = useColorModeValue('recode.300', 'recode.300');
 	let inputBg = useColorModeValue('white', 'gray.800');
+	const inputTextColor = useColorModeValue('gray.700', 'white');
+	const inputPlaceholderColor = useColorModeValue('gray.500', 'gray.400');
 	let navbarIcon = useColorModeValue('gray.500', 'gray.200');
 	let searchIcon = useColorModeValue('gray.700', 'gray.200');
 	const dropdownBg = useColorModeValue('white', 'gray.700');
 	const dropdownBorder = useColorModeValue('gray.200', 'whiteAlpha.200');
 	const dropdownHoverBg = useColorModeValue('gray.50', 'whiteAlpha.100');
+	const dropdownTitleColor = useColorModeValue('gray.700', 'white');
 	const mutedText = useColorModeValue('gray.500', 'gray.300');
 	const dropdownShadow = useColorModeValue(
 		'0 14px 40px rgba(15, 23, 42, 0.12)',
@@ -210,12 +213,12 @@ export default function HeaderLinks(props) {
 					<Input
 						fontSize="xs"
 						py="11px"
-						color="black"
-						caretColor="black"
+						color={inputTextColor}
+						caretColor={inputTextColor}
 						placeholder="Поиск по сайту..."
 						borderRadius="inherit"
-						_placeholder={{ color: 'gray.500' }}
-						_focus={{ color: 'black', caretColor: 'black' }}
+						_placeholder={{ color: inputPlaceholderColor }}
+						_focus={{ color: inputTextColor, caretColor: inputTextColor }}
 						value={searchQuery}
 						onChange={(event) => {
 							setSearchQuery(event.target.value);
@@ -289,7 +292,7 @@ export default function HeaderLinks(props) {
 										}}
 									>
 										<Box minW="0" flex="1">
-											<Text fontSize="0.92rem" fontWeight="600" color="gray.700" noOfLines={1}>
+											<Text fontSize="0.92rem" fontWeight="600" color={dropdownTitleColor} noOfLines={1}>
 												{result.title}
 											</Text>
 											<Text fontSize="0.78rem" color={mutedText} noOfLines={1}>
