@@ -14,6 +14,7 @@ import {
 	Input,
 	InputGroup,
 	InputRightElement,
+	Link,
 	List,
 	ListItem,
 	Modal,
@@ -28,10 +29,12 @@ import {
 	useColorModeValue,
 } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
 import { hasDadataApiKey, mapPartySuggestion, suggestParties } from 'services/dadata';
 import { createOrganization } from 'services/organization';
+
+const ORGANIZATION_ALREADY_EXISTS_ERROR = 'organization-already-exists';
 
 const initialForm = {
 	fullName: '',
@@ -65,6 +68,9 @@ function getUserFullName(user) {
 
 function getErrorMessage(error) {
 	const message = error.message || '';
+	if (message.includes('organization already exists')) {
+		return ORGANIZATION_ALREADY_EXISTS_ERROR;
+	}
 	if (message.includes('user already in organization')) {
 		return 'Компания уже привязана к аккаунту';
 	}
@@ -441,7 +447,17 @@ function CompanyRegistration() {
 					{submitError ? (
 						<Alert status="error" borderRadius="12px">
 							<AlertIcon />
-							{submitError}
+							{submitError === ORGANIZATION_ALREADY_EXISTS_ERROR ? (
+								<Text fontSize="sm">
+									Данная компания уже привязана к другому аккаунту. Решить вопрос можно через{' '}
+									<Link as={RouterLink} to="/lk/support" textDecoration="underline" fontWeight="bold">
+										техподдержку
+									</Link>
+									.
+								</Text>
+							) : (
+								submitError
+							)}
 						</Alert>
 					) : null}
 
