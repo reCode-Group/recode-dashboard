@@ -31,6 +31,8 @@ const getLegalHref = (anchor) => `${PUBLIC_SITE_URLS.legal}#${anchor}`;
 
 const PERSONAL_DATA_CONSENT_HREF = getLegalHref('personal-data-consent');
 const PRIVACY_POLICY_HREF = getLegalHref('privacy');
+const PASSWORD_MAX_LENGTH = 64;
+const PASSWORD_MAX_LENGTH_ERROR = `Пароль должен быть не длиннее ${PASSWORD_MAX_LENGTH} символов`;
 
 function getFriendlyError(error) {
 	const message = error.message || '';
@@ -85,11 +87,30 @@ function SignUp() {
 	const normalizedEmail = email.trim().toLowerCase();
 	const trimmedName = name.trim();
 
+	const handlePasswordChange = (event) => {
+		const nextPassword = event.target.value;
+
+		if (nextPassword.length > PASSWORD_MAX_LENGTH) {
+			setPassword(nextPassword.slice(0, PASSWORD_MAX_LENGTH));
+			setError(PASSWORD_MAX_LENGTH_ERROR);
+			return;
+		}
+
+		setPassword(nextPassword);
+		if (error === PASSWORD_MAX_LENGTH_ERROR) {
+			setError('');
+		}
+	};
+
 	const handleAccountSubmit = async (event) => {
 		event.preventDefault();
 
 		if (!trimmedName || !normalizedEmail || !password) {
 			setError('Введите имя, почту и пароль');
+			return;
+		}
+		if (password.length > PASSWORD_MAX_LENGTH) {
+			setError(PASSWORD_MAX_LENGTH_ERROR);
 			return;
 		}
 		if (!getPasswordStrength(password).isValid) {
@@ -314,10 +335,11 @@ function SignUp() {
 										placeholder="Ваш пароль"
 										size="lg"
 										value={password}
-										onChange={(event) => setPassword(event.target.value)}
+										onChange={handlePasswordChange}
 										onFocus={() => setIsPasswordFocused(true)}
 										onBlur={() => setIsPasswordFocused(false)}
 										isDisabled={isSubmitting}
+										maxLength={PASSWORD_MAX_LENGTH + 1}
 										pr="3rem"
 									/>
 									<InputRightElement width="3rem" h="100%">
