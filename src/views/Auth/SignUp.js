@@ -31,6 +31,8 @@ const getLegalHref = (anchor) => `${PUBLIC_SITE_URLS.legal}#${anchor}`;
 
 const PERSONAL_DATA_CONSENT_HREF = getLegalHref('personal-data-consent');
 const PRIVACY_POLICY_HREF = getLegalHref('privacy');
+const NAME_MAX_LENGTH = 32;
+const NAME_MAX_LENGTH_ERROR = `Имя должно быть не длиннее ${NAME_MAX_LENGTH} символов`;
 const PASSWORD_MAX_LENGTH = 64;
 const PASSWORD_MAX_LENGTH_ERROR = `Пароль должен быть не длиннее ${PASSWORD_MAX_LENGTH} символов`;
 
@@ -87,6 +89,21 @@ function SignUp() {
 	const normalizedEmail = email.trim().toLowerCase();
 	const trimmedName = name.trim();
 
+	const handleNameChange = (event) => {
+		const nextName = event.target.value;
+
+		if (nextName.length > NAME_MAX_LENGTH) {
+			setName(nextName.slice(0, NAME_MAX_LENGTH));
+			setError(NAME_MAX_LENGTH_ERROR);
+			return;
+		}
+
+		setName(nextName);
+		if (error === NAME_MAX_LENGTH_ERROR) {
+			setError('');
+		}
+	};
+
 	const handlePasswordChange = (event) => {
 		const nextPassword = event.target.value;
 
@@ -107,6 +124,10 @@ function SignUp() {
 
 		if (!trimmedName || !normalizedEmail || !password) {
 			setError('Введите имя, почту и пароль');
+			return;
+		}
+		if (trimmedName.length > NAME_MAX_LENGTH) {
+			setError(NAME_MAX_LENGTH_ERROR);
 			return;
 		}
 		if (password.length > PASSWORD_MAX_LENGTH) {
@@ -303,8 +324,9 @@ function SignUp() {
 									mb="24px"
 									size="lg"
 									value={name}
-									onChange={(event) => setName(event.target.value)}
+									onChange={handleNameChange}
 									isDisabled={isSubmitting}
+									maxLength={NAME_MAX_LENGTH + 1}
 								/>
 							</FormControl>
 							<FormControl isRequired>
