@@ -36,7 +36,7 @@ import CardHeader from 'components/Card/CardHeader.js';
 import TablesTableRow from 'components/Tables/TablesTableRow';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { Link as RouterLink, Navigate } from 'react-router-dom';
+import { Navigate, Link as RouterLink } from 'react-router-dom';
 import { getCurrentUser } from 'services/auth';
 import {
 	activateOrganizationEmployee,
@@ -59,20 +59,31 @@ const STATUS_LABELS = {
 	invited: 'Приглашен',
 	disabled: 'Отключен',
 };
+const CYRILLIC_PATTERN = /^[А-Яа-яЁё-]+$/;
+const MAX_FIO_LENGTH = 32;
 
 function formatTokenValue(value) {
 	return new Intl.NumberFormat('ru-RU').format(Number(value) || 0).replace(/,/g, ' ');
 }
 
-function getEmployeeName(employee) {
-	const parts = [employee.surname, employee.name].filter(Boolean);
-	return parts.length > 0 ? parts.join(' ') : employee.email;
+function normalizeEmail(value) {
+	return String(value || '')
+		.trim()
+		.toLowerCase();
 }
 
-function mapEmployee(employee) {
+function getEmployeeName(employee, isCurrentUser = false) {
+	const parts = [employee.surname, employee.name].filter(Boolean);
+	const name = parts.length > 0 ? parts.join(' ') : employee.email;
+	return isCurrentUser && employee.role === 'director' ? `${name} (Вы)` : name;
+}
+
+function mapEmployee(employee, currentUserEmail = '') {
+	const isCurrentUser = employee.email === currentUserEmail;
+
 	return {
 		organizationMemberID: employee.organization_member_id,
-		name: getEmployeeName(employee),
+		name: getEmployeeName(employee, isCurrentUser),
 		email: employee.email,
 		subdomain: `ID ${employee.user_id}`,
 		domain: ROLE_LABELS[employee.role] || employee.role || 'Сотрудник',
@@ -84,11 +95,36 @@ function mapEmployee(employee) {
 	};
 }
 
+function sortEmployees(employees, currentUserEmail = '') {
+	return [...employees].sort((a, b) => {
+		const aIsDirector = a.role === 'director';
+		const bIsDirector = b.role === 'director';
+
+		if (aIsDirector !== bIsDirector) {
+			return aIsDirector ? -1 : 1;
+		}
+
+		const aIsCurrentUser = a.email === currentUserEmail;
+		const bIsCurrentUser = b.email === currentUserEmail;
+
+		if (aIsCurrentUser !== bIsCurrentUser) {
+			return aIsCurrentUser ? -1 : 1;
+		}
+
+		return 0;
+	});
+}
+
 function getErrorMessage(error) {
 	const message = error.message || '';
 	if (message.includes('Forbidden')) return 'Недостаточно прав для управления сотрудниками';
 	if (message.includes('employee email already exists'))
 		return 'Сотрудник с таким Email уже существует';
+	if (message.includes('user already in organization'))
+		return 'Этот пользователь уже добавлен в вашу компанию';
+	if (message.includes('Mailbox does not exist')) return 'Почтовый ящик сотрудника не существует';
+	if (message.includes('gomail: could not send email'))
+		return 'Не удалось отправить письмо сотруднику';
 	if (message.includes('employee not found')) return 'Сотрудник не найден';
 	if (message.includes('already disabled')) return 'Сотрудник уже отключен';
 	if (message.includes('already active')) return 'Сотрудник уже активирован';
@@ -96,6 +132,26 @@ function getErrorMessage(error) {
 		return 'Недостаточно токенов на счете организации';
 	if (message.includes('Invalid input')) return 'Проверьте заполнение формы, есть ошибки';
 	return message || 'Не удалось выполнить действие';
+}
+
+function getFioErrors(label, value) {
+	const trimmed = value.trim();
+	const errors = [];
+
+	if (trimmed.length === 0) {
+		errors.push(`${label}: обязательное поле`);
+		return errors;
+	}
+
+	if (trimmed.length > MAX_FIO_LENGTH) {
+		errors.push(`${label}: не более ${MAX_FIO_LENGTH} символов`);
+	}
+
+	if (!CYRILLIC_PATTERN.test(trimmed)) {
+		errors.push(`${label}: допускается только кириллица`);
+	}
+
+	return errors;
 }
 
 const EmployeeTable = ({
@@ -131,6 +187,7 @@ const EmployeeTable = ({
 	const [transferTarget, setTransferTarget] = useState(null);
 	const [firstName, setFirstName] = useState('');
 	const [surname, setSurname] = useState('');
+	const [middleName, setMiddleName] = useState('');
 	const [email, setEmail] = useState('');
 	const [existingEmail, setExistingEmail] = useState('');
 	const [tokens, setTokens] = useState(0);
@@ -142,9 +199,11 @@ const EmployeeTable = ({
 		setError('');
 
 		try {
+			const currentUser = await getCurrentUser();
+			const currentUserEmail = currentUser.email || '';
+
 			if (enforceOrganizationGuard) {
-				const user = await getCurrentUser();
-				if (!user.has_organization) {
+				if (!currentUser.has_organization) {
 					setRedirectPath('/lk/company/reg');
 					return;
 				}
@@ -154,7 +213,11 @@ const EmployeeTable = ({
 				getOrganizationEmployees(),
 				getOrganizationDetails().catch(() => null),
 			]);
-			setRows((employeePayload.employees || []).map(mapEmployee));
+			setRows(
+				sortEmployees(employeePayload.employees || [], currentUserEmail).map((employee) =>
+					mapEmployee(employee, currentUserEmail)
+				)
+			);
 			setOrganizationBalance(organizationPayload?.tokens_remain || 0);
 		} catch (requestError) {
 			setError(getErrorMessage(requestError));
@@ -221,6 +284,7 @@ const EmployeeTable = ({
 	const resetCreateForm = () => {
 		setFirstName('');
 		setSurname('');
+		setMiddleName('');
 		setEmail('');
 		setFormError('');
 	};
@@ -243,13 +307,29 @@ const EmployeeTable = ({
 	};
 
 	const emailIsValid = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+	const employeeAlreadyInOrganization = (value) => {
+		const normalizedEmail = normalizeEmail(value);
+		return rows.some((row) => normalizeEmail(row.email) === normalizedEmail);
+	};
 
 	const validateCreateForm = () => {
-		if (!firstName.trim() || !surname.trim() || !email.trim()) {
-			return 'Заполните имя, фамилию и email.';
+		const fioErrors = [
+			...getFioErrors('Фамилия', surname),
+			...getFioErrors('Имя', firstName),
+			...getFioErrors('Отчество', middleName),
+		];
+
+		if (fioErrors.length > 0) {
+			return fioErrors.join('\n');
+		}
+		if (!email.trim()) {
+			return 'Укажите email.';
 		}
 		if (!emailIsValid(email)) {
 			return 'Укажите корректный email.';
+		}
+		if (employeeAlreadyInOrganization(email)) {
+			return 'Этот пользователь уже добавлен в вашу компанию.';
 		}
 		return '';
 	};
@@ -265,9 +345,10 @@ const EmployeeTable = ({
 		setFormError('');
 		try {
 			await createOrganizationEmployee({
-				email: email.trim(),
+				email: normalizeEmail(email),
 				name: firstName.trim(),
 				surname: surname.trim(),
+				lastname: middleName.trim(),
 			});
 			closeCreateModal();
 			await loadEmployees();
@@ -286,15 +367,21 @@ const EmployeeTable = ({
 	};
 
 	const handleAddExistingEmployee = async () => {
-		if (!emailIsValid(existingEmail)) {
-			setFormError('Укажите корректный email.');
+		const normalizedEmail = normalizeEmail(existingEmail);
+
+		if (!emailIsValid(normalizedEmail)) {
+			setFormError('Укажите корректный Email');
+			return;
+		}
+		if (employeeAlreadyInOrganization(normalizedEmail)) {
+			setFormError('Этот пользователь уже добавлен в вашу компанию');
 			return;
 		}
 
 		setIsSaving(true);
 		setFormError('');
 		try {
-			await addExistingOrganizationEmployee(existingEmail.trim());
+			await addExistingOrganizationEmployee(normalizedEmail);
 			closeExistingModal();
 			await loadEmployees();
 			toast({
@@ -319,7 +406,7 @@ const EmployeeTable = ({
 			await loadEmployees();
 			toast({
 				title: 'Сотрудник деактивирован',
-				description: 'Остаток токенов сотрудника возвращён на счёт компании.',
+				description: 'Остаток токенов сотрудника возвращён на счёт компании',
 				status: 'success',
 				duration: 3000,
 				isClosable: true,
@@ -372,11 +459,11 @@ const EmployeeTable = ({
 
 	const handleTransferTokens = async () => {
 		if (!transferTarget || tokens <= 0) {
-			setFormError('Укажите количество токенов больше нуля.');
+			setFormError('Укажите количество токенов больше нуля');
 			return;
 		}
 		if (tokens > organizationBalance) {
-			setFormError('Недостаточно токенов на счете организации.');
+			setFormError('Недостаточно токенов на счете организации');
 			return;
 		}
 
@@ -389,7 +476,7 @@ const EmployeeTable = ({
 			await loadEmployees();
 			toast({
 				title: 'Токены переведены',
-				description: `На счёт сотрудника переведено ${formatTokenValue(transferredTokens)} токенов.`,
+				description: `На счёт сотрудника переведено ${formatTokenValue(transferredTokens)} токенов`,
 				status: 'success',
 				duration: 3000,
 				isClosable: true,
@@ -494,8 +581,8 @@ const EmployeeTable = ({
 					<Text fontSize="xl" color={textColor} fontWeight="bold">
 						{title}
 					</Text>
-					{showFullListButton && (
-						onFullListClick ? (
+					{showFullListButton &&
+						(onFullListClick ? (
 							<Button
 								colorScheme="recode"
 								borderColor="recode.300"
@@ -520,8 +607,7 @@ const EmployeeTable = ({
 							>
 								Весь список
 							</Button>
-						)
-					)}
+						))}
 				</Flex>
 			</CardHeader>
 			<CardBody style={{ flexDirection: 'column' }} flex="1" minH="0">
@@ -590,6 +676,7 @@ const EmployeeTable = ({
 											status={row.status}
 											date={row.date}
 											hiddenColumns={hiddenColumns}
+											isMuted={row.rawStatus === 'disabled'}
 											onEdit={row.rawStatus === 'disabled' ? null : () => setTransferTarget(row)}
 											onActivate={row.rawStatus === 'disabled' ? () => handleActivate(row) : null}
 											onDeactivate={
@@ -604,7 +691,7 @@ const EmployeeTable = ({
 						</Table>
 					)}
 				</Box>
-				<Flex gap="20px" wrap="wrap">
+				<Flex gap="20px" wrap="wrap" pt="20px">
 					<Button
 						leftIcon={<Icon as={FaPlus} boxSize="10px" />}
 						variant="solid"
@@ -667,7 +754,7 @@ const EmployeeTable = ({
 							{formError ? (
 								<Alert status="error" borderRadius="12px">
 									<AlertIcon />
-									<Text>{formError}</Text>
+									<Text whiteSpace="pre-line">{formError}</Text>
 								</Alert>
 							) : null}
 							<FormControl isInvalid={Boolean(formError) && !surname.trim()}>
@@ -699,6 +786,21 @@ const EmployeeTable = ({
 									h="46px"
 								/>
 								<FormErrorMessage>Укажите имя</FormErrorMessage>
+							</FormControl>
+							<FormControl isInvalid={Boolean(formError) && !middleName.trim()}>
+								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
+									Отчество
+								</FormLabel>
+								<Input
+									value={middleName}
+									onChange={(event) => setMiddleName(event.target.value)}
+									placeholder="Иванович"
+									bg={modalInputBg}
+									borderColor={modalInputBorderColor}
+									borderRadius="12px"
+									h="46px"
+								/>
+								<FormErrorMessage>Укажите отчество</FormErrorMessage>
 							</FormControl>
 							<FormControl isInvalid={Boolean(formError) && !email.trim()}>
 								<FormLabel fontSize="14px" color={modalSubtitleColor} mb="8px">
@@ -758,8 +860,8 @@ const EmployeeTable = ({
 						<Text fontSize="24px" fontWeight="600" color={textColor} lineHeight="1.1">
 							Перевести токены
 						</Text>
-						<Text mt="6px" fontSize="14px" color={modalSubtitleColor}>
-							{transferTarget?.name}
+						<Text mt="6px" fontSize="14px" fontWeight={400} color={modalSubtitleColor}>
+							на счёт: {transferTarget?.name}
 						</Text>
 					</ModalHeader>
 					<ModalBody px="32px" py="24px" bg={sectionBg}>

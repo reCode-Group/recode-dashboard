@@ -1,7 +1,20 @@
 import { Avatar, Badge, Button, Flex, Td, Text, Tr, useColorModeValue } from '@chakra-ui/react';
 
 function TablesTableRow(props) {
-	const { logo, name, email, subdomain, domain, status, date, hiddenColumns = [], onEdit, onDeactivate, onActivate } = props;
+	const {
+		logo,
+		name,
+		email,
+		subdomain,
+		domain,
+		status,
+		date,
+		hiddenColumns = [],
+		isMuted = false,
+		onEdit,
+		onDeactivate,
+		onActivate,
+	} = props;
 	const textColor = useColorModeValue('gray.700', 'white');
 	const bgStatus = useColorModeValue('gray.400', '#1a202c');
 	const colorStatus = useColorModeValue('white', 'gray.400');
@@ -10,7 +23,7 @@ function TablesTableRow(props) {
 	const isActiveStatus = normalizedStatus === 'active' || normalizedStatus === 'активен';
 
 	return (
-		<Tr>
+		<Tr opacity={isMuted ? 0.56 : 1}>
 			{!hiddenColumnsSet.has('user') && (
 				<Td minWidth={{ sm: '250px' }} pl="0px" py="10px">
 					<Flex align="center" py="2px" minWidth="100%" flexWrap="nowrap">
