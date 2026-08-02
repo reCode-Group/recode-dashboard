@@ -676,7 +676,7 @@ export default function MacroTranslatorPage() {
 									</Text>
 									<Text fontSize="xs" fontWeight="500" color={mutedColor}>
 										ПАКЕТ:{' '}
-										<Link color={textColor} textDecor="underline">
+										<Link as={RouterLink} to="/lk/tariff" color={textColor} textDecor="underline">
 											{getTariffLabel(subscriptionName)}
 										</Link>
 									</Text>
