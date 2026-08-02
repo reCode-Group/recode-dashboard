@@ -99,15 +99,14 @@ export const AccountFundingSwitcher = ({
 }) => {
 	const visibleOptions = useMemo(() => options.filter(Boolean), [options]);
 	const toast = useToast();
-	const textColor = useColorModeValue('#2D3748', 'white');
-	const mutedColor = useColorModeValue('gray.500', 'gray.300');
-	const borderColor = useColorModeValue('gray.200', 'whiteAlpha.300');
-	const cardBg = useColorModeValue('white', 'gray.700');
-	const accentBg = useColorModeValue('blue.50', 'whiteAlpha.100');
-	const segmentBg = useColorModeValue('white', 'whiteAlpha.100');
-	const activeSegmentBg = useColorModeValue('#005DE0', '#3182CE');
-	const inactiveHoverBg = useColorModeValue('gray.50', 'whiteAlpha.200');
-	const compactSummaryBg = useColorModeValue('gray.50', 'whiteAlpha.100');
+	const textColor = 'white';
+	const mutedColor = 'whiteAlpha.700';
+	const borderColor = 'whiteAlpha.200';
+	const cardBg = '#151928';
+	const segmentBg = 'rgba(255, 255, 255, 0.06)';
+	const activeSegmentBg = '#005DE0';
+	const inactiveHoverBg = 'rgba(60, 141, 255, 0.16)';
+	const compactSummaryBg = 'rgba(255, 255, 255, 0.08)';
 
 	if (visibleOptions.length <= 1) {
 		return null;
@@ -131,6 +130,9 @@ export const AccountFundingSwitcher = ({
 				direction={isCompact ? 'column' : { base: 'column', md: 'row' }}
 				p={isCompact ? '0' : { base: '16px', md: '18px 20px' }}
 				bg={isCompact ? 'transparent' : cardBg}
+				bgGradient={isCompact ? undefined : 'linear(to-br, #151928, #1F2733)'}
+				border={isCompact ? '0' : '1px solid'}
+				borderColor={isCompact ? undefined : borderColor}
 				borderRadius={isCompact ? '14px' : '16px'}
 				w="100%"
 			>
@@ -155,10 +157,10 @@ export const AccountFundingSwitcher = ({
 								px="14px"
 								borderRadius="10px"
 								border="1px solid"
-								borderColor={borderColor}
+								borderColor={isActive ? 'rgba(60, 141, 255, 0.72)' : borderColor}
 								bg={isActive ? activeSegmentBg : segmentBg}
 								color={isActive ? 'white' : textColor}
-								boxShadow={isActive ? 'md' : 'none'}
+								boxShadow={isActive ? '0 10px 24px rgba(0, 93, 224, 0.32)' : 'none'}
 								fontSize="sm"
 								fontWeight="medium"
 								_hover={{ bg: isActive ? activeSegmentBg : inactiveHoverBg }}

@@ -188,6 +188,7 @@ function BillingPay() {
 	const reconciliationPromiseRef = useRef(null);
 	const paymentFormCleanupRef = useRef(null);
 	const isPaymentConfirmedRef = useRef(false);
+	const appliedRequestedAccountSearchRef = useRef('');
 
 	const titleColor = useColorModeValue('gray.700', 'white');
 	const subtitleColor = useColorModeValue('gray.400', 'gray.300');
@@ -309,7 +310,11 @@ function BillingPay() {
 	}, [accountType, canUseOrganizationAccount, isLoadingUser]);
 
 	useEffect(() => {
-		if (!requestedAccountType || requestedAccountType === accountType) {
+		if (!requestedAccountType || appliedRequestedAccountSearchRef.current === location.search) {
+			return;
+		}
+
+		if (isLoadingUser) {
 			return;
 		}
 
@@ -317,11 +322,16 @@ function BillingPay() {
 			return;
 		}
 
+		appliedRequestedAccountSearchRef.current = location.search;
+		if (requestedAccountType === accountType) {
+			return;
+		}
+
 		setAccountType(requestedAccountType);
 		setPaymentMethodId(getInitialPaymentMethodId(requestedAccountType));
 		setSubmitError('');
 		setBillResult(null);
-	}, [accountType, canUseOrganizationAccount, requestedAccountType]);
+	}, [accountType, canUseOrganizationAccount, isLoadingUser, location.search, requestedAccountType]);
 
 	useEffect(() => {
 		saveStorageValue(SELECTED_ACCOUNT_STORAGE_KEY, accountType);
