@@ -1,5 +1,6 @@
 // Chakra imports
 import {
+	Button,
 	Flex,
 	Switch,
 	Text,
@@ -13,11 +14,6 @@ import CardBody from 'components/Card/CardBody';
 import CardHeader from 'components/Card/CardHeader';
 
 const ACCOUNT_SETTINGS = [
-	{
-		id: 'conversionEmails',
-		label: 'Получать письма о новой конвертации макроса',
-		defaultValue: false,
-	},
 	{
 		id: 'twoFactorAuth',
 		label: 'Двух-факторная аутентификация',
@@ -54,7 +50,7 @@ function SettingRow({
 	);
 
 	return (
-		<Flex align='center' mb='20px'>
+		<Flex align='center' mb='12px'>
 			{isDisabled ? (
 				<Tooltip label='Недоступно' hasArrow placement='top' openDelay={250}>
 					<span>{switchElement}</span>
@@ -74,9 +70,11 @@ function SettingRow({
 	);
 }
 
-const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
+const PlatformSettings = ({ title, subtitle1, subtitle2, onChangePassword }) => {
 	const { colorMode, toggleColorMode } = useColorMode();
 	const textColor = useColorModeValue('gray.700', 'white');
+	const passwordButtonBorderColor = useColorModeValue('gray.200', 'whiteAlpha.300');
+	const passwordButtonHoverBg = useColorModeValue('gray.50', 'whiteAlpha.100');
 
 	return (
 		<Card id='settings' scrollMarginTop='110px' p='16px'>
@@ -87,17 +85,33 @@ const PlatformSettings = ({ title, subtitle1, subtitle2 }) => {
 			</CardHeader>
 			<CardBody px='5px'>
 				<Flex direction='column'>
-					<Text fontSize='sm' color='gray.500' fontWeight='600' mb='20px'>
+					<Text fontSize='sm' color='gray.500' fontWeight='600' mb='12px'>
 						{subtitle1}
 					</Text>
 					{ACCOUNT_SETTINGS.map((setting) => (
-						<SettingRow
-							key={setting.id}
-							label={setting.label}
-							isChecked={setting.defaultValue}
-							isDisabled={setting.id !== 'darkTheme'}
-							onChange={setting.id === 'darkTheme' ? toggleColorMode : undefined}
-						/>
+						<Flex key={setting.id} direction="column" align="flex-start">
+							<SettingRow
+								label={setting.label}
+								isChecked={setting.defaultValue}
+								isDisabled={setting.id !== 'darkTheme'}
+								onChange={setting.id === 'darkTheme' ? toggleColorMode : undefined}
+							/>
+							{setting.id === 'twoFactorAuth' ? (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									borderRadius="12px"
+									color="gray.500"
+									borderColor={passwordButtonBorderColor}
+									mb="16px"
+									onClick={onChangePassword}
+									_hover={{ bg: passwordButtonHoverBg }}
+								>
+									Сменить пароль
+								</Button>
+							) : null}
+						</Flex>
 					))}
 					<Text fontSize='sm' color='gray.500' fontWeight='600' m='6px 0px 20px 0px'>
 						{subtitle2}

@@ -25,6 +25,7 @@ import Header from './components/Header';
 import PlatformSettings from './components/PlatformSettings';
 import ProfileEditRequestModal from './components/ProfileEditRequestModal';
 import ProfileInformation from './components/ProfileInformation';
+import PasswordResetModal from 'views/Auth/components/PasswordResetModal';
 
 const emptyValue = 'Не указано';
 
@@ -68,6 +69,11 @@ function Profile() {
 	const location = useLocation();
 	const toast = useToast();
 	const { isOpen: isEditModalOpen, onOpen: onOpenEditModal, onClose: onCloseEditModal } = useDisclosure();
+	const {
+		isOpen: isPasswordModalOpen,
+		onOpen: onOpenPasswordModal,
+		onClose: onClosePasswordModal,
+	} = useDisclosure();
 	const bgProfile = useColorModeValue(
 		'hsla(0,0%,100%,.8)',
 		'linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)'
@@ -250,6 +256,7 @@ function Profile() {
 							title="Настройки платформы"
 							subtitle1="АККАУНТ"
 							subtitle2="ПЕРСОНАЛИЗАЦИЯ"
+							onChangePassword={onOpenPasswordModal}
 						/>
 					</Grid>
 					<Grid
@@ -282,6 +289,14 @@ function Profile() {
 						email={user?.email || emptyValue}
 						role={roleName}
 						company={companyName}
+					/>
+					<PasswordResetModal
+						isOpen={isPasswordModalOpen}
+						onClose={onClosePasswordModal}
+						initialEmail={user?.email || ''}
+						mode="change"
+						isEmailLocked={true}
+						closeOnSuccess={false}
 					/>
 				</>
 			)}
