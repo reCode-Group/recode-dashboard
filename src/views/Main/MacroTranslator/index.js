@@ -59,6 +59,12 @@ const TRANSLATION_MODE = {
 	PAID: 'paid',
 };
 
+const TRANSLATION_PROGRESS_STEPS = [
+	'Анализируем исходный макрос',
+	'Подбираем структуру перевода',
+	'Собираем итоговый код',
+];
+
 const FREE_TRANSLATIONS_PER_DAY = 4;
 const FREE_TRANSLATION_CHAR_LIMIT = 600;
 const FREE_TRANSLATION_LIMIT_MESSAGE = `В бесплатном переводе можно ввести не более ${FREE_TRANSLATION_CHAR_LIMIT} символов`;
@@ -118,6 +124,7 @@ export default function MacroTranslatorPage() {
 	const [lastConversion, setLastConversion] = useState(null);
 	const [isPageLoading, setIsPageLoading] = useState(true);
 	const [isConverting, setIsConverting] = useState(false);
+	const [translationProgressStep, setTranslationProgressStep] = useState(0);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [user, setUser] = useState(null);
 	const [subscriptionName, setSubscriptionName] = useState('Нет пакета');
@@ -135,6 +142,7 @@ export default function MacroTranslatorPage() {
 	const modalTextColor = useColorModeValue('gray.600', 'gray.200');
 	const modalGlassBg = useColorModeValue('rgba(255, 255, 255, 0.92)', 'rgba(26, 32, 44, 0.92)');
 	const modalSectionBg = useColorModeValue('rgba(255, 255, 255, 0.72)', 'rgba(26, 32, 44, 0.72)');
+	const resultLoadingBg = useColorModeValue('rgba(255, 255, 255, 0.9)', 'rgba(26, 32, 44, 0.9)');
 	const selectPlaceholderColor = useColorModeValue('gray.600', 'gray.200');
 	const toggleBg = useColorModeValue('gray.50', 'whiteAlpha.100');
 
@@ -148,6 +156,7 @@ export default function MacroTranslatorPage() {
 	const isFreeTranslation = translationMode === TRANSLATION_MODE.FREE;
 	const hasTranslatedCode =
 		Boolean(translated.trim()) && translated !== EMPTY_TRANSLATION_MESSAGE;
+	const currentTranslationProgress = TRANSLATION_PROGRESS_STEPS[translationProgressStep];
 
 	const loadData = useCallback(async ({ showLoader = true } = {}) => {
 		if (showLoader) {
@@ -217,6 +226,21 @@ export default function MacroTranslatorPage() {
 			}
 		};
 	}, []);
+
+	useEffect(() => {
+		if (!isConverting) {
+			setTranslationProgressStep(0);
+			return undefined;
+		}
+
+		const progressTimer = setInterval(() => {
+			setTranslationProgressStep((currentStep) =>
+				(currentStep + 1) % TRANSLATION_PROGRESS_STEPS.length
+			);
+		}, 3200);
+
+		return () => clearInterval(progressTimer);
+	}, [isConverting]);
 
 	const handleCopyResult = async () => {
 		if (!hasTranslatedCode) return;
@@ -290,6 +314,8 @@ export default function MacroTranslatorPage() {
 		setIsConverting(true);
 		setErrorMessage('');
 		setCopied(false);
+		setTranslated('');
+		setLastConversion(null);
 
 		try {
 			const requestPayload = {
@@ -632,10 +658,43 @@ export default function MacroTranslatorPage() {
 										right="10px"
 										zIndex={2}
 										_hover={{ bg: 'gray.300' }}
-										isDisabled={!hasTranslatedCode}
+										isDisabled={isConverting || !hasTranslatedCode}
 									>
 										{copied ? 'Скопировано.' : 'Копировать'}
 									</Button>
+									{isConverting ? (
+										<Flex
+											position="absolute"
+											inset="0"
+											zIndex={3}
+											borderRadius="15px"
+											bg={resultLoadingBg}
+											borderWidth="1px"
+											borderColor="recode.100"
+											align="center"
+											justify="center"
+											direction="column"
+											gap="14px"
+											px="24px"
+											textAlign="center"
+										>
+											<Spinner
+												thickness="4px"
+												speed="0.75s"
+												emptyColor="gray.200"
+												color="recode.300"
+												size="xl"
+											/>
+											<Box>
+												<Text fontSize="sm" fontWeight="700" color={textColor}>
+													{currentTranslationProgress}
+												</Text>
+												<Text mt="4px" fontSize="xs" color={mutedColor}>
+													Результат появится здесь автоматически
+												</Text>
+											</Box>
+										</Flex>
+									) : null}
 									<Textarea
 										value={translated}
 										placeholder="..."
@@ -649,6 +708,7 @@ export default function MacroTranslatorPage() {
 										pt="8px"
 										position="relative"
 										zIndex={1}
+										opacity={isConverting ? 0.35 : 1}
 										readOnly
 									/>
 								</Box>
