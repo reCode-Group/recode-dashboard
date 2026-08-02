@@ -6,6 +6,7 @@ import {
 	AccordionPanel,
 	Avatar,
 	Box,
+	Button,
 	Flex,
 	Text,
 	useColorModeValue,
@@ -29,6 +30,24 @@ function InfoRow({ label, value }) {
 	);
 }
 
+function normalizeDigits(value) {
+	return String(value || '').replace(/\D/g, '');
+}
+
+function getEntityType({ inn, kpp, ogrn }) {
+	const innDigits = normalizeDigits(inn);
+	const kppDigits = normalizeDigits(kpp);
+	const ogrnDigits = normalizeDigits(ogrn);
+
+	if (innDigits.length === 12 || ogrnDigits.length === 15) {
+		return 'ip';
+	}
+	if (kppDigits.length === 9 || innDigits.length === 10 || ogrnDigits.length === 13) {
+		return 'company';
+	}
+	return 'unknown';
+}
+
 const CompanyInformation = ({
 	title,
 	company,
@@ -41,9 +60,11 @@ const CompanyInformation = ({
 	inn,
 	kpp,
 	ogrn,
+	okpo,
 	email,
 	tokensRemain,
 	employeesCount,
+	onEdit,
 }) => {
 	const mainColor = useColorModeValue('gray.700', 'white');
 	const borderProfileColor = useColorModeValue('gray.100', 'rgba(255, 255, 255, 0.31)');
@@ -63,6 +84,10 @@ const CompanyInformation = ({
 		() => new Intl.NumberFormat('ru-RU').format(Number(employeesCount) || 0).replace(/,/g, ' '),
 		[employeesCount]
 	);
+	const entityType = useMemo(() => getEntityType({ inn, kpp, ogrn }), [inn, kpp, ogrn]);
+	const isIp = entityType === 'ip';
+	const entityTypeLabel =
+		entityType === 'ip' ? 'Индивидуальный предприниматель' : entityType === 'company' ? 'Юридическое лицо' : emptyValue;
 
 	return (
 		<Card
@@ -125,18 +150,33 @@ const CompanyInformation = ({
 					</Flex>
 
 					<CardHeader p="0" mb="10px">
-						<Text fontSize="lg" color={mainColor} fontWeight="bold">
-							{title}
-						</Text>
+						<Flex align="center" justify="space-between" gap="12px" w="100%">
+							<Text fontSize="lg" color={mainColor} fontWeight="bold">
+								{title}
+							</Text>
+							<Button
+								size="sm"
+								variant="ghost"
+								color="gray.500"
+								fontWeight="500"
+								borderRadius="8px"
+								onClick={onEdit}
+								_hover={{ bg: 'blackAlpha.50', color: mainColor }}
+							>
+								Изменить
+							</Button>
+						</Flex>
 					</CardHeader>
 
 					<Separator mb="10px" />
 
 					<Flex direction="column" gap="14px" mb="16px">
+						<InfoRow label="ТИП" value={entityTypeLabel} />
 						<InfoRow label="ПОЛНОЕ НАИМЕНОВАНИЕ" value={fullName} />
-						<InfoRow label="ИНН" value={inn} />
-						<InfoRow label="КПП" value={kpp} />
-						<InfoRow label="ОГРН" value={ogrn} />
+						<InfoRow label={isIp ? 'ИНН ИП' : 'ИНН'} value={inn} />
+						{isIp ? null : <InfoRow label="КПП" value={kpp} />}
+						<InfoRow label={isIp ? 'ОГРНИП' : 'ОГРН'} value={ogrn} />
+						<InfoRow label="ОКПО" value={okpo} />
 					</Flex>
 
 					<Separator mb="10px" />

@@ -10,6 +10,7 @@ import {
 	Spinner,
 	Text,
 	useColorModeValue,
+	useDisclosure,
 } from '@chakra-ui/react';
 import ProfileBgImage from 'assets/img/ProfileBackground.png';
 import ConversionHistory from 'components/Tables/ConversionHistory';
@@ -24,6 +25,7 @@ import { mapConversion } from 'utils/conversions';
 import Documents from 'views/Dashboard/Billing/components/Documents';
 import useMonthlySpendingReports from 'views/Dashboard/Billing/useMonthlySpendingReports';
 import EmployeeTable from 'views/Dashboard/Tables/components/EmployeeTable';
+import CompanyEditRequestModal from './components/CompanyEditRequestModal';
 import CompanyInformation from './components/CompanyInformation';
 
 const emptyValue = 'Не указано';
@@ -50,6 +52,7 @@ function getCompanyAddress(organization) {
 
 function Company() {
 	const location = useLocation();
+	const { isOpen: isEditModalOpen, onOpen: onOpenEditModal, onClose: onCloseEditModal } = useDisclosure();
 	const queryTab = useMemo(() => new URLSearchParams(location.search).get('tab'), [
 		location.search,
 	]);
@@ -192,8 +195,10 @@ function Company() {
 						inn={organization?.inn || emptyValue}
 						kpp={organization?.kpp || emptyValue}
 						ogrn={organization?.ogrn || emptyValue}
+						okpo={organization?.okpo || emptyValue}
 						tokensRemain={organization?.tokens_remain}
 						employeesCount={organization?.employees_count}
+						onEdit={onOpenEditModal}
 					/>
 				</GridItem>
 
@@ -296,6 +301,12 @@ function Company() {
 					</Grid>
 				</GridItem>
 			</Grid>
+			<CompanyEditRequestModal
+				isOpen={isEditModalOpen}
+				onClose={onCloseEditModal}
+				organization={organization}
+				user={currentUser}
+			/>
 		</Flex>
 	);
 }

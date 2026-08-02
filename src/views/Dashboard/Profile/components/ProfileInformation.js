@@ -1,5 +1,5 @@
 // Chakra imports
-import { Flex, Text, Tooltip, useColorModeValue } from '@chakra-ui/react';
+import { Button, Flex, Text, Tooltip, useColorModeValue } from '@chakra-ui/react';
 // Custom components
 import Card from 'components/Card/Card';
 import CardBody from 'components/Card/CardBody';
@@ -21,16 +21,29 @@ function InfoRow({ label, value, textColor }) {
 	);
 }
 
-const ProfileInformation = ({ title, company, role, name, mobile, email }) => {
+const ProfileInformation = ({ title, company, role, name, mobile, email, onEdit }) => {
 	const mainColor = useColorModeValue('gray.700', 'white');
 	const textColor = useColorModeValue('gray.500', 'white');
 
 	return (
 		<Card p="16px" my={{ sm: '24px', xl: '0px' }}>
 			<CardHeader p="12px 5px" mb="12px">
-				<Text fontSize="lg" color={mainColor} fontWeight="bold">
-					{title}
-				</Text>
+				<Flex align="center" justify="space-between" gap="12px" w="100%">
+					<Text fontSize="lg" color={mainColor} fontWeight="bold">
+						{title}
+					</Text>
+					<Button
+						size="sm"
+						variant="ghost"
+						color="gray.500"
+						fontWeight="500"
+						borderRadius="8px"
+						onClick={onEdit}
+						_hover={{ bg: 'blackAlpha.50', color: mainColor }}
+					>
+						Изменить
+					</Button>
+				</Flex>
 			</CardHeader>
 			<CardBody px="5px">
 				<Flex direction="column" w="100%" minW="0">

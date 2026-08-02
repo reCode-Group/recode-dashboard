@@ -6,6 +6,7 @@ import {
 	Grid,
 	Spinner,
 	useColorModeValue,
+	useDisclosure,
 	useToast,
 } from '@chakra-ui/react';
 import ProfileBgImage from 'assets/img/ProfileBackground.png';
@@ -22,6 +23,7 @@ import DocumentsFull from 'views/Dashboard/Billing/components/DocumentsFull';
 import useMonthlySpendingReports from 'views/Dashboard/Billing/useMonthlySpendingReports';
 import Header from './components/Header';
 import PlatformSettings from './components/PlatformSettings';
+import ProfileEditRequestModal from './components/ProfileEditRequestModal';
 import ProfileInformation from './components/ProfileInformation';
 
 const emptyValue = 'Не указано';
@@ -65,6 +67,7 @@ function getRoleLabel(role) {
 function Profile() {
 	const location = useLocation();
 	const toast = useToast();
+	const { isOpen: isEditModalOpen, onOpen: onOpenEditModal, onClose: onCloseEditModal } = useDisclosure();
 	const bgProfile = useColorModeValue(
 		'hsla(0,0%,100%,.8)',
 		'linear-gradient(112.83deg, rgba(255, 255, 255, 0.21) 0%, rgba(255, 255, 255, 0) 110.84%)'
@@ -168,7 +171,7 @@ function Profile() {
 			? [
 					{
 						id: 'documents',
-						name: 'ДОКУМЕНТЫ',
+						name: 'ДОКУМЕНТЫ КОМПАНИИ',
 						icon: <IoDocumentsSharp w="100%" h="100%" />,
 					},
 			  ]
@@ -241,6 +244,7 @@ function Profile() {
 							name={fullName}
 							mobile={mobile}
 							email={user?.email || emptyValue}
+							onEdit={onOpenEditModal}
 						/>
 						<PlatformSettings
 							title="Настройки платформы"
@@ -270,6 +274,15 @@ function Profile() {
 							showFullHistoryButton={true}
 						/>
 					</Grid>
+					<ProfileEditRequestModal
+						isOpen={isEditModalOpen}
+						onClose={onCloseEditModal}
+						currentFullName={fullName}
+						currentPhone={mobile}
+						email={user?.email || emptyValue}
+						role={roleName}
+						company={companyName}
+					/>
 				</>
 			)}
 		</Flex>

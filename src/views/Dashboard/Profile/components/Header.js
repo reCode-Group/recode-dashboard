@@ -238,10 +238,12 @@ const Header = ({
 									>
 										<Flex
 											align="center"
-											w={{ sm: '100%', lg: '135px' }}
+											w={{ sm: '100%', lg: 'auto' }}
+											minW={{ lg: tab.id === 'documents' ? '190px' : '135px' }}
 											bg={isActive ? 'hsla(0,0%,100%,.3)' : 'transparent'}
 											borderRadius="15px"
 											justifyContent="center"
+											px="14px"
 											py={isActive ? '12px' : '10px'}
 											boxShadow={
 												isActive
@@ -253,7 +255,7 @@ const Header = ({
 											cursor="pointer"
 										>
 											{tab.icon}
-											<Text fontSize="xs" color={textColor} fontWeight="bold" ms="6px">
+											<Text fontSize="xs" color={textColor} fontWeight="bold" ms="6px" whiteSpace="nowrap">
 												{tab.name}
 											</Text>
 										</Flex>
