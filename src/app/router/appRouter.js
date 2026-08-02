@@ -8,6 +8,7 @@ import { authRoutes } from './routes/authRoutes';
 import { dashboardRoutes } from './routes/dashboardRoutes';
 import { mainRoutes } from './routes/mainRoutes';
 import { routePaths } from './routePaths';
+import { AppErrorBoundary, RouterErrorElement } from './ui/AppErrorBoundary';
 import { RequireAuth } from './ui/RequireAuth';
 import { RequireGuest } from './ui/RequireGuest';
 import { RouteMetadata } from './ui/RouteMetadata';
@@ -15,6 +16,7 @@ import { RouteMetadata } from './ui/RouteMetadata';
 const appRouter = createBrowserRouter([
 	{
 		element: <RouteMetadata />,
+		errorElement: <RouterErrorElement />,
 		children: [
 			{
 				element: <MainLayout />,
@@ -44,5 +46,9 @@ const appRouter = createBrowserRouter([
 ]);
 
 export function AppRouter() {
-	return <RouterProvider router={appRouter} />;
+	return (
+		<AppErrorBoundary>
+			<RouterProvider router={appRouter} />
+		</AppErrorBoundary>
+	);
 }
