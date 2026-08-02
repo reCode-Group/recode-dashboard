@@ -65,7 +65,7 @@ const TRANSLATION_PROGRESS_STEPS = [
 	'Собираем итоговый код',
 ];
 
-const FREE_TRANSLATIONS_PER_DAY = 4;
+const FREE_TRANSLATIONS_PER_DAY = 3;
 const FREE_TRANSLATION_CHAR_LIMIT = 600;
 const FREE_TRANSLATION_LIMIT_MESSAGE = `В бесплатном переводе можно ввести не более ${FREE_TRANSLATION_CHAR_LIMIT} символов`;
 const VBA_PROCEDURE_PATTERN = /^\s*(?:Public\s+|Private\s+|Friend\s+|Static\s+)*(?:Sub|Function)\s+[A-Za-z_][A-Za-z0-9_]*\b/im;
