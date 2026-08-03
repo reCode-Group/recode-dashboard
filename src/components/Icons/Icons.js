@@ -45,6 +45,33 @@ export const CartIcon = createIcon({
 	),
 });
 
+export const BriefcaseBusinessIcon = createIcon({
+	displayName: 'BriefcaseBusinessIcon',
+	viewBox: '0 0 24 24',
+	path: (
+		<g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+			<path d="M12 12h.01" />
+			<path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+			<path d="M22 13a18.15 18.15 0 0 1-20 0" />
+			<rect width="20" height="14" x="2" y="6" rx="2" />
+		</g>
+	),
+});
+
+export const Building2Icon = createIcon({
+	displayName: 'Building2Icon',
+	viewBox: '0 0 24 24',
+	path: (
+		<g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+			<path d="M10 12h4" />
+			<path d="M10 8h4" />
+			<path d="M14 21v-3a2 2 0 0 0-4 0v3" />
+			<path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2" />
+			<path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" />
+		</g>
+	),
+});
+
 export const ClockIcon = createIcon({
 	displayName: 'ClockIcon',
 	viewBox: '0 0 24 24',

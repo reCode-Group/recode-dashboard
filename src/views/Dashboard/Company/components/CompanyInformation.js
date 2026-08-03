@@ -82,8 +82,12 @@ const CompanyInformation = ({
 	const borderProfileColor = useColorModeValue('gray.100', 'rgba(255, 255, 255, 0.31)');
 	const tokensBg = useColorModeValue('gray.50', 'whiteAlpha.100');
 	const tokensLabelColor = useColorModeValue('gray.500', 'gray.300');
-	const iconBg = useColorModeValue('gray.900', 'whiteAlpha.200');
-	const iconColor = useColorModeValue('white', 'white');
+	const companyIconBg = useColorModeValue('blue.50', 'blue.900');
+	const companyIconColor = useColorModeValue('blue.500', 'blue.200');
+	const companyIconBorder = useColorModeValue('blue.100', 'blue.700');
+	const ipIconBg = useColorModeValue('teal.50', 'teal.900');
+	const ipIconColor = useColorModeValue('teal.500', 'teal.200');
+	const ipIconBorder = useColorModeValue('teal.100', 'teal.700');
 	const glassBg = useColorModeValue(
 		'linear-gradient(113.34deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.8) 110.84%)',
 		'linear-gradient(113.34deg, rgba(26, 32, 44, 0.82) 0%, rgba(26, 32, 44, 0.8) 110.84%)'
@@ -107,6 +111,9 @@ const CompanyInformation = ({
 	const addressLabel = isIp ? 'МЕСТО РЕГИСТРАЦИИ ИП' : 'ЮРИДИЧЕСКИЙ АДРЕС';
 	const emailLabel = isIp ? 'EMAIL ИП' : 'EMAIL КОМПАНИИ';
 	const EntityIcon = isIp ? BriefcaseBusinessIcon : Building2Icon;
+	const iconBg = isIp ? ipIconBg : companyIconBg;
+	const iconColor = isIp ? ipIconColor : companyIconColor;
+	const iconBorder = isIp ? ipIconBorder : companyIconBorder;
 
 	return (
 		<Card
@@ -133,6 +140,8 @@ const CompanyInformation = ({
 							me="16px"
 							bg={iconBg}
 							color={iconColor}
+							border="1px solid"
+							borderColor={iconBorder}
 							borderRadius="12px"
 							w="80px"
 							h="80px"

@@ -186,6 +186,7 @@ function Company() {
 						title="Информация"
 						company={getCompanyName(organization)}
 						email={organization?.email || emptyValue}
+						organizationType={organization?.organization_type}
 						fullName={organization?.full_name}
 						responsibleFullName={organization?.responsible_full_name}
 						responsibleEmail={organization?.responsible_email}
@@ -195,7 +196,6 @@ function Company() {
 						inn={organization?.inn || emptyValue}
 						kpp={organization?.kpp || emptyValue}
 						ogrn={organization?.ogrn || emptyValue}
-						okpo={organization?.okpo || emptyValue}
 						tokensRemain={organization?.tokens_remain}
 						employeesCount={organization?.employees_count}
 						onEdit={onOpenEditModal}
