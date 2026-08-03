@@ -4,7 +4,6 @@ import {
 	AccordionIcon,
 	AccordionItem,
 	AccordionPanel,
-	Avatar,
 	Box,
 	Button,
 	Flex,
@@ -14,8 +13,11 @@ import {
 import Card from 'components/Card/Card';
 import CardBody from 'components/Card/CardBody';
 import CardHeader from 'components/Card/CardHeader';
+import { BriefcaseBusinessIcon, Building2Icon } from 'components/Icons/Icons';
 import { Separator } from 'components/Separator/Separator';
 import { useMemo } from 'react';
+
+const emptyValue = 'Не указано';
 
 function InfoRow({ label, value }) {
 	const textColor = useColorModeValue('gray.500', 'white');
@@ -48,9 +50,20 @@ function getEntityType({ inn, kpp, ogrn }) {
 	return 'unknown';
 }
 
+function normalizeEntityType(organizationType, requisites) {
+	if (organizationType === 'individual_entrepreneur') {
+		return 'ip';
+	}
+	if (organizationType === 'legal_entity') {
+		return 'company';
+	}
+	return getEntityType(requisites);
+}
+
 const CompanyInformation = ({
 	title,
 	company,
+	organizationType,
 	fullName,
 	responsibleFullName,
 	responsibleEmail,
@@ -60,7 +73,6 @@ const CompanyInformation = ({
 	inn,
 	kpp,
 	ogrn,
-	okpo,
 	email,
 	tokensRemain,
 	employeesCount,
@@ -70,12 +82,13 @@ const CompanyInformation = ({
 	const borderProfileColor = useColorModeValue('gray.100', 'rgba(255, 255, 255, 0.31)');
 	const tokensBg = useColorModeValue('gray.50', 'whiteAlpha.100');
 	const tokensLabelColor = useColorModeValue('gray.500', 'gray.300');
+	const iconBg = useColorModeValue('gray.900', 'whiteAlpha.200');
+	const iconColor = useColorModeValue('white', 'white');
 	const glassBg = useColorModeValue(
 		'linear-gradient(113.34deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.8) 110.84%)',
 		'linear-gradient(113.34deg, rgba(26, 32, 44, 0.82) 0%, rgba(26, 32, 44, 0.8) 110.84%)'
 	);
 
-	const avatarFallback = useMemo(() => company?.slice(0, 2) || 'К', [company]);
 	const formattedTokens = useMemo(
 		() => new Intl.NumberFormat('ru-RU').format(Number(tokensRemain) || 0).replace(/,/g, ' '),
 		[tokensRemain]
@@ -84,10 +97,16 @@ const CompanyInformation = ({
 		() => new Intl.NumberFormat('ru-RU').format(Number(employeesCount) || 0).replace(/,/g, ' '),
 		[employeesCount]
 	);
-	const entityType = useMemo(() => getEntityType({ inn, kpp, ogrn }), [inn, kpp, ogrn]);
+	const entityType = useMemo(
+		() => normalizeEntityType(organizationType, { inn, kpp, ogrn }),
+		[organizationType, inn, kpp, ogrn]
+	);
 	const isIp = entityType === 'ip';
 	const entityTypeLabel =
 		entityType === 'ip' ? 'Индивидуальный предприниматель' : entityType === 'company' ? 'Юридическое лицо' : emptyValue;
+	const addressLabel = isIp ? 'МЕСТО РЕГИСТРАЦИИ ИП' : 'ЮРИДИЧЕСКИЙ АДРЕС';
+	const emailLabel = isIp ? 'EMAIL ИП' : 'EMAIL КОМПАНИИ';
+	const EntityIcon = isIp ? BriefcaseBusinessIcon : Building2Icon;
 
 	return (
 		<Card
@@ -109,15 +128,20 @@ const CompanyInformation = ({
 					py="8px"
 				>
 					<Flex align="center" mb="22px">
-						<Box position="relative" me="16px">
-							<Avatar
-								name={avatarFallback}
-								bg="black"
-								color="white"
-								borderRadius="12px"
-								w="80px"
-								h="80px"
-							/>
+						<Box
+							position="relative"
+							me="16px"
+							bg={iconBg}
+							color={iconColor}
+							borderRadius="12px"
+							w="80px"
+							h="80px"
+							display="flex"
+							alignItems="center"
+							justifyContent="center"
+							flexShrink={0}
+						>
+							<EntityIcon boxSize="40px" />
 						</Box>
 						<Flex direction="column" minW="0">
 							<Text fontSize="xl" color={mainColor} fontWeight="bold" noOfLines={2}>
@@ -176,7 +200,6 @@ const CompanyInformation = ({
 						<InfoRow label={isIp ? 'ИНН ИП' : 'ИНН'} value={inn} />
 						{isIp ? null : <InfoRow label="КПП" value={kpp} />}
 						<InfoRow label={isIp ? 'ОГРНИП' : 'ОГРН'} value={ogrn} />
-						<InfoRow label="ОКПО" value={okpo} />
 					</Flex>
 
 					<Separator mb="10px" />
@@ -198,8 +221,8 @@ const CompanyInformation = ({
 							</AccordionButton>
 							<AccordionPanel px="0" pt="14px" pb="0">
 								<Flex direction="column" gap="14px">
-									<InfoRow label="ЮРИДИЧЕСКИЙ АДРЕС" value={legalAddress} />
-									<InfoRow label="EMAIL КОМПАНИИ" value={email} />
+									<InfoRow label={addressLabel} value={legalAddress} />
+									<InfoRow label={emailLabel} value={email} />
 									<InfoRow label="ФИО ОТВЕТСТВЕННОГО" value={responsibleFullName} />
 									<InfoRow label="ДОЛЖНОСТЬ ОТВЕТСТВЕННОГО" value={responsiblePosition} />
 									<InfoRow label="ТЕЛЕФОН ОТВЕТСТВЕННОГО" value={responsiblePhone} />

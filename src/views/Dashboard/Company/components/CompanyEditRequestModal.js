@@ -35,22 +35,22 @@ const tabs = [
 		id: 'general',
 		label: 'Реквизиты',
 		title: 'Реквизиты',
-		description: 'Названия, ИНН, ОГРН/ОГРНИП, ОКПО и КПП для юридического лица.',
-		subject: 'Запрос на изменение реквизитов компании',
+		description: 'Названия, ИНН, ОГРН/ОГРНИП и КПП для юридического лица.',
+		subject: 'Запрос на изменение реквизитов',
 	},
 	{
 		id: 'additional',
 		label: 'Контакты',
 		title: 'Контакты',
-		description: 'Юридический адрес, почта компании и данные ответственного лица.',
-		subject: 'Запрос на изменение контактных данных компании',
+		description: 'Адрес, почта и данные ответственного лица.',
+		subject: 'Запрос на изменение контактных данных',
 	},
 	{
 		id: 'director',
 		label: 'Руководитель',
 		title: 'Смена руководителя',
-		description: 'Укажите аккаунт и ФИО нового руководителя компании.',
-		subject: 'Запрос на смену руководителя компании',
+		description: 'Укажите аккаунт и ФИО нового руководителя.',
+		subject: 'Запрос на смену руководителя',
 	},
 ];
 
@@ -61,7 +61,6 @@ const initialForm = {
 	inn: '',
 	kpp: '',
 	ogrn: '',
-	okpo: '',
 	legalAddress: '',
 	orgEmail: '',
 	responsibleFullName: '',
@@ -91,7 +90,6 @@ const labels = {
 	inn: 'ИНН',
 	kpp: 'КПП',
 	ogrn: 'ОГРН / ОГРНИП',
-	okpo: 'ОКПО',
 	legalAddress: 'Юридический адрес',
 	orgEmail: 'Email компании',
 	responsibleFullName: 'ФИО ответственного',
@@ -106,7 +104,6 @@ function getRequisiteLength(field, entityType) {
 	if (field === 'inn') return entityType === 'ip' ? 12 : 10;
 	if (field === 'kpp') return 9;
 	if (field === 'ogrn') return entityType === 'ip' ? 15 : 13;
-	if (field === 'okpo') return entityType === 'ip' ? 10 : 8;
 	return undefined;
 }
 
@@ -135,6 +132,13 @@ function getRoleLabel(role) {
 }
 
 function inferEntityType(organization) {
+	if (organization?.organization_type === 'individual_entrepreneur') {
+		return 'ip';
+	}
+	if (organization?.organization_type === 'legal_entity') {
+		return 'company';
+	}
+
 	const inn = normalizeDigits(organization?.inn);
 	const kpp = normalizeDigits(organization?.kpp);
 	return !kpp && inn.length === 12 ? 'ip' : 'company';
@@ -150,7 +154,6 @@ function getInitialForm(organization) {
 		inn: normalizeDigits(organization?.inn),
 		kpp: normalizeDigits(organization?.kpp),
 		ogrn: normalizeDigits(organization?.ogrn),
-		okpo: normalizeDigits(organization?.okpo),
 		legalAddress: normalizeValue(organization?.address || organization?.post_address),
 		orgEmail: normalizeValue(organization?.email),
 		responsibleFullName: normalizeValue(organization?.responsible_full_name),
@@ -171,6 +174,22 @@ function getFieldValue(field, form) {
 	return normalizeValue(form[field]);
 }
 
+function getFieldLabel(field, form) {
+	if (field === 'inn') {
+		return form.entityType === 'ip' ? 'ИНН ИП' : 'ИНН';
+	}
+	if (field === 'ogrn') {
+		return form.entityType === 'ip' ? 'ОГРНИП' : 'ОГРН';
+	}
+	if (field === 'legalAddress') {
+		return form.entityType === 'ip' ? 'Место регистрации ИП' : 'Юридический адрес';
+	}
+	if (field === 'orgEmail') {
+		return form.entityType === 'ip' ? 'Email ИП' : 'Email компании';
+	}
+	return labels[field];
+}
+
 function getFieldsForTab(tabId, entityType) {
 	if (tabId === 'general') {
 		return [
@@ -180,7 +199,6 @@ function getFieldsForTab(tabId, entityType) {
 			'inn',
 			...(entityType === 'ip' ? [] : ['kpp']),
 			'ogrn',
-			'okpo',
 		];
 	}
 	if (tabId === 'additional') {
@@ -200,7 +218,7 @@ function buildTabChanges(tabId, currentForm, form) {
 	return getFieldsForTab(tabId, form.entityType)
 		.map((field) => ({
 			field,
-			label: labels[field],
+			label: getFieldLabel(field, form),
 			currentValue:
 				tabId === 'director' ? emptyValue : getFieldValue(field, currentForm),
 			nextValue: getFieldValue(field, form),
@@ -238,15 +256,6 @@ function validateTab(tabId, form, changes) {
 					: 'ОГРН должен содержать 13 цифр.';
 		}
 	}
-	if (tabId === 'general' && changedFields.has('okpo')) {
-		const length = form.entityType === 'ip' ? 10 : 8;
-		if (normalizeDigits(form.okpo).length !== length) {
-			nextErrors.okpo =
-				form.entityType === 'ip'
-					? 'ОКПО ИП должен содержать 10 цифр.'
-					: 'ОКПО организации должен содержать 8 цифр.';
-		}
-	}
 	if (tabId === 'director' && !form.newDirectorEmail.trim()) {
 		nextErrors.newDirectorEmail = 'Укажите email аккаунта нового руководителя.';
 	}
@@ -266,7 +275,7 @@ function buildDescription({ tab, user, organization, changes }) {
 		`ФИО: ${getUserFullName(user) || emptyValue}`,
 		`Роль: ${getRoleLabel(user?.organization_role)}`,
 		'',
-		'Текущая компания:',
+		'Текущие реквизиты:',
 		`Название: ${organization?.short_name || organization?.full_name || emptyValue}`,
 		`Полное наименование: ${organization?.full_name || emptyValue}`,
 		`ИНН: ${organization?.inn || emptyValue}`,
@@ -328,6 +337,21 @@ export default function CompanyEditRequestModal({ isOpen, onClose, organization,
 	const requestError = requestErrors[activeTab.id];
 	const isSending = activeSubmitState === 'sending';
 	const isIp = form.entityType === 'ip';
+	const entityTitle = isIp ? 'ИП' : 'компании';
+	const addressLabel = isIp ? 'Место регистрации ИП' : 'Юридический адрес';
+	const orgEmailLabel = isIp ? 'Email ИП' : 'Email компании';
+	const fullNamePlaceholder = isIp
+		? 'Индивидуальный предприниматель Иванов Иван Иванович'
+		: 'ООО Ромашка';
+	const shortNamePlaceholder = isIp ? 'ИП Иванов И.И.' : 'ООО Ромашка';
+	const innPlaceholder = isIp ? '123456789012' : '7700000000';
+	const kppPlaceholder = isIp ? 'Для ИП не требуется' : '770001001';
+	const ogrnPlaceholder = isIp ? '123456789012345' : '1027700132195';
+	const addressPlaceholder = isIp
+		? 'г. Москва, ул. Примерная, д. 1, кв. 10'
+		: 'г. Москва, ул. Примерная, д. 1';
+	const orgEmailPlaceholder = isIp ? 'ip@example.ru' : 'org@example.ru';
+	const responsiblePositionPlaceholder = isIp ? 'Индивидуальный предприниматель' : 'Руководитель';
 
 	useEffect(() => {
 		if (!isOpen) {
@@ -345,7 +369,7 @@ export default function CompanyEditRequestModal({ isOpen, onClose, organization,
 
 	const handleFieldChange = (field) => (event) => {
 		const maxLength = getRequisiteLength(field, form.entityType);
-		const value = ['inn', 'kpp', 'ogrn', 'okpo'].includes(field)
+		const value = ['inn', 'kpp', 'ogrn'].includes(field)
 			? normalizeDigits(event.target.value).slice(0, maxLength)
 			: event.target.value;
 		setForm((prev) => ({ ...prev, [field]: value }));
@@ -407,7 +431,7 @@ export default function CompanyEditRequestModal({ isOpen, onClose, organization,
 			<ModalContent borderRadius="16px" maxH="90vh">
 				<ModalHeader pb="8px">
 					<Text fontSize="20px" fontWeight="700">
-						Изменить данные компании
+						Изменить данные {entityTitle}
 					</Text>
 					<Text mt="6px" fontSize="sm" fontWeight="400" color={mutedColor}>
 						Выберите раздел и отправьте отдельную заявку.
@@ -447,7 +471,7 @@ export default function CompanyEditRequestModal({ isOpen, onClose, organization,
 											<Alert status="success" borderRadius="12px">
 												<AlertIcon />
 												<Text>
-													Заявка по реквизитам отправлена. Поддержка проверит изменения и обновит данные компании.
+													Заявка по реквизитам отправлена. Поддержка проверит изменения и обновит данные.
 												</Text>
 											</Alert>
 										) : null}
@@ -480,15 +504,16 @@ export default function CompanyEditRequestModal({ isOpen, onClose, organization,
 											</Flex>
 											<Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="14px">
 												<Field label="Полное наименование" error={fieldErrors.fullName}>
-													<Input value={form.fullName} onChange={handleFieldChange('fullName')} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
+													<Input value={form.fullName} onChange={handleFieldChange('fullName')} placeholder={fullNamePlaceholder} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
 												</Field>
 												<Field label="Сокращенное наименование" error={fieldErrors.shortName}>
-													<Input value={form.shortName} onChange={handleFieldChange('shortName')} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
+													<Input value={form.shortName} onChange={handleFieldChange('shortName')} placeholder={shortNamePlaceholder} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
 												</Field>
 												<Field label={isIp ? 'ИНН ИП' : 'ИНН'} error={fieldErrors.inn}>
 													<Input
 														value={form.inn}
 														onChange={handleFieldChange('inn')}
+														placeholder={innPlaceholder}
 														bg={inputBg}
 														borderColor={borderColor}
 														borderRadius="12px"
@@ -500,6 +525,7 @@ export default function CompanyEditRequestModal({ isOpen, onClose, organization,
 														<Input
 															value={form.kpp}
 															onChange={handleFieldChange('kpp')}
+															placeholder={kppPlaceholder}
 															bg={inputBg}
 															borderColor={borderColor}
 															borderRadius="12px"
@@ -513,20 +539,11 @@ export default function CompanyEditRequestModal({ isOpen, onClose, organization,
 													<Input
 														value={form.ogrn}
 														onChange={handleFieldChange('ogrn')}
+														placeholder={ogrnPlaceholder}
 														bg={inputBg}
 														borderColor={borderColor}
 														borderRadius="12px"
 														maxLength={getRequisiteLength('ogrn', form.entityType)}
-													/>
-												</Field>
-												<Field label="ОКПО" error={fieldErrors.okpo}>
-													<Input
-														value={form.okpo}
-														onChange={handleFieldChange('okpo')}
-														bg={inputBg}
-														borderColor={borderColor}
-														borderRadius="12px"
-														maxLength={getRequisiteLength('okpo', form.entityType)}
 													/>
 												</Field>
 											</Grid>
@@ -551,17 +568,17 @@ export default function CompanyEditRequestModal({ isOpen, onClose, organization,
 											</Alert>
 										) : null}
 										<Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap="14px">
-											<Field label="Юридический адрес" error={fieldErrors.legalAddress}>
-												<Input value={form.legalAddress} onChange={handleFieldChange('legalAddress')} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
+											<Field label={addressLabel} error={fieldErrors.legalAddress}>
+												<Input value={form.legalAddress} onChange={handleFieldChange('legalAddress')} placeholder={addressPlaceholder} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
 											</Field>
-											<Field label="Email компании" error={fieldErrors.orgEmail}>
-												<Input value={form.orgEmail} onChange={handleFieldChange('orgEmail')} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
+											<Field label={orgEmailLabel} error={fieldErrors.orgEmail}>
+												<Input value={form.orgEmail} onChange={handleFieldChange('orgEmail')} placeholder={orgEmailPlaceholder} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
 											</Field>
 											<Field label="ФИО ответственного" error={fieldErrors.responsibleFullName}>
 												<Input value={form.responsibleFullName} onChange={handleFieldChange('responsibleFullName')} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
 											</Field>
 											<Field label="Должность ответственного" error={fieldErrors.responsiblePosition}>
-												<Input value={form.responsiblePosition} onChange={handleFieldChange('responsiblePosition')} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
+												<Input value={form.responsiblePosition} onChange={handleFieldChange('responsiblePosition')} placeholder={responsiblePositionPlaceholder} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
 											</Field>
 											<Field label="Телефон ответственного" error={fieldErrors.responsiblePhone}>
 												<Input value={form.responsiblePhone} onChange={handleFieldChange('responsiblePhone')} bg={inputBg} borderColor={borderColor} borderRadius="12px" />
