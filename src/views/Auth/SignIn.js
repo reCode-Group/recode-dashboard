@@ -25,10 +25,17 @@ import { login } from 'services/auth';
 import { markAuthenticated } from 'services/session';
 import PasswordResetModal from './components/PasswordResetModal';
 
+function isUserNotVerifiedError(error) {
+	return (error.message || '').includes('user not verified');
+}
+
 function getFriendlyError(error) {
 	const message = error.message || '';
 	if (message.includes('wrong credentials')) {
 		return 'Неверная почта или пароль';
+	}
+	if (isUserNotVerifiedError(error)) {
+		return 'Подтвердите почту, чтобы войти в аккаунт';
 	}
 	if (message.includes('Invalid input')) {
 		return 'Введите корректную почту и пароль';
@@ -75,6 +82,17 @@ function SignIn() {
 			const destination = requestedPath === '/constructor' ? '/constructor' : '/lk/dashboard';
 			navigate(destination, { replace: true });
 		} catch (requestError) {
+			if (isUserNotVerifiedError(requestError)) {
+				navigate('/auth/sign-up', {
+					replace: true,
+					state: {
+						step: 'verify',
+						email: normalizedEmail,
+						password,
+					},
+				});
+				return;
+			}
 			setError(getFriendlyError(requestError));
 		} finally {
 			setIsSubmitting(false);

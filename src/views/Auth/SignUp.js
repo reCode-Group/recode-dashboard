@@ -20,8 +20,8 @@ import BgSignUp from 'assets/img/BgSignUp.png';
 // import { SberIdIcon, YandexIdIcon } from 'components/Icons/Icons';
 import AuthNavbar from 'components/Navbars/AuthNavbar.js';
 import { PUBLIC_SITE_URLS } from 'constants/publicSite';
-import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { login, register, sendVerificationCode, verifyCode } from 'services/auth';
 import { markAuthenticated, setPendingProfileEmail, setPendingProfileName } from 'services/session';
 import PasswordStrength, { getPasswordStrength } from './components/PasswordStrength';
@@ -66,6 +66,10 @@ function getFriendlyError(error) {
 
 function SignUp() {
 	const navigate = useNavigate();
+	const location = useLocation();
+	const initialVerification = location.state?.step === 'verify' && location.state?.email
+		? location.state
+		: null;
 	const titleColor = useColorModeValue('recode.300', 'recode.200');
 	const textColor = useColorModeValue('gray.700', 'white');
 	const secondTextColor = useColorModeValue('gray.400', 'white');
@@ -73,21 +77,45 @@ function SignUp() {
 	// const bgIcons = useColorModeValue('gray.50', 'rgba(255, 255, 255, 0.1)');
 	// const iconColor = useColorModeValue('black', 'lightgray');
 	const [name, setName] = useState('');
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
+	const [email, setEmail] = useState(initialVerification?.email || '');
+	const [password, setPassword] = useState(initialVerification?.password || '');
 	const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [code, setCode] = useState('');
 	const [isLegalAccepted, setIsLegalAccepted] = useState(false);
-	const [step, setStep] = useState('account');
+	const [step, setStep] = useState(initialVerification ? 'verify' : 'account');
 	const [error, setError] = useState('');
 	const [notice, setNotice] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isResendingCode, setIsResendingCode] = useState(false);
 	const { remainingSeconds, isCoolingDown, startCooldown, resetCooldown } = useResendCooldown(30);
+	const initialCodeRequestSentRef = useRef(false);
 
 	const normalizedEmail = email.trim().toLowerCase();
 	const trimmedName = name.trim();
+
+	useEffect(() => {
+		if (!initialVerification || initialCodeRequestSentRef.current) {
+			return;
+		}
+
+		initialCodeRequestSentRef.current = true;
+		setIsResendingCode(true);
+		setError('');
+
+		sendVerificationCode(normalizedEmail)
+			.then(() => {
+				setCode('');
+				setNotice('Код подтверждения отправлен на вашу почту ' + normalizedEmail);
+				startCooldown();
+			})
+			.catch((requestError) => {
+				setError(getFriendlyError(requestError));
+			})
+			.finally(() => {
+				setIsResendingCode(false);
+			});
+	}, [initialVerification, normalizedEmail, startCooldown]);
 
 	const handleNameChange = (event) => {
 		const nextName = event.target.value;
