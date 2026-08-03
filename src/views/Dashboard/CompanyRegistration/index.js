@@ -42,7 +42,6 @@ const initialForm = {
 	inn: '',
 	kpp: '',
 	ogrn: '',
-	okpo: '',
 	legalAddress: '',
 	orgEmail: '',
 	contactFio: '',
@@ -72,15 +71,15 @@ function getErrorMessage(error) {
 		return ORGANIZATION_ALREADY_EXISTS_ERROR;
 	}
 	if (message.includes('user already in organization')) {
-		return 'Компания уже привязана к аккаунту';
+		return 'Реквизиты уже привязаны к аккаунту';
 	}
 	if (message.includes('Invalid input')) {
-		return 'Проверьте реквизиты организации';
+		return 'Проверьте реквизиты';
 	}
 	if (message.includes('Forbidden')) {
-		return 'Недостаточно прав для привязки компании';
+		return 'Недостаточно прав для привязки';
 	}
-	return message || 'Не удалось привязать компанию';
+	return message || 'Не удалось выполнить привязку';
 }
 
 function CompanyRegistration() {
@@ -116,10 +115,31 @@ function CompanyRegistration() {
 
 	const dadataEnabled = hasDadataApiKey();
 	const isIp = entityType === 'ip';
+	const organizationType = isIp ? 'individual_entrepreneur' : 'legal_entity';
+	const entityTitle = isIp ? 'ИП' : 'организации';
+	const entityAccusativeTitle = isIp ? 'ИП' : 'компанию';
+	const searchPlaceholder = isIp
+		? 'Например, ИП Иванов или 500100732259'
+		: 'Например, ООО Ромашка или 2631012682';
+	const fullNamePlaceholder = isIp
+		? 'Индивидуальный предприниматель Иванов Иван Иванович'
+		: 'ООО Ромашка';
+	const shortNamePlaceholder = isIp ? 'ИП Иванов И.И.' : 'ООО Ромашка';
 	const innLabel = isIp ? 'ИНН ИП' : 'ИНН';
 	const innPlaceholder = isIp ? '123456789012' : '7700000000';
 	const ogrnLabel = isIp ? 'ОГРНИП' : 'ОГРН';
 	const ogrnPlaceholder = isIp ? '123456789012345' : '1027700132195';
+	const kppPlaceholder = isIp ? 'Для ИП не требуется' : '770001001';
+	const addressLabel = isIp ? 'Место регистрации ИП' : 'Юридический адрес';
+	const addressPlaceholder = isIp
+		? 'г. Москва, ул. Примерная, д. 1, кв. 10'
+		: 'г. Москва, ул. Примерная, д. 1';
+	const addressHelpText = isIp
+		? 'Место регистрации ИП нужно для заполнения карточки и проверки реквизитов при подключении к платежному аккаунту'
+		: 'Юридический адрес нужен для заполнения карточки организации и проверки реквизитов при подключении к платежному аккаунту';
+	const orgEmailPlaceholder = isIp ? 'ip@example.ru' : 'org@example.ru';
+	const orgEmailLabel = isIp ? 'Email ИП' : 'Email организации';
+	const contactPositionPlaceholder = isIp ? 'Индивидуальный предприниматель' : 'Руководитель';
 	const kppHelpText = 'Для ИП КПП не требуется.';
 
 	const handleEntityTypeChange = (nextType) => {
@@ -240,15 +260,8 @@ function CompanyRegistration() {
 		} else if (normalizeDigits(form.ogrn).length !== (isIp ? 15 : 13)) {
 			nextErrors.ogrn = isIp ? 'ОГРНИП должен содержать 15 цифр' : 'ОГРН должен содержать 13 цифр';
 		}
-		if (!form.okpo.trim()) {
-			nextErrors.okpo = 'Укажите ОКПО';
-		} else if (normalizeDigits(form.okpo).length !== (isIp ? 10 : 8)) {
-			nextErrors.okpo = isIp
-				? 'ОКПО ИП должен содержать 10 цифр'
-				: 'ОКПО организации должен содержать 8 цифр';
-		}
 		if (!form.legalAddress.trim()) {
-			nextErrors.legalAddress = 'Укажите юридический адрес';
+			nextErrors.legalAddress = isIp ? 'Укажите место регистрации ИП' : 'Укажите юридический адрес';
 		}
 		if (!finalResponsibleName?.trim()) {
 			nextErrors.contactFio = 'Укажите ФИО ответственного лица';
@@ -286,8 +299,7 @@ function CompanyRegistration() {
 		[innLabel, form.inn],
 		...(isIp ? [] : [['КПП', form.kpp]]),
 		[ogrnLabel, form.ogrn],
-		['ОКПО', form.okpo],
-		['Юридический адрес', form.legalAddress],
+		[addressLabel, form.legalAddress],
 		['ФИО ответственного лица', finalResponsibleName],
 		['Должность', finalResponsiblePosition],
 		['Контактный телефон', finalResponsiblePhone],
@@ -303,9 +315,8 @@ function CompanyRegistration() {
 		[innLabel, form.inn],
 		...(isIp ? [] : [['КПП', form.kpp]]),
 		[ogrnLabel, form.ogrn],
-		['ОКПО', form.okpo],
-		['Юридический адрес', form.legalAddress],
-		['Email организации', finalOrganizationEmail],
+		[addressLabel, form.legalAddress],
+		[orgEmailLabel, finalOrganizationEmail],
 		['ФИО ответственного лица', finalResponsibleName],
 		['Должность', finalResponsiblePosition],
 		['Контактный телефон', finalResponsiblePhone],
@@ -314,9 +325,7 @@ function CompanyRegistration() {
 
 	const handleFieldChange = (field) => (event) => {
 		const rawValue = event.target.value;
-		const value = ['inn', 'kpp', 'ogrn', 'okpo'].includes(field)
-			? normalizeDigits(rawValue)
-			: rawValue;
+		const value = ['inn', 'kpp', 'ogrn'].includes(field) ? normalizeDigits(rawValue) : rawValue;
 		setForm((prev) => ({ ...prev, [field]: value }));
 	};
 
@@ -330,7 +339,6 @@ function CompanyRegistration() {
 			inn: mapped.inn,
 			kpp: mapped.entityType === 'ip' ? '' : mapped.kpp,
 			ogrn: mapped.ogrn,
-			okpo: mapped.okpo || prev.okpo,
 			legalAddress: mapped.legalAddress,
 			contactFio: prev.contactFio || mapped.managementName,
 			contactPosition: prev.contactPosition || mapped.managementPost,
@@ -389,11 +397,11 @@ function CompanyRegistration() {
 		setIsSubmitting(true);
 		try {
 			await createOrganization({
+				organization_type: organizationType,
 				full_name: form.fullName.trim(),
 				inn: form.inn.trim() || null,
 				ogrn: form.ogrn.trim() || null,
 				kpp: isIp ? null : form.kpp.trim(),
-				okpo: form.okpo.trim() || null,
 				post_address: form.legalAddress.trim() || null,
 				address: form.legalAddress.trim() || null,
 				short_name: form.shortName.trim() || null,
@@ -410,7 +418,7 @@ function CompanyRegistration() {
 			setIsPreviewModalOpen(false);
 			setSubmitError(message);
 			scrollToPageTop();
-			if (message === 'Компания уже привязана к аккаунту') {
+			if (message === 'Реквизиты уже привязаны к аккаунту') {
 				navigate('/lk/company', { replace: true });
 			}
 		} finally {
@@ -430,7 +438,7 @@ function CompanyRegistration() {
 		<Flex direction="column" py={{ base: '120px', md: '75px' }} minH="100vh">
 			<Box maxW="1000px" w="100%">
 				<Text fontSize="32px" lineHeight="1.3" fontWeight="bold" color={titleColor}>
-					Подключение организации
+					Подключение {entityTitle}
 				</Text>
 				<Text
 					mt="4px"
@@ -440,7 +448,7 @@ function CompanyRegistration() {
 					fontWeight="bold"
 					color={subtitleColor}
 				>
-					Заполните реквизиты для привязки организации к аккаунту
+					Заполните реквизиты для привязки {entityTitle} к аккаунту
 				</Text>
 
 				<Flex direction="column" gap="16px">
@@ -449,8 +457,13 @@ function CompanyRegistration() {
 							<AlertIcon />
 							{submitError === ORGANIZATION_ALREADY_EXISTS_ERROR ? (
 								<Text fontSize="sm">
-									Данная компания уже привязана к другому аккаунту. Решить вопрос можно через{' '}
-									<Link as={RouterLink} to="/lk/support" textDecoration="underline" fontWeight="bold">
+									Эти реквизиты уже привязаны к другому аккаунту. Решить вопрос можно через{' '}
+									<Link
+										as={RouterLink}
+										to="/lk/support"
+										textDecoration="underline"
+										fontWeight="bold"
+									>
 										техподдержку
 									</Link>
 									.
@@ -482,7 +495,7 @@ function CompanyRegistration() {
 								<InputGroup size="md">
 									<Input
 										pr="110px"
-										placeholder="Например, ООО Ромашка или 2631012682"
+										placeholder={searchPlaceholder}
 										value={searchQuery}
 										onChange={(event) => {
 											const nextValue = event.target.value;
@@ -614,7 +627,7 @@ function CompanyRegistration() {
 							color={sectionTitleColor}
 							mb="16px"
 						>
-							Реквизиты организации
+							Реквизиты {entityTitle}
 						</Text>
 						<Flex mb="16px" gap="8px" wrap="wrap">
 							<Button
@@ -641,7 +654,7 @@ function CompanyRegistration() {
 										Полное наименование
 									</FormLabel>
 									<Input
-										placeholder="ООО Ромашка"
+										placeholder={fullNamePlaceholder}
 										value={form.fullName}
 										onChange={handleFieldChange('fullName')}
 									/>
@@ -654,7 +667,7 @@ function CompanyRegistration() {
 									Сокращенное наименование
 								</FormLabel>
 								<Input
-									placeholder="ООО Ромашка"
+									placeholder={shortNamePlaceholder}
 									value={form.shortName}
 									onChange={handleFieldChange('shortName')}
 								/>
@@ -679,7 +692,7 @@ function CompanyRegistration() {
 									КПП
 								</FormLabel>
 								<Input
-									placeholder="770001001"
+									placeholder={kppPlaceholder}
 									value={form.kpp}
 									onChange={handleFieldChange('kpp')}
 									maxLength={9}
@@ -704,19 +717,6 @@ function CompanyRegistration() {
 								/>
 								<FormErrorMessage>{errors.ogrn}</FormErrorMessage>
 							</FormControl>
-
-							<FormControl isInvalid={submitAttempted && Boolean(errors.okpo)}>
-								<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
-									ОКПО
-								</FormLabel>
-								<Input
-									placeholder="1234567890"
-									value={form.okpo}
-									onChange={handleFieldChange('okpo')}
-									maxLength={isIp ? 10 : 8}
-								/>
-								<FormErrorMessage>{errors.okpo}</FormErrorMessage>
-							</FormControl>
 						</Grid>
 					</Box>
 
@@ -732,25 +732,24 @@ function CompanyRegistration() {
 						</Text>
 						<FormControl isInvalid={submitAttempted && Boolean(errors.legalAddress)}>
 							<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
-								Юридический адрес
+								{addressLabel}
 							</FormLabel>
 							<Input
-								placeholder="г. Москва, ул. Примерная, д. 1"
+								placeholder={addressPlaceholder}
 								value={form.legalAddress}
 								onChange={handleFieldChange('legalAddress')}
 							/>
 							<Text mt="8px" fontSize="12px" color={mutedTextColor}>
-								Юридический адрес нужен для заполнения карточки организации и проверки реквизитов
-								при подключении к платежному аккаунту
+								{addressHelpText}
 							</Text>
 							<FormErrorMessage>{errors.legalAddress}</FormErrorMessage>
 						</FormControl>
 						<FormControl mt="16px">
 							<FormLabel ms="4px" fontSize="sm" fontWeight="normal" color={labelColor}>
-								Email организации
+								{orgEmailLabel}
 							</FormLabel>
 							<Input
-								placeholder="org@example.ru"
+								placeholder={orgEmailPlaceholder}
 								value={form.orgEmail}
 								onChange={handleFieldChange('orgEmail')}
 							/>
@@ -816,7 +815,7 @@ function CompanyRegistration() {
 									Должность
 								</FormLabel>
 								<Input
-									placeholder="Руководитель"
+									placeholder={contactPositionPlaceholder}
 									value={form.contactPosition}
 									onChange={handleFieldChange('contactPosition')}
 								/>
@@ -855,7 +854,8 @@ function CompanyRegistration() {
 						</Grid>
 						<Text mt="12px" fontSize="12px" color={mutedTextColor}>
 							ФИО, должность, телефон и корпоративная почта нужны, чтобы мы знали, кто отвечает за
-							подключение организации, и могли связаться по вопросам доступа, документов и настроек.
+							подключение {entityTitle}, и могли связаться по вопросам доступа, документов и
+							настроек.
 							<span className="underline">Эти данные хранятся в зашифрованном виде.</span>
 						</Text>
 					</Box>
@@ -880,7 +880,7 @@ function CompanyRegistration() {
 							onClick={handleOpenPreview}
 							_hover={{ bg: 'recode.400' }}
 						>
-							Привязать компанию
+							Привязать {entityAccusativeTitle}
 						</Button>
 					</Flex>
 				</Flex>
@@ -897,7 +897,7 @@ function CompanyRegistration() {
 			>
 				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
 				<ModalContent bg={cardBg} border="1px solid" borderColor={cardBorder} borderRadius="20px">
-					<ModalHeader color={sectionTitleColor}>Проверьте данные компании</ModalHeader>
+					<ModalHeader color={sectionTitleColor}>Проверьте данные {entityTitle}</ModalHeader>
 					<ModalBody>
 						<Flex direction="column" gap="10px">
 							{previewDataRows.map(([label, value]) => (
